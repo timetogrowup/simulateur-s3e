@@ -70,4 +70,7 @@ Fichiers : index.html, tests/smoke.cjs,
 docs/evolutions/EVOL-RECHARGE-002_recharge_publique_payante.txt,
 docs/guide_developpement_supervise.txt.
 Validation humaine : règle confirmée par le responsable du projet.
-Validation CI : à reporter à la clôture du lot.
+Validation CI : tests automatisés réussis le 17/10/2026. Recette humaine mobile encore à réaliser.
+
+8. COMPATIBILITÉ DES SAUVEGARDES
+La reprise d'une ancienne simulation avec bilan affiné déclenche un nouveau calcul selon les règles actuelles de recharge. Si les nouveaux paramètres publicPaidShare/publicPrice étaient absents, ils sont alimentés par défaut (domicile impossible = 100 % public payant ; prix public = ancien tarif public estimé). Les résultats peuvent donc différer d'une simulation ancienne ; prévenir l'utilisateur dans les limites connues.
