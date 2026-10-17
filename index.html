@@ -96,6 +96,54 @@ function calculate(e){
   const annual=breakdowns.map(items=>Object.values(items).reduce((a,b)=>a+b,0));
   return annual.map((cost,i)=>({id:i,label:labels[i],cost,gain:annual[0]-cost,breakdown:breakdowns[i]}));
 }
+// Calendrier monétaire : le prix d'achat et l'installation sont décaissés au départ,
+// la revente est encaissée une seule fois à l'échéance. Aucune dépréciation n'est
+// enregistrée dans les flux, car elle est purement économique et non monétaire.
+function cashflowSchedule(e,results){
+  if(!Number.isFinite(e.years)||e.years<=0||e.years>40)throw Error('Horizon de simulation invalide.');
+  const horizon=e.years;
+  const purchase=e.purchase;
+  const resale=e.resale==null?purchase*.38:e.resale;
+  const rows=[];
+  const cumulative=[0,0,0];
+  const annualOperating=results.map(s=>Object.entries(s.breakdown)
+     .filter(([key])=>key!=='depreciation'&&key!=='installation')
+     .reduce((total,[,value])=>total+value,0));
+  const upfront=[
+    0,
+    (results[1].breakdown.installation||0)*horizon,
+    purchase+(results[2].breakdown.installation||0)*horizon
+  ];
+  for(let start=0;start<horizon-1e-9;start+=1){
+    const duration=Math.min(1,horizon-start);
+    const end=start+duration;
+    const first=start===0;
+    const last=end>=horizon-1e-9;
+    const items=annualOperating.map((operating,i)=>{
+      const oneOff=first?upfront[i]:0;
+      const sale=last&&i===2?resale:0;
+      const outgoing=operating*duration+oneOff-sale;
+      cumulative[i]+=outgoing;
+      return {operating:operating*duration,oneOff,sale,outgoing,cumulative:cumulative[i]};
+    });
+    rows.push({start,end,duration,items});
+  }
+  const expected=results.map(x=>x.cost*horizon);
+  const discrepancy=cumulative.map((value,i)=>value-expected[i]);
+  if(discrepancy.some(x=>Math.abs(x)>0.01))throw Error('Déséquilibre trésorerie / coût économique : vérifier amortissement et revente.');
+  return {horizon,purchase,resale,rows,final:[...cumulative],expected,discrepancy};
+}
+function cashflowTable(schedule){
+ return '<h2>Trésorerie réelle et coût économique</h2>'+
+ '<p class="muted">Le coût économique annualise l’achat et la perte de valeur. La trésorerie comptabilise le prix entier au début, puis la revente seulement à la fin. Les remboursements et charges récurrents sont intégrés dans chaque période. Montants fictifs de recette.</p>'+
+ '<div style="overflow-x:auto"><table><tr><th>Période</th><th>Situation actuelle</th><th>Avec voiture de fonction</th><th>Sans voiture de fonction</th></tr>'+
+ schedule.rows.map((row,i)=>'<tr><td>Année '+(i+1)+(row.duration<1?' ('+row.duration.toLocaleString('fr-FR')+' an)':'')+'</td>'+
+ row.items.map(x=>'<td>'+fmt(x.outgoing)+'</td>').join('')+'</tr>').join('')+
+ '<tr><th>Cumul fin de période</th>'+schedule.final.map(x=>'<th>'+fmt(x)+'</th>').join('')+'</tr></table></div>'+
+ '<h3>Évolution du décaissement cumulé</h3>'+
+ schedule.rows.map((row,i)=>'<p class="muted">Fin année '+(i+1)+'</p>'+chartRows(row.items.map((item,j)=>({label:['Situation actuelle','Avec voiture de fonction','Sans voiture de fonction'][j],cost:item.cumulative})),'cost')).join('')+
+ '<details><summary>Comprendre les flux exceptionnels</summary><p>Achat du véhicule personnel : '+fmt(schedule.purchase)+' payé au départ. Valeur de revente : '+fmt(schedule.resale)+' encaissée à la fin. Installation éventuelle comptabilisée au départ pour les scénarios concernés. Les coûts annuels de dépréciation ne sont jamais un second paiement.</p></details>';
+}
 function sensitivities(e){
   const energy=[.8,1,1.2].map(factor=>{
     const estimate={...e,homePrice:e.homePrice*factor,electricPublic:e.electricPublic*factor,dieselPrice:e.dieselPrice*factor,petrolPrice:e.petrolPrice*factor};
@@ -113,7 +161,7 @@ function draw(){if(view==='home'){root.innerHTML='<article><h1>Votre véhicule, 
 if(view==='wizard'){const list=active();step=Math.min(step,list.length-1);const q=list[step];const ux=uxCopy[q.id]||['Questionnaire',q.title,''];const intro=q.id==='budget'?'<section class="scenario-intro"><strong>Et si vous rendiez votre voiture de fonction SUEZ ?</strong><p>Dans ce troisième scénario, vous n’utilisez plus de véhicule fourni par SUEZ : vous achetez et entretenez votre propre voiture. Une compensation SUEZ peut éventuellement être versée selon la grille applicable. Les questions suivantes concernent uniquement cette hypothèse.</p></section>':'';root.innerHTML='<article><p class="muted">'+ux[0]+' · Question '+(step+1)+' / '+list.length+'</p><div class="progress"><div style="width:'+((step+1)/list.length*100)+'%"></div></div>'+intro+'<h2>'+ux[1]+'</h2><p class="muted" style="line-height:1.5">'+ux[2]+'</p>'+q.options.map((v,i)=>'<label class="opt"><input type="radio" name="choice" '+(answers[q.id]===v?'checked':'')+' onchange="pickIndex('+i+')">'+v+'</label>').join('')+'<div class="buttons"><button class="secondary" onclick="prev()">Précédent</button><button onclick="next()">Suivant</button></div></article>';return}
 if(view==='recap'){root.innerHTML='<article><h1>Récapitulatif</h1><p>Vérifie les réponses avant le calcul.</p>'+active().map((q,i)=>'<p><span class="muted">'+q.title+'</span><br><b>'+ (answers[q.id]||'Non renseigné')+'</b> <button class="secondary" onclick="edit('+i+')">Modifier</button></p>').join('')+'<div class="buttons"><button onclick="first()">Calculer le premier bilan</button></div></article>';return}
 if(view==='refine'){const d={...base,...detail};const fields=[['trip','Km domicile-travail / an'],['professional','Km professionnels / an'],['personal','Km privés / an'],['years','Durée de détention (années)'],['purchase','Prix du véhicule personnel (€)'],['resale','Revente estimée (€)'],['insurance','Assurance annuelle (€)'],['maintenance','Entretien annuel (€)'],['homeShare','Part des recharges du véhicule SUEZ à domicile (0 à 1)'],['homePrice','Prix kWh domicile (€)'],['electricPublic','Prix kWh public du véhicule personnel (€)'],['dieselPrice','Prix litre diesel (€)'],['petrolPrice','Prix litre essence (€)'],['consumptionDiesel','Consommation diesel (L/100 km)'],['consumptionPetrol','Consommation essence (L/100 km)'],['consumptionHybrid','Consommation hybride (L/100 km)'],['consumptionPhevPetrol','Conso. hybride rechargeable (L/100 km)'],['consumptionPhevElectric','Conso. hybride rechargeable (kWh/100 km)'],['consumptionElectric','Consommation électrique (kWh/100 km)'],['install','Installation (€)'],['tax','TMI (0 à 1)'],['social','Cotisations salariales estimées (0 à 1)'],['socialDeductibleShare','Part estimée des cotisations déductibles (0 à 1)']];root.innerHTML='<article><h1>Affiner le bilan</h1><p>Chiffres indicatifs préremplis et modifiables. Calcul uniquement après validation.</p><form id="detail">'+fields.map(([key,label])=>'<label class="field"><span class="label">'+label+'</span><input type="number" step="any" name="'+key+'" value="'+(d[key]??Math.round(d.purchase*.38))+'"></label>').join('')+'<div class="buttons"><button type="submit">Recalculer le bilan affiné</button><button type="button" class="secondary" onclick="view=\'report\';draw()">Retour</button></div></form></article>';$('detail').onsubmit=ev=>{ev.preventDefault();detail={...Object.fromEntries(new FormData(ev.target).entries())};for(let k in detail)detail[k]=Number(detail[k]);if(!Object.values(detail).every(Number.isFinite)||detail.years<=0||detail.purchase<=0||detail.resale<0||detail.resale>detail.purchase||detail.homeShare<0||detail.homeShare>1||detail.insurance<0||detail.maintenance<0||detail.install<0||detail.homePrice<0||detail.electricPublic<0||detail.dieselPrice<0||detail.petrolPrice<0||detail.consumptionDiesel<0||detail.consumptionPetrol<0||detail.consumptionHybrid<0||detail.consumptionPhevPetrol<0||detail.consumptionPhevElectric<0||detail.consumptionElectric<0||detail.tax<0||detail.tax>1||detail.social<0||detail.social>1||detail.socialDeductibleShare<0||detail.socialDeductibleShare>1||detail.trip<0||detail.personal<0||detail.professional<0){alert('Vérifiez les montants et la part de recharge à domicile (0 à 100 %).');return}last=calculate({...base,...detail,kms:detail.trip+detail.personal});view='refined';draw()};return}
-const res=view==='refined'?last:calculate(base);const min=Math.min(...res.map(x=>x.cost));const sensitivity=sensitivities(view==='refined'?{...base,...detail,kms:detail.trip+detail.personal}:base);root.innerHTML='<article><h1>'+(view==='refined'?'Bilan affiné':'Premier bilan estimatif')+'</h1><p class="warn">Valeurs de TEST fictives. AEN : seuls les surcoûts estimés de cotisations et d’impôt sont comptés, jamais le montant brut déclaré. Fiscalité et compensation non validées.</p><div class="cards">'+res.map(s=>'<div class="card">'+s.label+'<b>'+fmt(s.cost/12)+'/mois</b><span class="'+(s.gain>=0?'positive':'negative')+'">'+(s.gain>0?'+':'')+fmt(s.gain/12)+'/mois vs actuel</span></div>').join('')+'</div><h2>Coût annuel comparé</h2><table><tr><th>Solution</th><th>Annuel</th><th>Écart annuel</th></tr>'+res.map(s=>'<tr><td>'+s.label+'</td><td>'+fmt(s.cost)+'</td><td>'+fmt(s.gain)+'</td></tr>').join('')+'</table><h2>Comparaison des coûts économiques nets annuels</h2><div role="img" aria-label="Graphique de comparaison des coûts économiques annuels">'+chartRows(res,'cost')+'</div><h2>Gains ou pertes de pouvoir d’achat par rapport à la situation actuelle</h2><p class="chartnote">Un gain positif signifie une dépense inférieure à la situation actuelle. Un montant négatif représente une perte de pouvoir d’achat.</p><div role="img" aria-label="Graphique des gains et pertes annuels">'+chartRows(res,'gain')+'</div><h2>Détail des postes annuels</h2><p class="muted">Les déplacements professionnels sont pris en charge par SUEZ et ne sont pas comptabilisés dans les dépenses personnelles. Les postes fiscaux et certaines consommations sont encore des estimations.</p><table><tr><th>Poste</th><th>Situation actuelle</th><th>Avec fonction</th><th>Sans fonction</th></tr>'+[
+const res=view==='refined'?last:calculate(base);const min=Math.min(...res.map(x=>x.cost));const reportAssumptions=view==='refined'?{...base,...detail,kms:detail.trip+detail.personal}:base;const sensitivity=sensitivities(reportAssumptions);const cashflow=cashflowSchedule(reportAssumptions,res);root.innerHTML='<article><h1>'+(view==='refined'?'Bilan affiné':'Premier bilan estimatif')+'</h1><p class="warn">Valeurs de TEST fictives. AEN : seuls les surcoûts estimés de cotisations et d’impôt sont comptés, jamais le montant brut déclaré. Fiscalité et compensation non validées.</p><div class="cards">'+res.map(s=>'<div class="card">'+s.label+'<b>'+fmt(s.cost/12)+'/mois</b><span class="'+(s.gain>=0?'positive':'negative')+'">'+(s.gain>0?'+':'')+fmt(s.gain/12)+'/mois vs actuel</span></div>').join('')+'</div><h2>Coût annuel comparé</h2><table><tr><th>Solution</th><th>Annuel</th><th>Écart annuel</th></tr>'+res.map(s=>'<tr><td>'+s.label+'</td><td>'+fmt(s.cost)+'</td><td>'+fmt(s.gain)+'</td></tr>').join('')+'</table><h2>Comparaison des coûts économiques nets annuels</h2><div role="img" aria-label="Graphique de comparaison des coûts économiques annuels">'+chartRows(res,'cost')+'</div><h2>Gains ou pertes de pouvoir d’achat par rapport à la situation actuelle</h2><p class="chartnote">Un gain positif signifie une dépense inférieure à la situation actuelle. Un montant négatif représente une perte de pouvoir d’achat.</p><div role="img" aria-label="Graphique des gains et pertes annuels">'+chartRows(res,'gain')+'</div><h2>Détail des postes annuels</h2><p class="muted">Les déplacements professionnels sont pris en charge par SUEZ et ne sont pas comptabilisés dans les dépenses personnelles. Les postes fiscaux et certaines consommations sont encore des estimations.</p><table><tr><th>Poste</th><th>Situation actuelle</th><th>Avec fonction</th><th>Sans fonction</th></tr>'+[
 ['aenSocial','AEN : cotisations salariales estimées'],
 ['aenTax','AEN : impôt supplémentaire estimé'],
 ['commute','Énergie domicile–travail'],
@@ -124,7 +172,7 @@ const res=view==='refined'?last:calculate(base);const min=Math.min(...res.map(x=
 ['other','Autres frais'],
 ['installation','Installation annualisée'],
 ['compensation','Compensation SUEZ (déduite)']
-].map(([key,label])=>'<tr><td>'+label+'</td>'+res.map(x=>'<td>'+fmt(x.breakdown[key]||0)+'</td>').join('')+'</tr>').join('')+'</table><p>Coût le plus faible selon ces hypothèses : <b>'+res.find(x=>x.cost===min).label+'</b>.</p><h2>Projection économique</h2><p>Durée : '+Math.round((view==='refined'?detail.years:base.years)*10)/10+' ans</p><div class="cards">'+res.map(s=>'<div class="card">'+s.label+'<b>'+fmt(s.cost*(view==='refined'?detail.years:base.years))+'</b></div>').join('')+'</div><h2>Analyses de sensibilité</h2><p class="muted">Hypothèses de test : énergie et valeur de revente à −20 %, référence, +20 %. Chaque ligne correspond au coût annuel net des trois situations.</p>'+[
+].map(([key,label])=>'<tr><td>'+label+'</td>'+res.map(x=>'<td>'+fmt(x.breakdown[key]||0)+'</td>').join('')+'</tr>').join('')+'</table><p>Coût le plus faible selon ces hypothèses : <b>'+res.find(x=>x.cost===min).label+'</b>.</p><h2>Projection économique</h2><p>Durée : '+Math.round((view==='refined'?detail.years:base.years)*10)/10+' ans</p><div class="cards">'+res.map(s=>'<div class="card">'+s.label+'<b>'+fmt(s.cost*(view==='refined'?detail.years:base.years))+'</b></div>').join('')+'</div>'+cashflowTable(cashflow)+'<h2>Analyses de sensibilité</h2><p class="muted">Hypothèses de test : énergie et valeur de revente à −20 %, référence, +20 %. Chaque ligne correspond au coût annuel net des trois situations.</p>'+[
 ['Prix de l’énergie',sensitivity.energy],
 ['Valeur de revente du véhicule personnel',sensitivity.resale]
 ].map(([label,items])=>'<h3>'+label+'</h3><table><tr><th>Variation</th><th>Situation actuelle</th><th>Avec fonction</th><th>Sans fonction</th></tr>'+items.map(item=>'<tr><td>'+(item.factor===1?'Référence':(item.factor<1?'−20 %':'+20 %'))+'</td>'+item.results.map(x=>'<td>'+fmt(x.cost)+'</td>').join('')+'</tr>').join('')+'</table>').join('')+'<details><summary>Hypothèses du calcul</summary><pre style="white-space:pre-wrap;overflow:auto">'+JSON.stringify(view==='refined'?{...base,...detail}:base,null,2)+'</pre></details><div class="buttons"><button onclick="view=\'refine\';draw()">Affiner mon bilan</button><button class="secondary" onclick="window.print()">Imprimer</button><button class="secondary" onclick="save()">Sauvegarder</button><button class="secondary" onclick="exportCSV()">Exporter CSV</button></div></article>';}
