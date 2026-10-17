@@ -42,7 +42,7 @@ test('parcours, recharge payante, affinage et export/import',async({page},testIn
  await expect(publicPrice).toHaveValue('0.5');
  await publicPrice.fill('0.75');
  await page.getByRole('button',{name:'Recalculer le bilan affiné'}).click();
- await expect(page.getByRole('heading',{name:'Bilan affiné'})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'Bilan affiné',exact:true})).toBeVisible();
  await expect(page.getByRole('heading',{name:'Évolution entre le premier bilan et le bilan affiné'})).toBeVisible();
 
  const csvDownload=page.waitForEvent('download');
@@ -67,7 +67,7 @@ test('parcours, recharge payante, affinage et export/import',async({page},testIn
  await expect(page.getByRole('heading',{name:'Mes simulations sauvegardées'})).toBeVisible();
  await expect(page.getByText('S3E Recette navigateur').first()).toBeVisible();
  await page.getByRole('button',{name:'Reprendre'}).first().click();
- await expect(page.getByRole('heading',{name:'Bilan affiné'})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'Bilan affiné',exact:true})).toBeVisible();
 
  await page.reload();
  const chooser=page.waitForEvent('filechooser');
