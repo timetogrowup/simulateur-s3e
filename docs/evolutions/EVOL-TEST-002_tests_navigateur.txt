@@ -61,3 +61,6 @@ LIVRAISON PRÉVUE
 3. Adaptations éventuelles limitées de l'interface si tests démontrent un défaut.
 4. Workflow GitHub Actions enrichi.
 5. Tests observés, guide TXT et README à jour.
+
+JOURNAL D'IMPLÉMENTATION
+Scripts Playwright, serveur local et job navigateur ajoutés. Un premier échec de test provenait d'un sélecteur de titre ambigu (« Bilan affiné » et titre de comparaison). Le sélecteur a été corrigé en correspondance exacte ; attente de la recette du dernier commit.
