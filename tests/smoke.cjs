@@ -35,4 +35,21 @@ assert.equal(result[0].gain,0,'Écart véhicule actuel = 0');
 assert.throws(()=>ev('calculate({...estimates(),homeShare:.8,freeShare:.5})'),/100/,'Contrôle du cumul recharge');
 ev("view='wizard'; step=active().findIndex(q=>q.id==='budget');draw()");
 assert.match(root.innerHTML,/Et si vous rendiez votre voiture de fonction/,'Introduction avant achat');
-console.log('OK : syntaxe et 13 contrôles fonctionnels du questionnaire et calcul');
+// Contrôles du moteur financier : ventilation, financement distinct et remboursements.
+ev("answers.commutePayer='SUEZ';answers.privatePayer='Salarié'");
+const scenario=ev('calculate(estimates())');
+assert.equal(scenario[0].breakdown.commute,0,'Trajets domicile-travail actuels pris en charge par SUEZ');
+assert.ok(scenario[0].breakdown.privateEnergy>0,'Énergie privée actuelle supportée par le salarié');
+assert.ok(scenario[2].breakdown.depreciation>0,'Véhicule personnel valorisé par dépréciation');
+assert.ok(scenario[2].breakdown.compensation<=0,'Compensation déduite des coûts');
+assert.ok(scenario.every(x=>Math.abs(x.cost-Object.values(x.breakdown).reduce((a,b)=>a+b,0))<.00001),'Somme des postes égale coût');
+const beforePro=ev('calculate({...estimates(),professional:0})');
+const afterPro=ev('calculate({...estimates(),professional:40000})');
+assert.ok(beforePro.every((v,i)=>Math.abs(v.cost-afterPro[i].cost)<.00001),'Aucun coût salarié supplémentaire pour les kilomètres professionnels');
+ev("answers.commutePayer='Salarié';answers.privatePayer='SUEZ'");
+const reverse=ev('calculate(estimates())');
+assert.ok(reverse[0].breakdown.commute>0&&reverse[0].breakdown.privateEnergy===0,'Prises en charge par usage indépendantes');
+ev("view='report';base=estimates();draw()");
+assert.match(root.innerHTML,/Détail des postes annuels/,'Ventilation financière visible');
+console.log('OK : syntaxe, parcours, contrôles du questionnaire et ventilation financière');
+
