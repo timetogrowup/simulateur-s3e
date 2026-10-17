@@ -1,0 +1,73 @@
+SIMULATEUR S3E — EVOL-RECHARGE-002
+Date : 17 octobre 2026
+Statut : décision métier confirmée, développement de recette.
+Objet : coût des recharges publiques payantes du futur véhicule électrique SUEZ.
+
+1. DÉCISION DU RESPONSABLE DE PROJET
+Les recharges effectuées sur une borne publique payante, sans prise en charge
+par SUEZ, sont payées personnellement par le salarié. Il ne faut pas les
+considérer automatiquement comme gratuites lorsque la recharge à domicile
+est impossible. Les recharges réellement couvertes par une borne ou carte
+énergie SUEZ restent gratuites pour le salarié.
+
+2. ÉVOLUTION DU QUESTIONNAIRE
+Pour le futur véhicule électrique :
+- « Recharge possible à domicile ? » conserve ses options.
+- Si « Impossible », pas de question sur la part à domicile : 0 %.
+  On retient dans ce prototype 100 % de recharge extérieure sur bornes
+  publiques payantes à la charge du salarié et on demande le tarif en €/kWh.
+- Si domicile possible, le salarié estime sa part de recharge à domicile.
+  Il précise quelle part des charges effectuées HORS domicile relève de
+  bornes publiques payantes à sa charge (0 à 100 %).
+- Si cette dernière part est nulle, le tarif public est inutile et masqué.
+- Les questions publiques sont masquées pour le futur véhicule non électrique.
+
+3. FORMULE DE RECETTE
+Pour un véhicule SUEZ électrique :
+K = kilomètres annuels personnels + domicile-travail
+C = consommation kWh/100 km
+H = part des recharges à domicile (0..1)
+D = tarif domicile €/kWh
+P = part des recharges hors domicile payantes pour le salarié (0..1)
+E = tarif des bornes publiques payantes €/kWh
+Coût salarié annuel = K × C / 100 × [H × D + (1-H) × P × E].
+Les kilomètres de mission professionnelle restent exclus du coût salarié
+selon la règle actuelle du simulateur.
+Si domicile impossible : H=0 et P=1 par hypothèse métier de ce parcours.
+Les frais payés par SUEZ n'ajoutent rien au coût salarié.
+Pour le véhicule PERSONNEL du scénario 3, conservation du modèle actuel
+où le salarié paie sa recharge à domicile et ses charges publiques :
+K × C/100 × [H × D + (1-H) × electricPublic].
+Le traitement des motorisations non électriques reste inchangé.
+
+4. DONNÉES
+publicPaidShare : part des charges publiques payées par le salarié.
+publicPrice : prix TTC estimé d'une borne publique payante.
+Valeurs fictives dans les fourchettes du questionnaire et variables affinables ;
+aucun tarif officiel SUEZ ni fournisseur n'est revendiqué.
+
+5. TESTS AUTOMATISÉS
+- « Impossible » masque domicile et affiche prix public.
+- La recharge publique payante coûte quelque chose au salarié.
+- Exemple 100 % public : coût = km × C/100 × tarif borne publique.
+- Exemple 50 % public / 50 % SUEZ pris en charge : coût public divisé par deux.
+- Exemple 0 % public, 100 % hors domicile réellement pris en charge SUEZ :
+  coût de recharge salarié nul.
+- Validation de la part 0..1 et du prix public non négatif.
+- Les scénarios initiaux, la trésorerie et les bilans ne doivent pas régresser.
+
+6. LIMITES / SUITES
+- Les tarifs publics sont des hypothèses de test, pas des tarifs contractuels.
+- La distinction des cartes SUEZ et de l'accès aux bornes par l'employeur
+  reste une règle à documenter lors de la disponibilité des politiques
+  définitives ; aucune recharge publique payante personnelle ne doit
+  être considérée gratuite par défaut.
+- Les sauvegardes antérieures peuvent contenir des hypothèses de calcul
+  différentes ; la version des référentiels doit être tracée à terme.
+
+7. TRAÇABILITÉ
+Fichiers : index.html, tests/smoke.cjs,
+docs/evolutions/EVOL-RECHARGE-002_recharge_publique_payante.txt,
+docs/guide_developpement_supervise.txt.
+Validation humaine : règle confirmée par le responsable du projet.
+Validation CI : à reporter à la clôture du lot.
