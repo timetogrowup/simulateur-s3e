@@ -26,3 +26,31 @@ jobs:
         env:
           S3E_DIFF_BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
         run: node tests/validate-docs.cjs
+
+  navigateur:
+    name: Parcours Chromium mobile et bureau
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+      - name: Installer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Installer Playwright (version figée)
+        run: npm install --no-package-lock
+      - name: Installer Chromium et bibliothèques système
+        run: npx playwright install --with-deps chromium
+      - name: Exécuter les tests navigateur
+        run: npm run test:browser
+      - name: Conserver les artefacts en cas d'échec
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tests-navigateur
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 7
