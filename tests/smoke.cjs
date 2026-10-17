@@ -207,6 +207,15 @@ localData.set('s3e-mobile-test',JSON.stringify({answers:{motor:'Diesel'},step:0,
 ev('migrateLegacy()');
 assert.equal(ev('readSaves()[0].title'),'Ancienne simulation','Migration de la sauvegarde initiale');
 assert.ok(localData.has('s3e-mobile-test'),'Ancien format préservé pour retour arrière');
+// Ancienne simulation affinée : ne pas restituer un ancien calcul de recharge gratuite.
+ev("answers.futureMotor='Électrique';answers.home='Impossible';base=estimates();detail={};last=calculate(base);view='refined'");
+ev("last[1].breakdown.commute=0;last[1].breakdown.privateEnergy=0");
+ev("storeSaves([{id:'old-refined',title:'Ancienne estimation',savedAt:Date.now(),data:snapshot()}])");
+ev("restoreSave('old-refined')");
+assert.ok(ev('last[1].breakdown.commute+last[1].breakdown.privateEnergy')>0,'Restauration recalculée avec bornes publiques payantes');
+ev("base={...base,publicPaidShare:undefined,publicPrice:undefined};view='refine';draw()");
+assert.ok(ev('Number.isFinite(refineInitial().values.publicPrice)'),'Anciennes sauvegardes : tarif public prérempli');
+assert.equal(ev('refineInitial().values.publicPaidShare'),1,'Anciennes sauvegardes : domicile impossible = public payant');
 console.log('OK : parcours, AEN, trésorerie, bilans et sauvegardes multiples');
 
 
