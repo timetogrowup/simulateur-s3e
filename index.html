@@ -2,7 +2,7 @@
 <html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Simulateur S3E · Recette mobile</title>
 <style>
-:root{font-family:system-ui,-apple-system,Arial;color:#14243a;background:#f4f7fb}*{box-sizing:border-box}body{margin:0}header{background:#063b66;color:#fff;padding:18px}header strong{font-size:21px}header small{display:block;color:#dbeafe}main{max-width:850px;margin:auto;padding:16px}article{background:#fff;border:1px solid #dbe3ef;border-radius:16px;padding:20px;margin:13px 0;box-shadow:0 2px 8px #0001}h1{font-size:24px}h2{font-size:19px}p{line-height:1.5}.warn{background:#fff5d8;padding:12px;border-radius:9px}.scenario-intro{background:#eaf4fe;border-left:4px solid #07599b;padding:14px;border-radius:10px;margin:18px 0}.scenario-intro p{font-size:14px;margin:9px 0 0}.label{font-weight:650}label.opt{display:flex;gap:12px;align-items:center;border:1px solid #d2d9e5;border-radius:10px;padding:13px;margin:9px 0}input[type=radio]{width:20px;height:20px}button{background:#07599b;color:#fff;border:0;border-radius:11px;padding:13px 16px;font-size:16px;font-weight:600;cursor:pointer}button.secondary{background:#e8f0f8;color:#123b60}button:disabled{opacity:.45}.buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}.progress{height:8px;background:#e5e7eb;border-radius:9px;overflow:hidden}.progress div{height:100%;background:#0879c3}.muted{color:#5d6c7b;font-size:14px}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:9px}.card{background:#f0f7ff;padding:12px;border-radius:10px}.card b{display:block;font-size:20px;margin:6px 0}.positive{color:#087545}.negative{color:#b3261e}table{border-collapse:collapse;width:100%;font-size:13px}.barrow{display:grid;grid-template-columns:minmax(100px,1fr) 2fr auto;gap:8px;align-items:center;margin:11px 0;font-size:13px}.track{height:15px;border-radius:12px;background:#edf1f6;overflow:hidden}.fill{height:100%;background:#1976ae;border-radius:12px}.fill.neg{background:#b45b57}.chartnote{font-size:12px;color:#637084}th,td{padding:9px;border-bottom:1px solid #e5e7eb;text-align:right}th:first-child,td:first-child{text-align:left}input[type=number]{padding:10px;width:100%;font-size:16px;border:1px solid #ccd7e4;border-radius:9px}.field{display:block;margin:12px 0}.refine-section{border-top:1px solid #dbe3ef;padding:12px 0}.refine-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.refine-heading button{font-size:13px;padding:8px}.field{padding:7px;border-radius:8px}.field.changed{background:#fff1d4;border-left:4px solid #bf751b}.field small{display:block;padding-top:3px}.field input{margin-top:6px}footer{padding:22px;text-align:center;color:#6c7480;font-size:13px}@media print{header,.buttons,.warn{display:none!important}article{break-inside:avoid;box-shadow:none}}
+:root{font-family:system-ui,-apple-system,Arial;color:#14243a;background:#f4f7fb}*{box-sizing:border-box}body{margin:0}header{background:#063b66;color:#fff;padding:18px}header strong{font-size:21px}header small{display:block;color:#dbeafe}main{max-width:850px;margin:auto;padding:16px}article{background:#fff;border:1px solid #dbe3ef;border-radius:16px;padding:20px;margin:13px 0;box-shadow:0 2px 8px #0001}h1{font-size:24px}h2{font-size:19px}p{line-height:1.5}.warn{background:#fff5d8;padding:12px;border-radius:9px}.scenario-intro{background:#eaf4fe;border-left:4px solid #07599b;padding:14px;border-radius:10px;margin:18px 0}.scenario-intro p{font-size:14px;margin:9px 0 0}.label{font-weight:650}label.opt{display:flex;gap:12px;align-items:center;border:1px solid #d2d9e5;border-radius:10px;padding:13px;margin:9px 0}input[type=radio]{width:20px;height:20px}button{background:#07599b;color:#fff;border:0;border-radius:11px;padding:13px 16px;font-size:16px;font-weight:600;cursor:pointer}button.secondary{background:#e8f0f8;color:#123b60}button:disabled{opacity:.45}.buttons{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}.progress{height:8px;background:#e5e7eb;border-radius:9px;overflow:hidden}.progress div{height:100%;background:#0879c3}.muted{color:#5d6c7b;font-size:14px}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:9px}.card{background:#f0f7ff;padding:12px;border-radius:10px}.card b{display:block;font-size:20px;margin:6px 0}.positive{color:#087545}.negative{color:#b3261e}table{border-collapse:collapse;width:100%;font-size:13px}.barrow{display:grid;grid-template-columns:minmax(100px,1fr) 2fr auto;gap:8px;align-items:center;margin:11px 0;font-size:13px}.track{height:15px;border-radius:12px;background:#edf1f6;overflow:hidden}.fill{height:100%;background:#1976ae;border-radius:12px}.fill.neg{background:#b45b57}.chartnote{font-size:12px;color:#637084}th,td{padding:9px;border-bottom:1px solid #e5e7eb;text-align:right}th:first-child,td:first-child{text-align:left}input[type=number]{padding:10px;width:100%;font-size:16px;border:1px solid #ccd7e4;border-radius:9px}.field{display:block;margin:12px 0}.refine-section{border-top:1px solid #dbe3ef;padding:12px 0}.refine-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.refine-heading button{font-size:13px;padding:8px}.field{padding:7px;border-radius:8px}.field.changed{background:#fff1d4;border-left:4px solid #bf751b}.field small{display:block;padding-top:3px}.field input{margin-top:6px}footer{padding:22px;text-align:center;color:#6c7480;font-size:13px}.save-entry{border:1px solid #dbe3ef;border-radius:10px;padding:12px;margin:10px 0}.save-entry small{display:block;margin-top:5px}@media print{header,.buttons,.warn{display:none!important}article{break-inside:avoid;box-shadow:none}}
 </style></head>
 <body><header><strong>S3E · Simulateur véhicules</strong><small>Recette mobile — démonstration avec données fictives</small></header><main id="root"></main><footer>Prototype de test. Aucune donnée transmise à SUEZ ou au S3E. Les calculs ne constituent pas une simulation fiscale validée.</footer>
 <script src="referentiels/aen_TEST.js"></script>
@@ -240,7 +240,7 @@ function comparisonTable(first,refined){
  '<div style="overflow-x:auto"><table><tr><th>Situation</th><th>Premier gain / perte annuel</th><th>Gain / perte affiné annuel</th><th>Écart</th></tr>'+
  rows.map(x=>'<tr><td>'+x.label+'</td><td>'+fmt(x.initialGain)+'</td><td>'+fmt(x.refinedGain)+'</td><td>'+fmt(x.annualGainDelta)+'</td></tr>').join('')+'</table></div>';
 }
-function draw(){if(view==='home'){root.innerHTML='<article><h1>Votre véhicule, votre pouvoir d’achat</h1><p>Simulez vos trois solutions avec un questionnaire rapide, puis affinez les hypothèses.</p><p class="warn">Toutes les grilles AEN et compensation sont fictives. Les calculs fiscaux sont des approximations pour tester le parcours.</p><div class="buttons"><button onclick="start()">Commencer</button><button class="secondary" onclick="load()">Reprendre une sauvegarde</button></div></article>';return}
+function draw(){if(view==='saves'){try{root.innerHTML=savesPage()}catch(error){alert('Lecture impossible : '+error.message);view='home';draw()}return;}if(view==='home'){root.innerHTML='<article><h1>Votre véhicule, votre pouvoir d’achat</h1><p>Simulez vos trois solutions avec un questionnaire rapide, puis affinez les hypothèses.</p><p class="warn">Toutes les grilles AEN et compensation sont fictives. Les calculs fiscaux sont des approximations pour tester le parcours.</p><div class="buttons"><button onclick="start()">Commencer</button><button class="secondary" onclick="load()">Reprendre une sauvegarde</button></div></article>';return}
 if(view==='wizard'){const list=active();step=Math.min(step,list.length-1);const q=list[step];const ux=uxCopy[q.id]||['Questionnaire',q.title,''];const intro=q.id==='budget'?'<section class="scenario-intro"><strong>Et si vous rendiez votre voiture de fonction SUEZ ?</strong><p>Dans ce troisième scénario, vous n’utilisez plus de véhicule fourni par SUEZ : vous achetez et entretenez votre propre voiture. Une compensation SUEZ peut éventuellement être versée selon la grille applicable. Les questions suivantes concernent uniquement cette hypothèse.</p></section>':'';root.innerHTML='<article><p class="muted">'+ux[0]+' · Question '+(step+1)+' / '+list.length+'</p><div class="progress"><div style="width:'+((step+1)/list.length*100)+'%"></div></div>'+intro+'<h2>'+ux[1]+'</h2><p class="muted" style="line-height:1.5">'+ux[2]+'</p>'+q.options.map((v,i)=>'<label class="opt"><input type="radio" name="choice" '+(answers[q.id]===v?'checked':'')+' onchange="pickIndex('+i+')">'+v+'</label>').join('')+'<div class="buttons"><button class="secondary" onclick="prev()">Précédent</button><button onclick="next()">Suivant</button></div></article>';return}
 if(view==='recap'){root.innerHTML='<article><h1>Récapitulatif</h1><p>Vérifie les réponses avant le calcul.</p>'+active().map((q,i)=>'<p><span class="muted">'+q.title+'</span><br><b>'+ (answers[q.id]||'Non renseigné')+'</b> <button class="secondary" onclick="edit('+i+')">Modifier</button></p>').join('')+'<div class="buttons"><button onclick="first()">Calculer le premier bilan</button></div></article>';return}
 if(view==='refine'){
@@ -292,8 +292,88 @@ function start(){view='wizard';step=0;draw()}function pick(id,v){answers[id]=v;i
 function pickIndex(i){const q=active()[step];if(!q||!q.options[i])return;pick(q.id,q.options[i])}
 function prev(){step=Math.max(0,step-1);draw()}function next(){const list=active();if(!answers[list[step].id])return alert('Choisis une réponse.');if(step<list.length-1)step++;else view='recap';draw()}
 function edit(i){step=i;view='wizard';draw()}function first(){if(active().some(q=>!answers[q.id]))return alert('Complète les questions restantes.');base=estimates();try{calculate(base);view='report';draw()}catch(e){alert(e.message)}}
-function save(){localStorage.setItem('s3e-mobile-test',JSON.stringify({answers,step,view,base,detail,last}));alert('Simulation sauvegardée sur ce navigateur')}
-function load(){let x=JSON.parse(localStorage.getItem('s3e-mobile-test')||'null');if(!x)return alert('Aucune sauvegarde');({answers,step,view,base,detail,last}=x);draw()}
+const STORAGE_KEY='s3e-simulations-v2';
+const LEGACY_KEY='s3e-mobile-test';
+const MAX_SAVES=20;
+function snapshot(){
+ return {answers:{...answers},step,view,base:base?{...base}:null,detail:{...detail},last:last?JSON.parse(JSON.stringify(last)):null};
+}
+function validSnapshot(x){
+ if(!x||typeof x!=='object'||Array.isArray(x)||!x.answers||typeof x.answers!=='object'||Array.isArray(x.answers)||!['home','wizard','recap','report','refine','refined'].includes(x.view))return false;
+ if(!Number.isInteger(x.step)||x.step<0||x.step>qs.length)return false;
+ if(!x.detail||typeof x.detail!=='object'||Array.isArray(x.detail))return false;
+ if(['report','refine','refined'].includes(x.view)&&(!x.base||typeof x.base!=='object'||!Number.isFinite(x.base.years)||x.base.years<=0))return false;
+ if(x.view==='refined'&&(!Array.isArray(x.last)||x.last.length!==3))return false;
+ if(Object.values(x.answers).some(v=>typeof v!=='string'||v.length>150))return false;
+ if(Object.values(x.detail).some(v=>typeof v!=='number'||!Number.isFinite(v)))return false;
+ return true;
+}
+function readSaves(){
+ const raw=localStorage.getItem(STORAGE_KEY);
+ if(!raw)return [];
+ const parsed=JSON.parse(raw);
+ if(!parsed||parsed.schemaVersion!==2||!Array.isArray(parsed.items)||parsed.items.length>MAX_SAVES)throw Error('Format de sauvegardes non reconnu.');
+ if(parsed.items.some(x=>!x||typeof x.id!=='string'||!Number.isFinite(x.savedAt)||typeof x.title!=='string'||x.title.length>100||!validSnapshot(x.data)))throw Error('Une sauvegarde est endommagée.');
+ return parsed.items;
+}
+function storeSaves(items){localStorage.setItem(STORAGE_KEY,JSON.stringify({schemaVersion:2,items}));}
+function migrateLegacy(){
+ if(localStorage.getItem(STORAGE_KEY)!==null)return;
+ const legacy=localStorage.getItem(LEGACY_KEY);
+ if(!legacy)return;
+ const old=JSON.parse(legacy);
+ if(!validSnapshot(old))throw Error('Ancienne sauvegarde non compatible : aucune donnée effacée.');
+ storeSaves([{id:'legacy',title:'Ancienne simulation',savedAt:Date.now(),data:old}]);
+ // Conserver l'ancienne clé pour permettre un retour arrière.
+}
+function save(){
+ try{
+  migrateLegacy();
+  const items=readSaves();
+  if(items.length>=MAX_SAVES){alert('Limite de '+MAX_SAVES+' simulations atteinte. Supprimez une ancienne sauvegarde.');return;}
+  const suggested='Simulation '+(items.length+1);
+  const name=prompt('Nom de cette simulation :',suggested);
+  if(name===null)return;
+  const title=name.trim();
+  if(!title||title.length>100){alert('Nom requis (100 caractères maximum).');return;}
+  const data=snapshot();
+  if(!validSnapshot(data))throw Error('La simulation actuelle ne peut pas être enregistrée.');
+  items.unshift({id:'s'+Date.now()+'-'+(items.length+1),title,savedAt:Date.now(),data});
+  storeSaves(items);
+  alert('Simulation « '+title+' » enregistrée sur cet appareil.');
+ }catch(error){alert('Sauvegarde impossible : '+error.message);}
+}
+function load(){
+ try{migrateLegacy();const items=readSaves();if(!items.length)return alert('Aucune sauvegarde disponible.');view='saves';draw();}
+ catch(error){alert('Impossible de lire les sauvegardes : '+error.message);}
+}
+function restoreSave(id){
+ try{
+  const item=readSaves().find(x=>x.id===id);
+  if(!item||!validSnapshot(item.data))throw Error('Simulation introuvable ou invalide.');
+  const x=JSON.parse(JSON.stringify(item.data));
+  ({answers,step,view,base,detail,last}=x);
+  refineDraft=null;
+  if(view==='refine')view='report';
+  draw();
+ }catch(error){alert('Reprise impossible : '+error.message);}
+}
+function removeSave(id){
+ try{
+  const items=readSaves(),item=items.find(x=>x.id===id);
+  if(!item)return;
+  if(!confirm('Supprimer définitivement « '+item.title+' » de cet appareil ?'))return;
+  storeSaves(items.filter(x=>x.id!==id));
+  draw();
+ }catch(error){alert('Suppression impossible : '+error.message);}
+}
+function savesPage(){
+ const items=readSaves();
+ return '<article><h1>Mes simulations sauvegardées</h1><p class="muted">Les données restent sur ce navigateur. Elles peuvent disparaître si vous effacez ses données ou changez d’appareil.</p>'+
+ (items.length?items.map(item=>'<div class="save-entry"><strong>'+escapeHtml(item.title)+'</strong><small class="muted">Enregistrée le '+new Date(item.savedAt).toLocaleString('fr-FR')+'</small><div class="buttons"><button onclick="restoreSave(\''+item.id+'\')">Reprendre</button><button class="secondary" onclick="removeSave(\''+item.id+'\')">Supprimer</button></div></div>').join(''):'<p>Aucune simulation sauvegardée.</p>')+
+ '<div class="buttons"><button class="secondary" onclick="view=\'home\';draw()">Retour à l’accueil</button></div></article>';
+}
+function escapeHtml(value){return String(value).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
 function exportCSV(){const arr=view==='refined'?last:calculate(base);const data='Solution;Coût annuel EUR;Gain annuel EUR\n'+arr.map(s=>[s.label,s.cost.toFixed(2),s.gain.toFixed(2)].join(';')).join('\n');const u=URL.createObjectURL(new Blob(['\ufeff'+data],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=u;a.download='S3E_TEST_bilan.csv';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)}
 draw();
 </script></body></html>
