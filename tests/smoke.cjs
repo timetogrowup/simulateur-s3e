@@ -51,5 +51,26 @@ const reverse=ev('calculate(estimates())');
 assert.ok(reverse[0].breakdown.commute>0&&reverse[0].breakdown.privateEnergy===0,'Prises en charge par usage indépendantes');
 ev("view='report';base=estimates();draw()");
 assert.match(root.innerHTML,/Détail des postes annuels/,'Ventilation financière visible');
-console.log('OK : syntaxe, parcours, contrôles du questionnaire et ventilation financière');
+// Différenciation des motorisations et sensibilités.
+const assumptions=ev('estimates()');
+assert.ok(assumptions.petrolPrice>assumptions.dieselPrice,'Deux tarifs de carburants distincts');
+ev("answers.motor='Diesel';answers.commutePayer='Salarié';answers.privatePayer='Salarié'");
+const diesel=ev('calculate(estimates())')[0].cost;
+ev("answers.motor='Essence'");
+const petrol=ev('calculate(estimates())')[0].cost;
+assert.notEqual(diesel,petrol,'Essence et diesel ont des coûts distincts');
+ev("answers.persMotor='Hybride rechargeable'");
+const phev=ev('calculate(estimates())');
+assert.ok(phev.every(x=>Number.isFinite(x.cost)),'Hybride rechargeable calculable');
+const sens=ev('sensitivities(estimates())');
+assert.equal(sens.energy.length,3,'Trois hypothèses énergie');
+assert.equal(sens.resale.length,3,'Trois hypothèses revente');
+assert.ok(sens.energy[0].results[2].cost<sens.energy[2].results[2].cost,'Hausse énergie augmente coût personnel');
+assert.ok(sens.resale[0].results[2].cost>sens.resale[2].results[2].cost,'Hausse revente réduit coût personnel');
+ev("view='report';base=estimates();draw()");
+assert.match(root.innerHTML,/Comparaison des coûts économiques nets annuels/,'Graphique coûts visible');
+assert.match(root.innerHTML,/Analyses de sensibilité/,'Sensibilités visibles');
+assert.match(root.innerHTML,/Gains ou pertes de pouvoir d’achat/,'Graphique gains visible');
+console.log('OK : syntaxe, parcours, moteur par motorisation, sensibilités et graphiques');
+
 
