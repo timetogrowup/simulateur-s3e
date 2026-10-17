@@ -246,7 +246,7 @@ function comparisonTable(first,refined){
  '<div style="overflow-x:auto"><table><tr><th>Situation</th><th>Premier gain / perte annuel</th><th>Gain / perte affiné annuel</th><th>Écart</th></tr>'+
  rows.map(x=>'<tr><td>'+x.label+'</td><td>'+fmt(x.initialGain)+'</td><td>'+fmt(x.refinedGain)+'</td><td>'+fmt(x.annualGainDelta)+'</td></tr>').join('')+'</table></div>';
 }
-function draw(){if(view==='saves'){try{root.innerHTML=savesPage()}catch(error){alert('Lecture impossible : '+error.message);view='home';draw()}return;}if(view==='home'){root.innerHTML='<article><h1>Votre véhicule, votre pouvoir d’achat</h1><p>Simulez vos trois solutions avec un questionnaire rapide, puis affinez les hypothèses.</p><p class="warn">Toutes les grilles AEN et compensation sont fictives. Les calculs fiscaux sont des approximations pour tester le parcours.</p><div class="buttons"><button onclick="start()">Commencer</button><button class="secondary" onclick="load()">Reprendre une sauvegarde</button></div></article>';return}
+function draw(){if(view==='saves'){try{root.innerHTML=savesPage()}catch(error){alert('Lecture impossible : '+error.message);view='home';draw()}return;}if(view==='home'){root.innerHTML='<article><h1>Votre véhicule, votre pouvoir d’achat</h1><p>Simulez vos trois solutions avec un questionnaire rapide, puis affinez les hypothèses.</p><p class="warn">Toutes les grilles AEN et compensation sont fictives. Les calculs fiscaux sont des approximations pour tester le parcours.</p><div class="buttons"><button onclick="start()">Commencer</button><button class="secondary" onclick="load()">Reprendre une sauvegarde</button><button class="secondary" onclick="chooseImportJSON()">Importer un JSON</button></div></article>';return}
 if(view==='wizard'){const list=active();step=Math.min(step,list.length-1);const q=list[step];const ux=uxCopy[q.id]||['Questionnaire',q.title,''];const intro=q.id==='budget'?'<section class="scenario-intro"><strong>Et si vous rendiez votre voiture de fonction SUEZ ?</strong><p>Dans ce troisième scénario, vous n’utilisez plus de véhicule fourni par SUEZ : vous achetez et entretenez votre propre voiture. Une compensation SUEZ peut éventuellement être versée selon la grille applicable. Les questions suivantes concernent uniquement cette hypothèse.</p></section>':'';root.innerHTML='<article><p class="muted">'+ux[0]+' · Question '+(step+1)+' / '+list.length+'</p><div class="progress"><div style="width:'+((step+1)/list.length*100)+'%"></div></div>'+intro+'<h2>'+ux[1]+'</h2><p class="muted" style="line-height:1.5">'+ux[2]+'</p>'+q.options.map((v,i)=>'<label class="opt"><input type="radio" name="choice" '+(answers[q.id]===v?'checked':'')+' onchange="pickIndex('+i+')">'+v+'</label>').join('')+'<div class="buttons"><button class="secondary" onclick="prev()">Précédent</button><button onclick="next()">Suivant</button></div></article>';return}
 if(view==='recap'){root.innerHTML='<article><h1>Récapitulatif</h1><p>Vérifie les réponses avant le calcul.</p>'+active().map((q,i)=>'<p><span class="muted">'+q.title+'</span><br><b>'+ (answers[q.id]||'Non renseigné')+'</b> <button class="secondary" onclick="edit('+i+')">Modifier</button></p>').join('')+'<div class="buttons"><button onclick="first()">Calculer le premier bilan</button></div></article>';return}
 if(view==='refine'){
@@ -293,7 +293,7 @@ const res=view==='refined'?last:calculate(base);const min=Math.min(...res.map(x=
 ].map(([key,label])=>'<tr><td>'+label+'</td>'+res.map(x=>'<td>'+fmt(x.breakdown[key]||0)+'</td>').join('')+'</tr>').join('')+'</table><p>Coût le plus faible selon ces hypothèses : <b>'+res.find(x=>x.cost===min).label+'</b>.</p><h2>Projection économique</h2><p>Durée : '+Math.round((view==='refined'?detail.years:base.years)*10)/10+' ans</p><div class="cards">'+res.map(s=>'<div class="card">'+s.label+'<b>'+fmt(s.cost*(view==='refined'?detail.years:base.years))+'</b></div>').join('')+'</div>'+cashflowTable(cashflow)+(view==='refined'?comparisonTable(calculate(base),res):'')+'<h2>Analyses de sensibilité</h2><p class="muted">Hypothèses de test : énergie et valeur de revente à −20 %, référence, +20 %. Chaque ligne correspond au coût annuel net des trois situations.</p>'+[
 ['Prix de l’énergie',sensitivity.energy],
 ['Valeur de revente du véhicule personnel',sensitivity.resale]
-].map(([label,items])=>'<h3>'+label+'</h3><table><tr><th>Variation</th><th>Situation actuelle</th><th>Avec fonction</th><th>Sans fonction</th></tr>'+items.map(item=>'<tr><td>'+(item.factor===1?'Référence':(item.factor<1?'−20 %':'+20 %'))+'</td>'+item.results.map(x=>'<td>'+fmt(x.cost)+'</td>').join('')+'</tr>').join('')+'</table>').join('')+'<details><summary>Hypothèses du calcul</summary><pre style="white-space:pre-wrap;overflow:auto">'+JSON.stringify(view==='refined'?{...base,...detail}:base,null,2)+'</pre></details><div class="buttons"><button onclick="view=\'refine\';draw()">Affiner mon bilan</button><button class="secondary" onclick="window.print()">Imprimer</button><button class="secondary" onclick="save()">Sauvegarder</button><button class="secondary" onclick="exportCSV()">Exporter CSV</button></div></article>';}
+].map(([label,items])=>'<h3>'+label+'</h3><table><tr><th>Variation</th><th>Situation actuelle</th><th>Avec fonction</th><th>Sans fonction</th></tr>'+items.map(item=>'<tr><td>'+(item.factor===1?'Référence':(item.factor<1?'−20 %':'+20 %'))+'</td>'+item.results.map(x=>'<td>'+fmt(x.cost)+'</td>').join('')+'</tr>').join('')+'</table>').join('')+'<details><summary>Hypothèses du calcul</summary><pre style="white-space:pre-wrap;overflow:auto">'+JSON.stringify(view==='refined'?{...base,...detail}:base,null,2)+'</pre></details><div class="buttons"><button onclick="view=\'refine\';draw()">Affiner mon bilan</button><button class="secondary" onclick="window.print()">Imprimer</button><button class="secondary" onclick="save()">Sauvegarder</button><button class="secondary" onclick="exportCSV()">Exporter CSV détaillé</button><button class="secondary" onclick="exportJSON()">Sauvegarder en JSON</button></div></article>';}
 function start(){view='wizard';step=0;draw()}function pick(id,v){answers[id]=v;if(id==='futureMotor'&&v!=='Électrique'){delete answers.home;delete answers.install;delete answers.homeShare;delete answers.homePrice;delete answers.publicPaidShare;delete answers.publicPrice;delete answers.subsidy;}if(id==='aen')answers.aenFuture=v;if(id==='proKm')answers.energyCard=v==='Aucun'?'Non':'Oui';if(id==='home'&&v==='Impossible'){answers.homeShare='0 %';answers.publicPaidShare='100 %';delete answers.publicPrice;}if(id==='publicPaidShare'&&v==='0 %')delete answers.publicPrice;draw()}
 function pickIndex(i){const q=active()[step];if(!q||!q.options[i])return;pick(q.id,q.options[i])}
 function prev(){step=Math.max(0,step-1);draw()}function next(){const list=active();if(!answers[list[step].id])return alert('Choisis une réponse.');if(step<list.length-1)step++;else view='recap';draw()}
@@ -390,6 +390,102 @@ function savesPage(){
  '<div class="buttons"><button class="secondary" onclick="view=\'home\';draw()">Retour à l’accueil</button></div></article>';
 }
 function escapeHtml(value){return String(value).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));}
-function exportCSV(){const arr=view==='refined'?last:calculate(base);const data='Solution;Coût annuel EUR;Gain annuel EUR\n'+arr.map(s=>[s.label,s.cost.toFixed(2),s.gain.toFixed(2)].join(';')).join('\n');const u=URL.createObjectURL(new Blob(['\ufeff'+data],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=u;a.download='S3E_TEST_bilan.csv';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)}
+// Export autonome CSV UTF-8 : le séparateur reste « ; » pour Excel FR.
+function csvCell(value){
+ if(typeof value==='number'&&Number.isFinite(value))return String(value);
+ let raw=String(value??'').replaceAll('\r',' ').replaceAll('\n',' ');
+ if(/^[=+@\t\r-]/.test(raw)&&!/^-[0-9]+(?:\.[0-9]+)?$/.test(raw))raw="'"+raw;
+ return '"'+raw.replaceAll('"','""')+'"';
+}
+function csvRows(){
+ if(!base||!['report','refined'].includes(view))throw Error('Aucun bilan à exporter.');
+ const initial=calculate(base);
+ const refined=view==='refined'?calculate({...base,...detail}):null;
+ const rows=[['section','champ','scenario','valeur','unite'],
+  ['information','statut','', 'FICTIF — AEN, compensation, fiscalité et tarifs de test',''],
+  ['information','version référentiel AEN','',REF.aen.version,''],
+  ['information','version référentiel véhicules','',REF.vehicles.version,'']];
+ for(const [key,value] of Object.entries(answers))rows.push(['questionnaire',key,'',value,'']);
+ const assumptions=view==='refined'?{...base,...detail}:base;
+ for(const [key,value] of Object.entries(assumptions))if(value!==null&&value!==undefined)rows.push(['hypothese',key,'',value,'']);
+ for(const [stage,data] of [['premier_bilan',initial],['bilan_affine',refined]]){
+  if(!data)continue;
+  for(const item of data){
+   rows.push([stage,'cout_economique_annuel',item.label,item.cost,'EUR/an']);
+   rows.push([stage,'gain_pouvoir_achat_annuel',item.label,item.gain,'EUR/an']);
+   for(const [key,amount] of Object.entries(item.breakdown))rows.push([stage,key,item.label,amount,'EUR/an']);
+  }
+ }
+ if(refined)for(const item of compareBilans(initial,refined)){
+  rows.push(['comparaison','variation_cout_annuelle',item.label,item.annualCostDelta,'EUR/an']);
+  rows.push(['comparaison','variation_cout_mensuelle',item.label,item.monthlyCostDelta,'EUR/mois']);
+  rows.push(['comparaison','variation_pouvoir_achat_annuelle',item.label,item.annualGainDelta,'EUR/an']);
+ }
+ return rows;
+}
+function csvContent(){return '\ufeff'+csvRows().map(row=>row.map(csvCell).join(';')).join('\r\n')+'\r\n';}
+function downloadText(content,filename,mimetype){
+ const url=URL.createObjectURL(new Blob([content],{type:mimetype}));
+ const link=document.createElement('a');
+ link.href=url;link.download=filename;link.click();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function exportCSV(){
+ try{downloadText(csvContent(),'S3E_TEST_bilan_detail.csv','text/csv;charset=utf-8');}
+ catch(error){alert('Export CSV impossible : '+error.message);}
+}
+const PORTABLE_FORMAT='S3E_SIMULATION';
+function portablePayload(title='Simulation S3E'){
+ const data=snapshot();
+ if(!validSnapshot(data))throw Error('La simulation actuelle n’est pas enregistrable.');
+ return {format:PORTABLE_FORMAT,schemaVersion:2,exportedAt:new Date().toISOString(),title,referentiels:{
+   aen:REF.aen.version,compensation:REF.comp.version,vehicules:REF.vehicles.version,hypotheses:REF.assumptions.version
+ },data};
+}
+function parsePortableJSON(raw){
+ if(typeof raw!=='string'||raw.length>1000000)throw Error('Le fichier est vide ou trop volumineux.');
+ const parsed=JSON.parse(raw);
+ if(!parsed||parsed.format!==PORTABLE_FORMAT||parsed.schemaVersion!==2)throw Error('Format ou version JSON non reconnu.');
+ if(typeof parsed.title!=='string'||!parsed.title.trim()||parsed.title.length>100||!validSnapshot(parsed.data))throw Error('Simulation JSON invalide.');
+ if(!parsed.referentiels||typeof parsed.referentiels!=='object')throw Error('Versions de référentiels manquantes.');
+ return parsed;
+}
+function exportJSON(){
+ try{
+  const suggested='Simulation S3E';
+  const name=prompt('Nom de la simulation à exporter :',suggested);
+  if(name===null)return;
+  if(!name.trim()||name.length>100)throw Error('Nom invalide.');
+  downloadText(JSON.stringify(portablePayload(name.trim()),null,2),'S3E_TEST_simulation.json','application/json;charset=utf-8');
+ }catch(error){alert('Export JSON impossible : '+error.message);}
+}
+function importPortableJSON(raw){
+ const parsed=parsePortableJSON(raw);
+ migrateLegacy();
+ const items=readSaves();
+ if(items.length>=MAX_SAVES)throw Error('Limite des sauvegardes atteinte.');
+ // Pas de modification de la simulation active lors de l'import.
+ items.unshift({id:'import-'+Date.now()+'-'+(items.length+1),title:parsed.title,savedAt:Date.now(),data:parsed.data});
+ storeSaves(items);
+ return parsed.title;
+}
+function chooseImportJSON(){
+ const input=document.createElement('input');
+ input.type='file';input.accept='.json,application/json';
+ input.onchange=async()=>{
+  const file=input.files&&input.files[0];
+  if(!file)return;
+  if(file.size>1000000){alert('Fichier JSON trop volumineux.');return;}
+  try{
+   const raw=await file.text();
+   const parsed=parsePortableJSON(raw);
+   if(!confirm('Importer « '+parsed.title+' » dans les sauvegardes de cet appareil ?'))return;
+   const title=importPortableJSON(raw);
+   alert('Simulation « '+title+' » importée. Ouvrez les sauvegardes pour la reprendre.');
+  }catch(error){alert('Import impossible : '+error.message);}
+ };
+ input.click();
+}
+
 draw();
 </script></body></html>
