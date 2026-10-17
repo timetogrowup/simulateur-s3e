@@ -1,5 +1,5 @@
 SIMULATEUR S3E — GUIDE TXT DE DÉVELOPPEMENT SUPERVISÉ
-Version 1.4 — 17/10/2026
+Version 1.5 — 17/10/2026
 Statut : guide de projet et journal de recette, non validation métier ni fiscale.
 
 DOCUMENTS MAÎTRES
@@ -91,3 +91,7 @@ CLÔTURE TECHNIQUE EVOL-RECHARGE-002
 Tests de cohérence GitHub Actions : réussis le 17/10/2026.
 La restauration d'un ancien bilan affiné recalcule ses résultats avec les nouvelles règles, pour éviter l'affichage d'un ancien coût de recharge extérieure nul. Valeurs manquantes des anciens dossiers affinés prises par défaut.
 Recette visuelle sur téléphone et validation des tarifs publics encore à effectuer. Aucun montant officiel SUEZ n'est intégré.
+
+AJUSTEMENT EVOL-RECHARGE-002 — TARIF PUBLIC AUTOMATIQUE
+17/10/2026 : si aucune recharge à domicile n'est possible, la question sur le prix des bornes publiques est masquée ; 100 % des recharges sont supposées payées personnellement et chiffrées par défaut à 0,50 €/kWh (hypothèse fictive issue du référentiel). Le prix se modifie seulement lors de l'affinage. Les valeurs publiques sauvegardées dans le questionnaire rapide ne prévalent pas sur ce défaut.
+Fichiers : index.html, tests/smoke.cjs, docs/evolutions/EVOL-RECHARGE-002_recharge_publique_payante.txt.
