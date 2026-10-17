@@ -62,3 +62,7 @@ Ces tests n'évaluent pas encore un navigateur réel et **ne bloquent pas automa
 Le bilan permet d'exporter un **CSV détaillé** avec scénarios, postes, hypothèses, données fictives et comparatif éventuel entre premier bilan et bilan affiné. Un export **JSON versionné** permet de conserver une simulation et de l'importer depuis l'accueil sur un autre navigateur ou appareil. L'import crée une sauvegarde locale distincte, sans serveur ni transmission. Les contenus exportés peuvent comporter des réponses individuelles : les conserver de façon appropriée.
 
 Les contrôles automatisés couvrent les formats, écarts, avertissements et rejets des JSON invalides. Une recette sur téléphone reste nécessaire. Voir [le cadrage et bilan TXT](docs/evolutions/EVOL-EXPORT-001_exports_detailles.txt).
+
+## Tests en navigateur — EVOL-TEST-002
+
+Une recette automatique Playwright utilise **Chromium** avec un profil mobile Pixel 7 émulé et un profil bureau. Le test couvre le questionnaire, le scénario de recharge publique, l'affinage, les exports CSV/JSON, les sauvegardes et l'import. Il tourne contre un serveur local alimenté par le code du commit, dans le job `Parcours Chromium mobile et bureau` de GitHub Actions. Commande locale après installation : `npm install --no-package-lock && npx playwright install chromium && npm run test:browser`. Cette émulation ne remplace pas une validation sur téléphone réel. [Cadrage TXT](docs/evolutions/EVOL-TEST-002_tests_navigateur.txt).
