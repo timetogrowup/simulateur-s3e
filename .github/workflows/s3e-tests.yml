@@ -1,17 +1,28 @@
-name: S3E - Tests de cohérence
+name: S3E - Contrôles qualité
 on:
   push:
     branches: [main]
   pull_request:
+permissions:
+  contents: read
 jobs:
-  smoke:
+  qualite:
+    name: Tests, référentiels et documentation
     runs-on: ubuntu-latest
     steps:
-      - name: Récupérer le code
+      - name: Récupérer le dépôt et son historique
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Installer Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Vérifier le parcours et les calculs
+      - name: Contrôler le questionnaire et les calculs
         run: node tests/smoke.cjs
+      - name: Contrôler les référentiels fictifs
+        run: node tests/validate-referentiels.cjs
+      - name: Contrôler les documents TXT et les évolutions
+        env:
+          S3E_DIFF_BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+        run: node tests/validate-docs.cjs
