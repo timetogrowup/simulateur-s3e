@@ -224,7 +224,39 @@ const priceOverride=ev('calculate({...estimates(),publicPrice:.85})');
 const defaultPrice=ev('calculate(estimates())');
 assert.ok(priceOverride[1].breakdown.commute+priceOverride[1].breakdown.privateEnergy>defaultPrice[1].breakdown.commute+defaultPrice[1].breakdown.privateEnergy,'Tarif public modifiable à l’affinage');
 assert.equal(ev('refineInitial().values.publicPaidShare'),1,'Anciennes sauvegardes : domicile impossible = public payant');
-console.log('OK : parcours, AEN, trésorerie, bilans et sauvegardes multiples');
+// Exports CSV : scénarios, postes, hypothèses, écarts et neutralisation des formules.
+ev("answers.futureMotor='Électrique';answers.home='Impossible';base=estimates();detail={maintenance:estimates().maintenance+240};last=calculate({...base,...detail});view='refined'");
+const csv=ev('csvContent()');
+assert.match(csv,/premier_bilan/,'CSV comporte le premier bilan');
+assert.match(csv,/bilan_affine/,'CSV comporte le bilan affiné');
+assert.match(csv,/comparaison/,'CSV comporte les écarts');
+assert.match(csv,/aenSocial/,'CSV ventile les charges AEN');
+assert.match(csv,/publicPrice/,'CSV contient le prix public utilisé');
+assert.match(csv,/FICTIF/,'CSV avertit du caractère fictif');
+assert.match(csv,/EUR\/an/,'CSV indique les unités');
+assert.equal(ev("csvCell('=HYPERLINK(1)')"),'"\'=HYPERLINK(1)"','Injection de formule désactivée');
+assert.equal(ev('csvCell(-125.5)'),'-125.5','Nombres négatifs préservés');
+ev("view='report'");
+assert.doesNotMatch(ev('csvContent()'),/bilan_affine/,'CSV premier bilan ne fabrique pas un bilan affiné');
+// Fichier JSON portable : versionnement, import non destructif et refus des fichiers incorrects.
+ev("view='refined';last=calculate({...base,...detail})");
+const jsonPayload=ev("portablePayload('Essai transfert')");
+assert.equal(jsonPayload.format,'S3E_SIMULATION','Format JSON identifié');
+assert.equal(jsonPayload.schemaVersion,2,'Schéma JSON versionné');
+const rawPortable=JSON.stringify(jsonPayload);
+assert.equal(ev('parsePortableJSON('+JSON.stringify(rawPortable)+').title'),'Essai transfert','Lecture JSON compatible');
+const oldSize=ev('readSaves().length');
+ev('importPortableJSON('+JSON.stringify(rawPortable)+')');
+assert.equal(ev('readSaves().length'),oldSize+1,'Import crée nouvelle sauvegarde');
+assert.equal(ev('readSaves()[0].title'),'Essai transfert','Nom portable conservé');
+assert.equal(ev('view'),'refined','Import ne change pas la page actuelle');
+assert.throws(()=>ev("parsePortableJSON('{}')"),/version/,'JSON non conforme rejeté');
+const wrongVersion=JSON.stringify({...jsonPayload,schemaVersion:99});
+assert.throws(()=>ev('parsePortableJSON('+JSON.stringify(wrongVersion)+')'),/version/,'Version incompatible rejetée');
+const oldAfterImport=ev('readSaves().length');
+assert.throws(()=>ev("importPortableJSON('{}')"),/version/,'Import incorrect refusé');
+assert.equal(ev('readSaves().length'),oldAfterImport,'Import invalide sans modification des sauvegardes');
+console.log('OK : parcours, AEN, trésorerie, bilans, sauvegardes et exports CSV/JSON');
 
 
 
