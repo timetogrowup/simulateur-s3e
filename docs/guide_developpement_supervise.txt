@@ -1,0 +1,46 @@
+SIMULATEUR S3E — GUIDE TXT DE DÉVELOPPEMENT SUPERVISÉ
+Version 1.1 — 17/10/2026
+Statut : guide de projet et journal de recette, non validation métier ni fiscale.
+
+DOCUMENTS MAÎTRES
+cahier_des_charges_simulateur_S3E.txt
+architecture_projet_simulateur_S3E.txt
+architecture_code_html_js_simulateur_S3E.txt
+strategie_developpement_controles_coherence_S3E.txt
+S3E_evolution_calcul_AEN_v1.txt
+Les décisions ultérieures de l'utilisateur prévalent en cas de conflit.
+
+PÉRIMÈTRE FIGÉ
+Trois intitulés : Situation actuelle / Demain avec une voiture de fonction / Demain sans voiture de fonction.
+Questionnaire rapide dynamique ; premier bilan ; affinage prérempli ; recalcul uniquement au clic ; bilan affiné ; sauvegarde et export ; aucune collecte de données du salarié.
+Seul l'impact estimé en cotisations et impôt de l'AEN compte comme coût, pas le brut. Sur le futur véhicule électrique SUEZ, seules les recharges au domicile payées par le salarié sont à sa charge. Référentiels AEN, compensation et consommations : FICTIFS, non officiels.
+
+LOT ACTUEL — COMPARATIF DES BILANS
+Modifier index.html et tests/smoke.cjs. Développer compareBilans(initial,refined) pour les mêmes trois scénarios, puis comparisonTable(...).
+Afficher le tableau seulement après « Recalculer le bilan affiné ».
+Coût delta annuel = affiné - initial ; delta mensuel = delta annuel / 12.
+Gain de pouvoir d'achat = coût situation actuelle - coût scénario ; évolution du gain = gain affiné - gain initial.
+Une hausse des dépenses doit être signalée comme perte, sans confondre changement d'hypothèses et chronologie réelle.
+Aucune nouvelle formule métier dans le code des tableaux ; ne pas écraser les résultats initiaux.
+
+TESTS ATTENDUS
+1. Trois scénarios conservés.
+2. Tableau absent sur le premier bilan.
+3. Tableau présent sur bilan affiné.
+4. +240 € d'entretien personnel => +240 €/an, +20 €/mois sur le coût personnel.
+5. Gain de pouvoir d'achat personnel diminué de 240 €/an.
+6. Situation actuelle inchangée dans cet exemple.
+7. Rejet des bilans incomplets et conservation des tests de non-régression.
+Porte de sortie : GitHub Actions réussi pour le dernier code.
+
+PROCHAINS LOTS
+Sauvegardes locales multiples et reprise robuste.
+Export détaillé des postes, des hypothèses et des deux bilans.
+Modularisation progressive du fichier HTML/JS, tests de non-régression et recette mobile.
+Contrôle de validité des référentiels et intégration des données officielles lorsqu'elles seront disponibles.
+
+LIMITES
+Toutes les grilles SUEZ sont fictives. Fiscalité, régime social de la compensation, AEN et hypothèse de déductibilité restent à valider. Les frais de financement et l'inflation ne sont pas encore traités. Les tests automatiques ne remplacent pas une recette utilisateur dans le navigateur.
+
+CONTRÔLE DE CONTINUITÉ
+À chaque lot : mise à jour du TXT, changement ciblé du code, tests, suivi du déploiement, rapport des limites. Ne pas ajouter de fonctionnalités rejetées.
