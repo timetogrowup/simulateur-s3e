@@ -1,7 +1,7 @@
 SIMULATEUR S3E — CADRAGE DU RENFORCEMENT GITHUB ACTIONS
 Identifiant : EVOL-CI-001
 Version : 1.0 — 17/10/2026
-Statut : cadrage préalable à l'implémentation
+Statut : implémentation effectuée, validation CI à renseigner après contrôle
 Responsable d'arbitrage : responsable humain du projet
 Références : docs/gouvernance_projet_chatgpt_github.txt ; docs/guide_developpement_supervise.txt
 
@@ -97,3 +97,11 @@ Produire, dans cet ordre :
 (3) workflow enrichi ;
 (4) mises à jour du guide TXT et README ;
 (5) observation des conclusions de workflow et compte rendu.
+
+10. LIVRAISON TECHNIQUE DU LOT
+Fichiers créés : tests/validate-referentiels.cjs, tests/validate-docs.cjs.
+Workflow enrichi : .github/workflows/s3e-tests.yml.
+Vérifications : non-régression, typage et bornage des quatre référentiels fictifs, présence des TXT, traçabilité du changement applicatif depuis la révision de base sur CI GitHub.
+Exécution locale : node tests/smoke.cjs ; node tests/validate-referentiels.cjs ; node tests/validate-docs.cjs.
+Pas de dépendance npm ajoutée. Droits du workflow limités à contents: read.
+Publication GitHub Pages NON conditionnée par ce workflow : un changement d'architecture de publication et de protection de branche sera cadré séparément.
