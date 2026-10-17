@@ -1,5 +1,5 @@
 SIMULATEUR S3E — GUIDE TXT DE DÉVELOPPEMENT SUPERVISÉ
-Version 1.5 — 17/10/2026
+Version 1.6 — 17/10/2026
 Statut : guide de projet et journal de recette, non validation métier ni fiscale.
 
 DOCUMENTS MAÎTRES
@@ -95,3 +95,11 @@ Recette visuelle sur téléphone et validation des tarifs publics encore à effe
 AJUSTEMENT EVOL-RECHARGE-002 — TARIF PUBLIC AUTOMATIQUE
 17/10/2026 : si aucune recharge à domicile n'est possible, la question sur le prix des bornes publiques est masquée ; 100 % des recharges sont supposées payées personnellement et chiffrées par défaut à 0,50 €/kWh (hypothèse fictive issue du référentiel). Le prix se modifie seulement lors de l'affinage. Les valeurs publiques sauvegardées dans le questionnaire rapide ne prévalent pas sur ce défaut.
 Fichiers : index.html, tests/smoke.cjs, docs/evolutions/EVOL-RECHARGE-002_recharge_publique_payante.txt.
+
+LOT EVOL-CI-001 — RENFORCEMENT DE GITHUB ACTIONS
+Date : 17/10/2026
+Document de cadrage conservé dans docs/evolutions/EVOL-CI-001_github_actions.txt.
+Fonctions implémentées : tests de non-régression existants ; contrôle indépendant des référentiels fictifs (valeurs, unités, version et statut) ; contrôle présence et traçabilité des TXT lors d'un changement de code/référentiel.
+Workflow : .github/workflows/s3e-tests.yml. Scripts : tests/validate-referentiels.cjs et tests/validate-docs.cjs.
+Points à venir : tests sur navigateur réel et mobile, analyse de sécurité plus complète, stratégie de livraison/versionnement et blocage éventuel de la publication Pages après tests, nécessitant une décision distincte.
+Aucun contrôle CI ne valide la fiscalité ni les données officielles SUEZ.
