@@ -25,3 +25,16 @@ Le montant brut de l'avantage en nature n'est **pas** une dépense directe du sa
 ## Mise à jour et contrôle
 
 Les tests automatiques sont disponibles dans `tests/smoke.cjs`, exécutés via GitHub Actions à chaque mise à jour. Les barèmes et le catalogue officiels SUEZ ne sont pas inclus. Le code est encore un prototype monofichier et doit être progressivement modularisé selon l'architecture du projet.
+
+## Référentiels séparés — version de recette
+
+Les fichiers sous `referentiels/` sont des jeux de données **entièrement fictifs** :
+
+- `aen_TEST.js` : montants mensuels d'AEN proposés dans les deux questions correspondantes.
+- `compensations_TEST.js` : montants mensuels de compensation en cas de restitution du véhicule de fonction.
+- `vehicules_TEST.js` : consommations indicatives par motorisation, sans désigner un catalogue SUEZ réel.
+- `hypotheses_TEST.js` : tarifs de l'énergie, entretien, assurance, revente et paramètres fiscaux provisoires.
+
+Les fichiers sont chargés localement par le navigateur depuis GitHub Pages **avant** le moteur JavaScript, sans API ni collecte des réponses. Les propriétés `statut: "FICTIF"` sont vérifiées au démarrage. Les montants AEN et compensations sont extraits des fichiers, et ne sont plus répétés dans les formules.
+
+**Attention :** modifier des fichiers de tests ne suffit pas à rendre des données officielles. Avant intégration réelle, vérifier les schémas, la provenance, les dates d'application, les règles d'éligibilité et la fiscalité. La validation actuelle interdit volontairement de faire passer un fichier marqué autrement que FICTIF pour un jeu de test.
