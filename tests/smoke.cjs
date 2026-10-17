@@ -144,7 +144,24 @@ assert.equal(ev('validateRefine(refineInitial().values)'),null,'Valeurs initiale
 assert.match(ev('validateRefine({...refineInitial().values,homeShare:1.5})'),/taux/,'Recharge impossible rejetée');
 assert.match(ev('validateRefine({...refineInitial().values,resale:999999})'),/revente/,'Revente aberrante rejetée');
 assert.match(ev('validateRefine({...refineInitial().values,purchase:NaN})'),/numériques/,'Champs manquants rejetés');
-console.log('OK : référentiels, questionnaires, AEN, trésorerie et affinage en cinq sections');
+// Comparaison premier bilan / bilan affiné : uniquement quand le bilan affiné existe.
+ev("base=estimates();detail={};last=null;view='report';draw()");
+assert.doesNotMatch(root.innerHTML,/Évolution entre le premier bilan et le bilan affiné/,'Ne pas afficher le comparatif sur le premier bilan');
+const firstResults=ev('calculate(base)');
+const changedAssumptions=ev('({...base,maintenance:base.maintenance+240})');
+const refinedResults=ev('calculate(changedAssumptions)');
+const comparison=ev('compareBilans(calculate(base),calculate({...base,maintenance:base.maintenance+240}))');
+assert.equal(comparison.length,3,'Trois situations dans le comparatif');
+assert.ok(Math.abs(comparison[2].annualCostDelta-240)<1e-8,'Entretien +240 euros donne hausse de 240 euros annuels');
+assert.ok(Math.abs(comparison[2].monthlyCostDelta-20)<1e-8,'Hausse mensuelle égale 20 euros');
+assert.ok(Math.abs(comparison[2].annualGainDelta+240)<1e-8,'Une hausse du coût diminue le pouvoir d’achat');
+assert.equal(comparison[0].annualCostDelta,0,'La situation actuelle est inchangée dans le test');
+ev("detail={maintenance:base.maintenance+240};last=calculate({...base,...detail});view='refined';draw()");
+assert.match(root.innerHTML,/Évolution entre le premier bilan et le bilan affiné/,'Comparatif présent seulement au bilan affiné');
+assert.match(root.innerHTML,/Variation du pouvoir d’achat/,'Gain ou perte affiché');
+assert.match(root.innerHTML,/Bilan affiné/,'Restitution existante préservée');
+assert.throws(()=>ev('compareBilans([],[])'),/incompatibles/,'Rejeter bilans incomplets');
+console.log('OK : référentiels, AEN, trésorerie, affinage et comparaison des bilans');
 
 
 
