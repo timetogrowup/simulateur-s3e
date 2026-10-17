@@ -1,7 +1,7 @@
 SIMULATEUR S3E — CADRAGE DES TESTS NAVIGATEUR
 ID : EVOL-TEST-002
 Version : 1.0 — 17 octobre 2026
-Statut : CADRAGE préalable à l'implémentation
+Statut : DÉVELOPPÉ — tests Chromium mobile et bureau réussis, recette physique à faire
 Références : gouvernance_projet_chatgpt_github.txt ; guide_developpement_supervise.txt
 
 OBJECTIF
@@ -64,3 +64,10 @@ LIVRAISON PRÉVUE
 
 JOURNAL D'IMPLÉMENTATION
 Scripts Playwright, serveur local et job navigateur ajoutés. Un premier échec de test provenait d'un sélecteur de titre ambigu (« Bilan affiné » et titre de comparaison). Le sélecteur a été corrigé en correspondance exacte ; attente de la recette du dernier commit.
+
+CLÔTURE TECHNIQUE DU LOT — 17/10/2026
+Le workflow GitHub Actions 39010924722 a exécuté les deux jobs, chacun terminé avec conclusion SUCCESS :
+- Tests, référentiels et documentation : SUCCESS.
+- Parcours Chromium mobile et bureau : SUCCESS.
+Les étapes couvrent les téléchargements et import JSON en navigateur, la modification du tarif de recharge publique, la sauvegarde, le bilan affiné et les erreurs de page. Le test a également contrôlé l'absence de débordement global sur le viewport mobile émulé.
+Réserve : aucune exécution sur téléphone Samsung physique ; GitHub Pages déploie séparément et n'attend pas encore cette CI.
