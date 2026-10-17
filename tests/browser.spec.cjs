@@ -23,7 +23,7 @@ test('parcours, recharge payante, affinage et export/import',async({page},testIn
   const title=await heading.textContent();
   const radios=page.locator('input[name="choice"]');
   let optionIndex=0;
-  if(/Recharge possible à domicile/i.test(title)){
+  if(/recharger.*domicile|Recharge possible à domicile/i.test(title)){
     optionIndex=await page.locator('label.opt').allTextContents().then(xs=>xs.findIndex(x=>x.includes('Impossible')));
     expect(optionIndex).toBeGreaterThanOrEqual(0);
   }
