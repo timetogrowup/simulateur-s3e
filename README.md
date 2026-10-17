@@ -50,3 +50,9 @@ Lorsque la recharge du futur véhicule électrique SUEZ à domicile est impossib
 ### Si la recharge à domicile est impossible
 
 Le questionnaire rapide ne demande **pas** le tarif de recharge publique. Il applique automatiquement le tarif fictif `kwhPublic` du référentiel `referentiels/hypotheses_TEST.js` (0,50 €/kWh actuellement), sur 100 % des recharges payantes à l'extérieur. Le salarié peut modifier ce prix lors de l'**affinage du bilan**. Aucun tarif SUEZ officiel n'est revendiqué.
+
+## Contrôles GitHub Actions — EVOL-CI-001
+
+Le workflow [S3E - Contrôles qualité](.github/workflows/s3e-tests.yml) s'exécute à chaque push sur `main` et sur les pull requests. Il lance `node tests/smoke.cjs`, `node tests/validate-referentiels.cjs` et `node tests/validate-docs.cjs`. Le validateur documentaire contrôle les TXT obligatoires ; avec l'historique Git disponible, toute modification d'index.html ou des référentiels exige une mise à jour conjointe d'un TXT sous `docs/`. [Cadrage TXT](docs/evolutions/EVOL-CI-001_github_actions.txt).
+
+Ces tests n'évaluent pas encore un navigateur réel et **ne bloquent pas automatiquement la publication GitHub Pages**. Ils ne remplacent pas la recette métier ou fiscale.
