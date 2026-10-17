@@ -74,3 +74,8 @@ Validation CI : tests automatisés réussis le 17/10/2026. Recette humaine mobil
 
 8. COMPATIBILITÉ DES SAUVEGARDES
 La reprise d'une ancienne simulation avec bilan affiné déclenche un nouveau calcul selon les règles actuelles de recharge. Si les nouveaux paramètres publicPaidShare/publicPrice étaient absents, ils sont alimentés par défaut (domicile impossible = 100 % public payant ; prix public = ancien tarif public estimé). Les résultats peuvent donc différer d'une simulation ancienne ; prévenir l'utilisateur dans les limites connues.
+
+9. AJUSTEMENT DE PARCOURS — PRIX PUBLIC PAR DÉFAUT (17/10/2026)
+Décision confirmée : si la recharge à domicile est « Impossible », ne pas poser la question du tarif public dans le questionnaire rapide. Le coût de recharge extérieure payante est calculé avec REF.assumptions.prix.kwhPublic, valeur fictive actuelle de 0,50 €/kWh. Ce paramètre reste modifiable dans le formulaire d'affinage : « Tarif des bornes publiques à votre charge (€/kWh) ».
+Dans ce cas, H = 0, P = 1 et E = valeur de référence ; une ancienne réponse mémorisée pour publicPrice est ignorée dans le bilan rapide. Les autres parcours demeurent inchangés.
+Contrôles : question masquée ; estimation = référentiel ; présence dans l'affinage ; simulation du changement de prix ; tests de non-régression.
