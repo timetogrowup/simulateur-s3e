@@ -216,6 +216,30 @@ function validateRefine(values){
   for(const key of required.filter(key=>!['tax','social','socialDeductibleShare','homeShare','purchase','years','resale'].includes(key)))if(values[key]<0)return 'Les distances, tarifs et dépenses doivent être positifs.';
   return null;
 }
+// Comparaison entre deux bilans : mêmes scénarios, mêmes unités (euros/an).
+// Ce comparatif n'influence pas les calculs ni les réponses conservées.
+function compareBilans(initial,refined){
+ if(!Array.isArray(initial)||!Array.isArray(refined)||initial.length!==3||refined.length!==3)throw Error('Bilans incompatibles.');
+ return initial.map((first,i)=>{
+   const next=refined[i];
+   if(first.id!==next.id||![first.cost,next.cost,first.gain,next.gain].every(Number.isFinite))throw Error('Scénarios du bilan incohérents.');
+   const annualCostDelta=next.cost-first.cost;
+   return {id:first.id,label:first.label,initialAnnualCost:first.cost,refinedAnnualCost:next.cost,annualCostDelta,
+     monthlyCostDelta:annualCostDelta/12,initialGain:first.gain,refinedGain:next.gain,
+     annualGainDelta:next.gain-first.gain,monthlyGainDelta:(next.gain-first.gain)/12};
+ });
+}
+function comparisonTable(first,refined){
+ const rows=compareBilans(first,refined);
+ return '<h2>Évolution entre le premier bilan et le bilan affiné</h2>'+
+ '<p class="muted">Les montants sont des coûts économiques nets annuels. Une variation positive du coût signifie une dépense plus élevée après affinage ; une variation négative signifie une économie. Ce tableau mesure le changement des hypothèses, pas une évolution réelle dans le temps.</p>'+
+ '<div style="overflow-x:auto"><table><tr><th>Situation</th><th>Premier bilan</th><th>Bilan affiné</th><th>Variation par an</th><th>Variation par mois</th></tr>'+
+ rows.map(x=>'<tr><td>'+x.label+'</td><td>'+fmt(x.initialAnnualCost)+'</td><td>'+fmt(x.refinedAnnualCost)+'</td><td>'+fmt(x.annualCostDelta)+'</td><td>'+fmt(x.monthlyCostDelta)+'</td></tr>').join('')+
+ '</table></div>'+
+ '<h3>Variation du pouvoir d’achat par rapport à la situation actuelle</h3>'+
+ '<div style="overflow-x:auto"><table><tr><th>Situation</th><th>Premier gain / perte annuel</th><th>Gain / perte affiné annuel</th><th>Écart</th></tr>'+
+ rows.map(x=>'<tr><td>'+x.label+'</td><td>'+fmt(x.initialGain)+'</td><td>'+fmt(x.refinedGain)+'</td><td>'+fmt(x.annualGainDelta)+'</td></tr>').join('')+'</table></div>';
+}
 function draw(){if(view==='home'){root.innerHTML='<article><h1>Votre véhicule, votre pouvoir d’achat</h1><p>Simulez vos trois solutions avec un questionnaire rapide, puis affinez les hypothèses.</p><p class="warn">Toutes les grilles AEN et compensation sont fictives. Les calculs fiscaux sont des approximations pour tester le parcours.</p><div class="buttons"><button onclick="start()">Commencer</button><button class="secondary" onclick="load()">Reprendre une sauvegarde</button></div></article>';return}
 if(view==='wizard'){const list=active();step=Math.min(step,list.length-1);const q=list[step];const ux=uxCopy[q.id]||['Questionnaire',q.title,''];const intro=q.id==='budget'?'<section class="scenario-intro"><strong>Et si vous rendiez votre voiture de fonction SUEZ ?</strong><p>Dans ce troisième scénario, vous n’utilisez plus de véhicule fourni par SUEZ : vous achetez et entretenez votre propre voiture. Une compensation SUEZ peut éventuellement être versée selon la grille applicable. Les questions suivantes concernent uniquement cette hypothèse.</p></section>':'';root.innerHTML='<article><p class="muted">'+ux[0]+' · Question '+(step+1)+' / '+list.length+'</p><div class="progress"><div style="width:'+((step+1)/list.length*100)+'%"></div></div>'+intro+'<h2>'+ux[1]+'</h2><p class="muted" style="line-height:1.5">'+ux[2]+'</p>'+q.options.map((v,i)=>'<label class="opt"><input type="radio" name="choice" '+(answers[q.id]===v?'checked':'')+' onchange="pickIndex('+i+')">'+v+'</label>').join('')+'<div class="buttons"><button class="secondary" onclick="prev()">Précédent</button><button onclick="next()">Suivant</button></div></article>';return}
 if(view==='recap'){root.innerHTML='<article><h1>Récapitulatif</h1><p>Vérifie les réponses avant le calcul.</p>'+active().map((q,i)=>'<p><span class="muted">'+q.title+'</span><br><b>'+ (answers[q.id]||'Non renseigné')+'</b> <button class="secondary" onclick="edit('+i+')">Modifier</button></p>').join('')+'<div class="buttons"><button onclick="first()">Calculer le premier bilan</button></div></article>';return}
@@ -260,7 +284,7 @@ const res=view==='refined'?last:calculate(base);const min=Math.min(...res.map(x=
 ['other','Autres frais'],
 ['installation','Installation annualisée'],
 ['compensation','Compensation SUEZ (déduite)']
-].map(([key,label])=>'<tr><td>'+label+'</td>'+res.map(x=>'<td>'+fmt(x.breakdown[key]||0)+'</td>').join('')+'</tr>').join('')+'</table><p>Coût le plus faible selon ces hypothèses : <b>'+res.find(x=>x.cost===min).label+'</b>.</p><h2>Projection économique</h2><p>Durée : '+Math.round((view==='refined'?detail.years:base.years)*10)/10+' ans</p><div class="cards">'+res.map(s=>'<div class="card">'+s.label+'<b>'+fmt(s.cost*(view==='refined'?detail.years:base.years))+'</b></div>').join('')+'</div>'+cashflowTable(cashflow)+'<h2>Analyses de sensibilité</h2><p class="muted">Hypothèses de test : énergie et valeur de revente à −20 %, référence, +20 %. Chaque ligne correspond au coût annuel net des trois situations.</p>'+[
+].map(([key,label])=>'<tr><td>'+label+'</td>'+res.map(x=>'<td>'+fmt(x.breakdown[key]||0)+'</td>').join('')+'</tr>').join('')+'</table><p>Coût le plus faible selon ces hypothèses : <b>'+res.find(x=>x.cost===min).label+'</b>.</p><h2>Projection économique</h2><p>Durée : '+Math.round((view==='refined'?detail.years:base.years)*10)/10+' ans</p><div class="cards">'+res.map(s=>'<div class="card">'+s.label+'<b>'+fmt(s.cost*(view==='refined'?detail.years:base.years))+'</b></div>').join('')+'</div>'+cashflowTable(cashflow)+(view==='refined'?comparisonTable(calculate(base),res):'')+'<h2>Analyses de sensibilité</h2><p class="muted">Hypothèses de test : énergie et valeur de revente à −20 %, référence, +20 %. Chaque ligne correspond au coût annuel net des trois situations.</p>'+[
 ['Prix de l’énergie',sensitivity.energy],
 ['Valeur de revente du véhicule personnel',sensitivity.resale]
 ].map(([label,items])=>'<h3>'+label+'</h3><table><tr><th>Variation</th><th>Situation actuelle</th><th>Avec fonction</th><th>Sans fonction</th></tr>'+items.map(item=>'<tr><td>'+(item.factor===1?'Référence':(item.factor<1?'−20 %':'+20 %'))+'</td>'+item.results.map(x=>'<td>'+fmt(x.cost)+'</td>').join('')+'</tr>').join('')+'</table>').join('')+'<details><summary>Hypothèses du calcul</summary><pre style="white-space:pre-wrap;overflow:auto">'+JSON.stringify(view==='refined'?{...base,...detail}:base,null,2)+'</pre></details><div class="buttons"><button onclick="view=\'refine\';draw()">Affiner mon bilan</button><button class="secondary" onclick="window.print()">Imprimer</button><button class="secondary" onclick="save()">Sauvegarder</button><button class="secondary" onclick="exportCSV()">Exporter CSV</button></div></article>';}
