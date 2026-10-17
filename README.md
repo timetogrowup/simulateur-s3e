@@ -46,3 +46,7 @@ Le document de référence est [docs/gouvernance_projet_chatgpt_github.txt](docs
 ## Recharge publique payante — EVOL-RECHARGE-002
 
 Lorsque la recharge du futur véhicule électrique SUEZ à domicile est impossible, la simulation considère les bornes publiques payantes comme étant à la charge du salarié et demande leur tarif. Si le domicile est accessible, le questionnaire distingue la recharge à domicile et les recharges extérieures payées personnellement. Seules les charges extérieures effectivement couvertes par SUEZ sont sans coût pour le salarié. Les prix sont fictifs. Voir [la décision métier détaillée](docs/evolutions/EVOL-RECHARGE-002_recharge_publique_payante.txt).
+
+### Si la recharge à domicile est impossible
+
+Le questionnaire rapide ne demande **pas** le tarif de recharge publique. Il applique automatiquement le tarif fictif `kwhPublic` du référentiel `referentiels/hypotheses_TEST.js` (0,50 €/kWh actuellement), sur 100 % des recharges payantes à l'extérieur. Le salarié peut modifier ce prix lors de l'**affinage du bilan**. Aucun tarif SUEZ officiel n'est revendiqué.
