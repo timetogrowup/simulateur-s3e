@@ -1,5 +1,5 @@
 SIMULATEUR S3E — GUIDE TXT DE DÉVELOPPEMENT SUPERVISÉ
-Version 1.7 — 17/10/2026
+Version 1.8 — 17/10/2026
 Statut : guide de projet et journal de recette, non validation métier ni fiscale.
 
 DOCUMENTS MAÎTRES
@@ -111,3 +111,10 @@ Code : index.html ; tests/smoke.cjs.
 Export CSV : 3 scénarios, coûts et gains annuels, décompositions, réponses, hypothèses et comparatif initial-affiné lorsque disponible. CSV UTF-8, protection contre injection de formule, avertissement de données fictives.
 Export JSON : format S3E_SIMULATION v2, titre, versions des référentiels, contenu de la simulation locale. Import explicite avec contrôle de format, ajout d'une sauvegarde locale indépendante et recalcul ultérieur du bilan.
 Limites : recette mobile en attente, aucune synchronisation serveur, pas de validation fiscale ou paie. Prochain lot prioritaire : tests navigateurs et accessibilité mobile, avec cadrage TXT préalable.
+
+LOT EVOL-TEST-002 — PARCOURS NAVIGATEUR AUTOMATISÉ
+17/10/2026 — script Playwright en cours de recette technique.
+Cadrage conservé : docs/evolutions/EVOL-TEST-002_tests_navigateur.txt.
+Fichiers : package.json, playwright.config.cjs, tests/serve.cjs, tests/browser.spec.cjs et .github/workflows/s3e-tests.yml.
+Deux profils : Chromium mobile Pixel 7 émulé et Chromium bureau. Vérifications : questionnaire recharge impossible, prix public prérempli et modifié, bilan affiné, sauvegarde locale, téléchargements CSV/JSON, import JSON, erreurs JavaScript et absence de débordement majeur.
+GitHub Actions ajoute un job navigateur indépendant des contrôles de calcul/référentiels/docs. Artefacts d'échec Playwright conservés 7 jours. Le déploiement GitHub Pages demeure distinct.
