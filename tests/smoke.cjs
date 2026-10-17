@@ -12,6 +12,10 @@ const context=vm.createContext({
  localStorage:{getItem:()=>null,setItem:()=>{}},
  alert:()=>{},console,JSON,Number,Object,Math,URL,Blob,FormData,
 });
+// Les référentiels sont évalués avant le code de la page, comme dans index.html.
+for(const path of ['referentiels/aen_TEST.js','referentiels/compensations_TEST.js','referentiels/vehicules_TEST.js','referentiels/hypotheses_TEST.js']){
+  vm.runInContext(fs.readFileSync(path,'utf8'),context,{timeout:3000,filename:path});
+}
 vm.runInContext(js,context,{timeout:3000});
 const ev=(str)=>vm.runInContext(str,context);
 assert.match(root.innerHTML,/Commencer/,'Accueil présent');
@@ -114,7 +118,17 @@ assert.equal(noInstall.rows[0].items[1].oneOff,0,'Sans installation, aucun paiem
 ev("base=estimates();view='report';draw()");
 assert.match(root.innerHTML,/Trésorerie réelle et coût économique/,'Tableau de trésorerie affiché');
 assert.match(root.innerHTML,/Évolution du décaissement cumulé/,'Projection cumulée visible');
-console.log('OK : parcours, AEN, calculs financiers et échéancier de trésorerie');
+// Référentiels : absence de barèmes codés dans le calcul, valeurs tests cohérentes.
+assert.equal(ev('validateReferentiels(REF)'),true,'Jeu de référentiels complet');
+assert.equal(ev('REF.aen.montants.length'),4,'Quatre valeurs AEN test');
+assert.equal(ev('REF.comp.montants.length'),4,'Quatre valeurs de compensation test');
+assert.equal(ev("qs.find(q=>q.id==='aen').options[1]"),'200 €/mois','Question AEN dérivée du référentiel');
+assert.equal(ev("qs.find(q=>q.id==='comp').options[2]"),'300 €/mois','Question compensation dérivée du référentiel');
+assert.equal(ev('estimates().consumptionElectric'),20,'Consommation VE issue du catalogue test');
+assert.equal(ev('estimates().insurance'),700,'Assurance issue hypothèses test');
+assert.throws(()=>ev("validateReferentiels({...REF,aen:{statut:'FICTIF',montants:[]}})"),/Barème/,'Rejet d’un barème vide');
+assert.throws(()=>ev("validateReferentiels({...REF,comp:null})"),/manquants/,'Rejet d’un fichier manquant');
+console.log('OK : référentiels fictifs, questionnaires, AEN, calculs et trésorerie');
 
 
 
