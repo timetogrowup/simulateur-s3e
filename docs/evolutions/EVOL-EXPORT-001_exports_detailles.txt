@@ -1,0 +1,37 @@
+SIMULATEUR S3E — FICHE D'ÉVOLUTION EVOL-EXPORT-001
+Date : 17/10/2026 | Version 1.0 | Statut : CADRAGE
+Objet : exports détaillés et sauvegarde JSON portable.
+
+OBJECTIFS
+1. Export CSV détaillé et lisible hors simulateur, comportant métadonnées de recette, hypothèses, réponses, résultats par scénario, décomposition annuelle et comparaison premier/affiné.
+2. Export JSON d'une seule simulation transportable entre appareils, sous version de schéma.
+3. Import JSON via sélection explicite d'un fichier sur le téléphone ou l'ordinateur, sans serveur ni transmission.
+4. Aucun CSV ni JSON ne peut être interprété comme un montant officiel : mention FICTIF/TEST dans les exports.
+
+CONVENTIONS
+CSV : UTF-8 BOM, séparateur point-virgule, colonnes « section;champ;scénario;valeur;unité ». Les montants sont des nombres avec point décimal dans le fichier ; pas de formules exécutables à l'ouverture dans Excel. Les cellules commençant par = + - @ tab CR sont protégées comme du texte, sauf nombres numériques signés valides.
+Comparaison du premier bilan et du bilan affiné seulement si disponible. Les données professionnelles restent dans les hypothèses, sans être facturées au salarié.
+JSON : {format:"S3E_SIMULATION", schemaVersion:2, exportedAt, title, referentiels, data:snapshot()}.
+L'import contrôle format, taille du fichier, structure, valeurs numériques et identifiants de réponse ; aucune exécution de code ni écrasement des sauvegardes existantes. Limite 20 sauvegardes locales. Un import ajoute une nouvelle sauvegarde nommée avec confirmation utilisateur ; le bilan sera recalculé au chargement, conformément au moteur courant. Les résultats fiscaux restent approximatifs.
+Les fichiers sont générés à la demande par le navigateur ; pas d'envoi réseau.
+
+CRITÈRES DE RECETTE
+- CSV contient 3 scénarios × bilan initial et, le cas échéant, bilan affiné.
+- Tous les postes financiers sont exportés avec unité EUR/an.
+- Résultats et hypothèses correspondent aux calculs en mémoire.
+- CSV protège une chaîne de type formule et conserve les nombres.
+- JSON respecte le format versionné, refuse schéma inconnu/format invalide et limites.
+- Import ne modifie pas la simulation active ni les sauvegardes en cas d'échec.
+- Import valide ajoute une sauvegarde locale indépendante.
+- Recalcul lors de la reprise ; aucune régression questionnaire/AEN/recharge/trésorerie.
+- Tests GitHub Actions réussis ; recette navigateur/mobile reste à réaliser.
+
+FICHIERS
+docs/evolutions/EVOL-EXPORT-001_exports_detailles.txt
+docs/guide_developpement_supervise.txt
+index.html
+tests/smoke.cjs
+README.md
+
+LIMITES
+Pas d'export Excel natif ni de synchronisation cloud. Les fichiers exportés peuvent contenir des réponses relatives aux trajets et revenus approximés : ils restent sous la responsabilité de l'utilisateur. Les montants SUEZ restent fictifs. Le fichier JSON n'est pas un document de preuve, et une version ultérieure du moteur peut recalculer des montants différents.
