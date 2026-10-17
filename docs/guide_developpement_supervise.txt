@@ -1,5 +1,5 @@
 SIMULATEUR S3E — GUIDE TXT DE DÉVELOPPEMENT SUPERVISÉ
-Version 1.2 — 17/10/2026
+Version 1.3 — 17/10/2026
 Statut : guide de projet et journal de recette, non validation métier ni fiscale.
 
 DOCUMENTS MAÎTRES
@@ -13,7 +13,7 @@ Les décisions ultérieures de l'utilisateur prévalent en cas de conflit.
 PÉRIMÈTRE FIGÉ
 Trois intitulés : Situation actuelle / Demain avec une voiture de fonction / Demain sans voiture de fonction.
 Questionnaire rapide dynamique ; premier bilan ; affinage prérempli ; recalcul uniquement au clic ; bilan affiné ; sauvegarde et export ; aucune collecte de données du salarié.
-Seul l'impact estimé en cotisations et impôt de l'AEN compte comme coût, pas le brut. Sur le futur véhicule électrique SUEZ, seules les recharges au domicile payées par le salarié sont à sa charge. Référentiels AEN, compensation et consommations : FICTIFS, non officiels.
+Seul l'impact estimé en cotisations et impôt de l'AEN compte comme coût, pas le brut. Sur le futur véhicule électrique SUEZ, le salarié paie les recharges effectuées à domicile ET les bornes publiques payantes sans prise en charge par SUEZ ; les recharges effectivement couvertes par SUEZ restent gratuites pour lui. Référentiels AEN, compensation et consommations : FICTIFS, non officiels.
 
 LOT ACTUEL — COMPARATIF DES BILANS
 Modifier index.html et tests/smoke.cjs. Développer compareBilans(initial,refined) pour les mêmes trois scénarios, puis comparisonTable(...).
@@ -77,3 +77,12 @@ LIMITES ET VIGILANCES
 
 LOT APRÈS CELUI-CI
 EVOL-EXPORT-001 : export détaillé CSV (trois scénarios, postes, hypothèses, bilan initial / affiné) et proposition de sauvegarde JSON portable avec contrôle strict.
+
+LOT EVOL-RECHARGE-002 — RECHARGES PUBLIQUES PAYANTES
+Date : 17/10/2026
+Décision : les bornes publiques payantes sans prise en charge SUEZ sont à la charge du salarié. Lorsque le domicile ne permet aucune recharge, la totalité des recharges hors domicile est estimée payante pour le salarié dans le prototype, avec un tarif public à saisir.
+Calcul : km × consommation kWh/100 × [part domicile × tarif domicile + (1-part domicile) × part publique payante × tarif public].
+Les bornes et cartes effectivement financées par SUEZ ne créent aucun coût pour le salarié.
+Implémentation : index.html, tests/smoke.cjs. Fiche spécifique : docs/evolutions/EVOL-RECHARGE-002_recharge_publique_payante.txt.
+Contrôles : conditions d’affichage, calcul 100 % public payant, moitié payante, recharge SUEZ gratuite, non-régression du bilan.
+Limites : valeurs tarifaires fictives ; traitement des versions de sauvegardes anciennes à fiabiliser.
