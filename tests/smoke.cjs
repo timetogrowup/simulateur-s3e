@@ -149,7 +149,7 @@ ev("base=estimates();detail={};last=null;view='report';draw()");
 assert.doesNotMatch(root.innerHTML,/Évolution entre le premier bilan et le bilan affiné/,'Ne pas afficher le comparatif sur le premier bilan');
 const firstResults=ev('calculate(base)');
 const changedAssumptions=ev('({...base,maintenance:base.maintenance+240})');
-const refinedResults=ev('calculate(changedAssumptions)');
+const refinedResults=ev('calculate({...base,maintenance:base.maintenance+240})');
 const comparison=ev('compareBilans(calculate(base),calculate({...base,maintenance:base.maintenance+240}))');
 assert.equal(comparison.length,3,'Trois situations dans le comparatif');
 assert.ok(Math.abs(comparison[2].annualCostDelta-240)<1e-8,'Entretien +240 euros donne hausse de 240 euros annuels');
