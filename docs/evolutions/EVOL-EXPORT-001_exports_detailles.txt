@@ -1,5 +1,5 @@
 SIMULATEUR S3E — FICHE D'ÉVOLUTION EVOL-EXPORT-001
-Date : 17/10/2026 | Version 1.0 | Statut : CADRAGE
+Date : 17/10/2026 | Version 1.0 | Statut : CODE ET TESTS AUTOMATISÉS RÉALISÉS ; RECETTE MOBILE OUVERTE
 Objet : exports détaillés et sauvegarde JSON portable.
 
 OBJECTIFS
@@ -35,3 +35,10 @@ README.md
 
 LIMITES
 Pas d'export Excel natif ni de synchronisation cloud. Les fichiers exportés peuvent contenir des réponses relatives aux trajets et revenus approximés : ils restent sous la responsabilité de l'utilisateur. Les montants SUEZ restent fictifs. Le fichier JSON n'est pas un document de preuve, et une version ultérieure du moteur peut recalculer des montants différents.
+
+BILAN DE RÉALISATION — 17/10/2026
+Implémenté : csvRows(), csvCell(), csvContent(), exportCSV(), portablePayload(), parsePortableJSON(), importPortableJSON(), exportJSON(), chooseImportJSON().
+Interface : bouton CSV détaillé et JSON sur les bilans ; bouton d'import JSON à l'accueil.
+Contrôles automatiques : contenu des bilans et écarts, hypothèses, balise FICTIF, unité EUR/an, neutralisation de formule CSV, format JSON, version, refus d'import invalide, création de sauvegarde sans changement de la simulation en cours.
+GitHub Actions : réussi sur commit 0173e762 (tests de contrôle qualité).
+Réserve : téléchargement et sélection JSON à tester sur Android et navigateurs de bureau ; fiscalité et références SUEZ toujours fictives.
