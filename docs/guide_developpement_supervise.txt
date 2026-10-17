@@ -1,5 +1,5 @@
 SIMULATEUR S3E — GUIDE TXT DE DÉVELOPPEMENT SUPERVISÉ
-Version 1.1 — 17/10/2026
+Version 1.2 — 17/10/2026
 Statut : guide de projet et journal de recette, non validation métier ni fiscale.
 
 DOCUMENTS MAÎTRES
@@ -48,3 +48,32 @@ CONTRÔLE DE CONTINUITÉ
 GOUVERNANCE DOCUMENTAIRE
 La gouvernance du projet est décrite dans docs/gouvernance_projet_chatgpt_github.txt (édition 1.0).
 Le document fait référence pour le suivi documentaire, la traçabilité des décisions, les contrôles et les comptes rendus, sous réserve de validation par le responsable du projet.
+
+LOT SUIVANT — SAUVEGARDES NOMMÉES V2 (EVOL-SAVE-001)
+Date : 17/10/2026
+Objectif : permettre plusieurs simulations indépendantes dans le navigateur, leur reprise et la suppression individuelle.
+État : développé, recette automatisée en cours de vérification à la rédaction.
+
+RÈGLES RETENUES
+- Stockage local uniquement : clé s3e-simulations-v2, format versionné schemaVersion=2.
+- Maximum 20 simulations par navigateur ; titre fourni par le salarié (100 caractères maximum).
+- Chaque simulation contient réponses, étape, vue, estimation, valeurs affinées et bilan affiné éventuel.
+- Consultation des simulations depuis « Reprendre une sauvegarde » à l’accueil.
+- Chaque entrée peut être reprise ou supprimée après confirmation.
+- Les noms sont échappés dans le HTML : un titre ne doit pas injecter du code.
+- L'ancienne clé s3e-mobile-test est migrée si aucune sauvegarde V2 n’existe et l’original est conservé.
+- Une donnée corrompue est refusée sans effacement automatique ; les erreurs sont signalées.
+- Les données restent sur le navigateur ; elles peuvent disparaître avec les données locales et ne sont pas synchronisées.
+
+CODE CIBLÉ
+- index.html : snapshot(), validSnapshot(), readSaves(), storeSaves(), migrateLegacy(), save(), load(), restoreSave(), removeSave(), savesPage(), escapeHtml().
+- tests/smoke.cjs : sauvegardes multiples, reprises indépendantes, suppression, format invalide, ancienne sauvegarde, écran de gestion.
+
+LIMITES ET VIGILANCES
+- Pas encore de sauvegarde JSON téléchargeable, d'import ni de synchronisation multi-appareils.
+- Les résultats enregistrés peuvent reposer sur des hypothèses fiscales fictives anciennes ; une future reprise devra gérer explicitement le schéma et la version des référentiels.
+- Le schéma de validation est provisoire ; le rendre plus strict lors de la modularisation.
+- Tests navigateur réel et mobile à faire en complément de la CI.
+
+LOT APRÈS CELUI-CI
+EVOL-EXPORT-001 : export détaillé CSV (trois scénarios, postes, hypothèses, bilan initial / affiné) et proposition de sauvegarde JSON portable avec contrôle strict.
