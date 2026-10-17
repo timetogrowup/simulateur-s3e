@@ -8,7 +8,7 @@ Ouvrir `index.html` via GitHub Pages après activation dans Settings > Pages (De
 
 ## Parcours
 
-Questionnaire conditionnel de 23 questions (la question sur la recharge gratuite hors domicile a été retirée), trois scénarios, premier bilan, affinage des montants, nouveau bilan, sauvegarde locale, export CSV et impression.
+Questionnaire conditionnel de 25 questions (la question sur la recharge gratuite hors domicile a été retirée), trois scénarios, premier bilan, affinage des montants, nouveau bilan, sauvegarde locale, export CSV et impression.
 
 ## Limites de cette publication
 
@@ -42,3 +42,7 @@ Les fichiers sont chargés localement par le navigateur depuis GitHub Pages **av
 ## Gouvernance ChatGPT + GitHub
 
 Le document de référence est [docs/gouvernance_projet_chatgpt_github.txt](docs/gouvernance_projet_chatgpt_github.txt). Il décrit les responsabilités, les décisions, la gestion des versions, le cycle d'évolution, les contrôles, les niveaux de validation et les règles de confidentialité. Ce document est une proposition de gouvernance soumise à l'adoption du responsable du projet.
+
+## Recharge publique payante — EVOL-RECHARGE-002
+
+Lorsque la recharge du futur véhicule électrique SUEZ à domicile est impossible, la simulation considère les bornes publiques payantes comme étant à la charge du salarié et demande leur tarif. Si le domicile est accessible, le questionnaire distingue la recharge à domicile et les recharges extérieures payées personnellement. Seules les charges extérieures effectivement couvertes par SUEZ sont sans coût pour le salarié. Les prix sont fictifs. Voir [la décision métier détaillée](docs/evolutions/EVOL-RECHARGE-002_recharge_publique_payante.txt).
