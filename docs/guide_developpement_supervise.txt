@@ -44,3 +44,7 @@ Toutes les grilles SUEZ sont fictives. Fiscalité, régime social de la compensa
 
 CONTRÔLE DE CONTINUITÉ
 À chaque lot : mise à jour du TXT, changement ciblé du code, tests, suivi du déploiement, rapport des limites. Ne pas ajouter de fonctionnalités rejetées.
+
+GOUVERNANCE DOCUMENTAIRE
+La gouvernance du projet est décrite dans docs/gouvernance_projet_chatgpt_github.txt (édition 1.0).
+Le document fait référence pour le suivi documentaire, la traçabilité des décisions, les contrôles et les comptes rendus, sous réserve de validation par le responsable du projet.
