@@ -1,0 +1,13 @@
+{
+  "name": "simulateur-s3e",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Tests en navigateur du prototype S3E (référentiels fictifs)",
+  "scripts": {
+    "test:unit": "node tests/smoke.cjs && node tests/validate-referentiels.cjs && node tests/validate-docs.cjs",
+    "test:browser": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1"
+  }
+}
