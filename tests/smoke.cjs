@@ -6,10 +6,14 @@ assert.ok(scripts.length,'Bloc JavaScript introuvable');
 const js=scripts.map(m=>m[1]).join('\n');
 new vm.Script(js,{filename:'index.inline.js'});
 const root={innerHTML:''};
+const localData=new Map();
+let saveName='Essai S3E';
+let deletionConfirmed=true;
 const context=vm.createContext({
  document:{getElementById:id=>id==='root'?root:{onsubmit:null}},
  window:{print:()=>{}},
- localStorage:{getItem:()=>null,setItem:()=>{}},
+ localStorage:{getItem:key=>localData.get(key)??null,setItem:(key,value)=>localData.set(key,value)},
+ prompt:()=>saveName,confirm:()=>deletionConfirmed,
  alert:()=>{},console,JSON,Number,Object,Math,URL,Blob,FormData,
 });
 // Les référentiels sont évalués avant le code de la page, comme dans index.html.
@@ -161,7 +165,36 @@ assert.match(root.innerHTML,/Évolution entre le premier bilan et le bilan affin
 assert.match(root.innerHTML,/Variation du pouvoir d’achat/,'Gain ou perte affiché');
 assert.match(root.innerHTML,/Bilan affiné/,'Restitution existante préservée');
 assert.throws(()=>ev('compareBilans([],[])'),/incompatibles/,'Rejeter bilans incomplets');
-console.log('OK : référentiels, AEN, trésorerie, affinage et comparaison des bilans');
+// Sauvegardes nommées, intégrité, persistance et reprise.
+ev("base=estimates();detail={};last=null;view='report';draw()");
+ev('save()');
+assert.equal(ev('readSaves().length'),1,'Première sauvegarde conservée');
+assert.equal(ev('readSaves()[0].title'),'Essai S3E','Nom de simulation conservé');
+ev("answers.motor='Essence';save()");
+assert.equal(ev('readSaves().length'),2,'Plusieurs simulations indépendantes');
+const firstSaveId=ev('readSaves()[1].id');
+ev("answers.motor='Diesel'");
+ev("restoreSave(readSaves()[0].id)");
+assert.equal(ev('answers.motor'),'Essence','Restauration des réponses de la deuxième simulation');
+ev("restoreSave(readSaves()[1].id)");
+assert.equal(ev('answers.motor'),'Diesel','Restauration des réponses de la première simulation');
+ev('load()');
+assert.match(root.innerHTML,/Mes simulations sauvegardées/,'Page de reprise disponible');
+assert.match(root.innerHTML,/Reprendre/,'Action de reprise disponible');
+assert.match(root.innerHTML,/Supprimer/,'Action de suppression disponible');
+ev('removeSave(readSaves()[0].id)');
+assert.equal(ev('readSaves().length'),1,'Suppression d’une simulation précise');
+assert.ok(ev('validSnapshot(snapshot())')===false,'Vue des sauvegardes non enregistrable');
+assert.throws(()=>ev("readSaves.call(null);validateReferentiels({...REF,comp:null})"),/manquants/,'Tests référentiels préservés');
+assert.equal(ev('validSnapshot({view:"report",answers:{},detail:{},step:0,base:null})'),false,'Sauvegarde bilan sans base rejetée');
+localData.set('s3e-simulations-v2','{broken JSON');
+assert.throws(()=>ev('readSaves()'),SyntaxError,'Stockage corrompu refusé');
+localData.delete('s3e-simulations-v2');
+localData.set('s3e-mobile-test',JSON.stringify({answers:{motor:'Diesel'},step:0,view:'wizard',base:null,detail:{},last:null}));
+ev('migrateLegacy()');
+assert.equal(ev('readSaves()[0].title'),'Ancienne simulation','Migration de la sauvegarde initiale');
+assert.ok(localData.has('s3e-mobile-test'),'Ancien format préservé pour retour arrière');
+console.log('OK : parcours, AEN, trésorerie, bilans et sauvegardes multiples');
 
 
 
