@@ -166,7 +166,7 @@ assert.match(root.innerHTML,/Variation du pouvoir d’achat/,'Gain ou perte affi
 assert.match(root.innerHTML,/Bilan affiné/,'Restitution existante préservée');
 assert.throws(()=>ev('compareBilans([],[])'),/incompatibles/,'Rejeter bilans incomplets');
 // Sauvegardes nommées, intégrité, persistance et reprise.
-ev("base=estimates();detail={};last=null;view='report';draw()");
+ev("answers.motor='Diesel';base=estimates();detail={};last=null;view='report';draw()");
 ev('save()');
 assert.equal(ev('readSaves().length'),1,'Première sauvegarde conservée');
 assert.equal(ev('readSaves()[0].title'),'Essai S3E','Nom de simulation conservé');
