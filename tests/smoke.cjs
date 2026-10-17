@@ -128,7 +128,23 @@ assert.equal(ev('estimates().consumptionElectric'),20,'Consommation VE issue du 
 assert.equal(ev('estimates().insurance'),700,'Assurance issue hypothèses test');
 assert.throws(()=>ev("validateReferentiels({...REF,aen:{statut:'FICTIF',montants:[]}})"),/Barème/,'Rejet d’un barème vide');
 assert.throws(()=>ev("validateReferentiels({...REF,comp:null})"),/manquants/,'Rejet d’un fichier manquant');
-console.log('OK : référentiels fictifs, questionnaires, AEN, calculs et trésorerie');
+// Affinage en cinq sections et validation sans recalcul automatique.
+ev("base=estimates();detail={};last=null;view='refine';draw()");
+assert.equal(ev('refineGroups.length'),5,'Cinq sections métiers');
+assert.match(root.innerHTML,/Vos déplacements/,'Section déplacements visible');
+assert.match(root.innerHTML,/Votre véhicule actuel/,'Section situation actuelle visible');
+assert.match(root.innerHTML,/Demain avec une voiture de fonction/,'Section future visible');
+assert.match(root.innerHTML,/Demain sans voiture de fonction/,'Section personnelle visible');
+assert.match(root.innerHTML,/Fiscalité et hypothèses/,'Section fiscalité visible');
+assert.match(root.innerHTML,/Réinitialiser cette section/,'Réinitialisation par section visible');
+assert.match(root.innerHTML,/Réinitialiser tout/,'Réinitialisation globale visible');
+assert.match(root.innerHTML,/Estimation initiale/,'Valeurs sources conservées');
+assert.equal(ev('last'),null,'Ouverture du formulaire sans recalcul');
+assert.equal(ev('validateRefine(refineInitial().values)'),null,'Valeurs initiales valides');
+assert.match(ev('validateRefine({...refineInitial().values,homeShare:1.5})'),/taux/,'Recharge impossible rejetée');
+assert.match(ev('validateRefine({...refineInitial().values,resale:999999})'),/revente/,'Revente aberrante rejetée');
+assert.match(ev('validateRefine({...refineInitial().values,purchase:NaN})'),/numériques/,'Champs manquants rejetés');
+console.log('OK : référentiels, questionnaires, AEN, trésorerie et affinage en cinq sections');
 
 
 
