@@ -97,7 +97,24 @@ assert.ok(!('aen' in rAen[0].breakdown),'Le brut AEN n’entre pas comme coût')
 assert.ok(rAen[2].breakdown.compensation<0,'Compensation nette déduite');
 ev("base=estimates();view='report';draw()");
 assert.match(root.innerHTML,/AEN : cotisations salariales estimées/,'Ventilation AEN visible');
-console.log('OK : parcours, finance, moteur AEN-001 de recette et graphiques');
+// Trésorerie : pas de double comptage du prix d'achat ni de la revente.
+ev("answers.persMotor='Diesel';answers.futureMotor='Électrique';answers.home='Installation nécessaire';answers.subsidy='Non'");
+const cashAssumptions=ev('estimates()');
+const cashResults=ev('calculate(estimates())');
+const schedule=ev('cashflowSchedule(estimates(),calculate(estimates()))');
+assert.equal(schedule.rows.length,Math.ceil(cashAssumptions.years),'Périodes annuelles et fraction terminale');
+assert.ok(schedule.rows[0].items[2].oneOff>=cashAssumptions.purchase,'Achat décaissé intégralement au départ');
+assert.equal(schedule.rows[1].items[2].oneOff,0,'Aucun nouvel achat en année 2');
+assert.equal(schedule.rows.at(-1).items[2].sale,cashAssumptions.purchase*.38,'Revente versée une seule fois en fin de période');
+assert.ok(schedule.rows.slice(0,-1).every(row=>row.items[2].sale===0),'Pas de vente avant échéance');
+assert.ok(schedule.discrepancy.every(x=>Math.abs(x)<0.01),'Rapprochement économique et trésorerie');
+assert.ok(schedule.rows[0].items[1].oneOff>0,'Installation SUEZ à domicile décaissée au début');
+const noInstall=ev("cashflowSchedule({...estimates(),install:0},calculate({...estimates(),install:0}))");
+assert.equal(noInstall.rows[0].items[1].oneOff,0,'Sans installation, aucun paiement initial futur SUEZ');
+ev("base=estimates();view='report';draw()");
+assert.match(root.innerHTML,/Trésorerie réelle et coût économique/,'Tableau de trésorerie affiché');
+assert.match(root.innerHTML,/Évolution du décaissement cumulé/,'Projection cumulée visible');
+console.log('OK : parcours, AEN, calculs financiers et échéancier de trésorerie');
 
 
 
