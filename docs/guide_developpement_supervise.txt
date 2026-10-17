@@ -1,5 +1,5 @@
 SIMULATEUR S3E — GUIDE TXT DE DÉVELOPPEMENT SUPERVISÉ
-Version 1.6 — 17/10/2026
+Version 1.7 — 17/10/2026
 Statut : guide de projet et journal de recette, non validation métier ni fiscale.
 
 DOCUMENTS MAÎTRES
@@ -103,3 +103,11 @@ Fonctions implémentées : tests de non-régression existants ; contrôle indép
 Workflow : .github/workflows/s3e-tests.yml. Scripts : tests/validate-referentiels.cjs et tests/validate-docs.cjs.
 Points à venir : tests sur navigateur réel et mobile, analyse de sécurité plus complète, stratégie de livraison/versionnement et blocage éventuel de la publication Pages après tests, nécessitant une décision distincte.
 Aucun contrôle CI ne valide la fiscalité ni les données officielles SUEZ.
+
+LOT EVOL-EXPORT-001 — EXPORTS DÉTAILLÉS ET JSON PORTABLE
+17/10/2026 — implémenté, tests GitHub Actions réussis.
+Cadrage : docs/evolutions/EVOL-EXPORT-001_exports_detailles.txt.
+Code : index.html ; tests/smoke.cjs.
+Export CSV : 3 scénarios, coûts et gains annuels, décompositions, réponses, hypothèses et comparatif initial-affiné lorsque disponible. CSV UTF-8, protection contre injection de formule, avertissement de données fictives.
+Export JSON : format S3E_SIMULATION v2, titre, versions des référentiels, contenu de la simulation locale. Import explicite avec contrôle de format, ajout d'une sauvegarde locale indépendante et recalcul ultérieur du bilan.
+Limites : recette mobile en attente, aucune synchronisation serveur, pas de validation fiscale ou paie. Prochain lot prioritaire : tests navigateurs et accessibilité mobile, avec cadrage TXT préalable.
