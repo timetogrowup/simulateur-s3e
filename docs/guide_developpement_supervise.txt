@@ -1,5 +1,5 @@
 SIMULATEUR S3E — GUIDE TXT DE DÉVELOPPEMENT SUPERVISÉ
-Version 1.3 — 17/10/2026
+Version 1.4 — 17/10/2026
 Statut : guide de projet et journal de recette, non validation métier ni fiscale.
 
 DOCUMENTS MAÎTRES
@@ -86,3 +86,8 @@ Les bornes et cartes effectivement financées par SUEZ ne créent aucun coût po
 Implémentation : index.html, tests/smoke.cjs. Fiche spécifique : docs/evolutions/EVOL-RECHARGE-002_recharge_publique_payante.txt.
 Contrôles : conditions d’affichage, calcul 100 % public payant, moitié payante, recharge SUEZ gratuite, non-régression du bilan.
 Limites : valeurs tarifaires fictives ; traitement des versions de sauvegardes anciennes à fiabiliser.
+
+CLÔTURE TECHNIQUE EVOL-RECHARGE-002
+Tests de cohérence GitHub Actions : réussis le 17/10/2026.
+La restauration d'un ancien bilan affiné recalcule ses résultats avec les nouvelles règles, pour éviter l'affichage d'un ancien coût de recharge extérieure nul. Valeurs manquantes des anciens dossiers affinés prises par défaut.
+Recette visuelle sur téléphone et validation des tarifs publics encore à effectuer. Aucun montant officiel SUEZ n'est intégré.
