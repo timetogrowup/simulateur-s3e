@@ -80,7 +80,24 @@ assert.ok(zeroHome[2].breakdown.commute+zeroHome[2].breakdown.privateEnergy>0,'V
 const fullHome=ev('calculate({...estimates(),homeShare:1})');
 assert.ok(fullHome[1].breakdown.commute+fullHome[1].breakdown.privateEnergy>0,'Futur SUEZ : part domicile payante');
 assert.equal(ev('active().some(q=>q.id==="freeShare")'),false,'Absence dans parcours conditionnel');
-console.log('OK : syntaxe, parcours, moteur financier, recharge SUEZ, sensibilités et graphiques');
+// Évolution AEN-001 : le brut n'est jamais une charge directe.
+const eAen=ev('estimates()');
+const impact=ev('netImpact(2400,estimates())');
+assert.ok(impact.social>0&&impact.tax>0,'Séparation des cotisations et de l’impôt');
+assert.ok(impact.cost<impact.gross,'Coût AEN distinct du montant brut déclaré');
+assert.ok(Math.abs(impact.cost-impact.social-impact.tax)<1e-7,'Somme des deux composantes');
+const withoutDeduction=ev('netImpact(2400,{...estimates(),socialDeductibleShare:0})');
+assert.ok(impact.tax<withoutDeduction.tax,'Déductibilité réduit la base fiscale estimée');
+const zeroTax=ev('netImpact(2400,{...estimates(),tax:0})');
+assert.equal(zeroTax.tax,0,'TMI à zéro supprime surcoût impôt');
+ev("answers.aen='200 €/mois';answers.aenFuture='200 €/mois'");
+const rAen=ev('calculate(estimates())');
+assert.ok(rAen[0].breakdown.aenSocial>0&&rAen[0].breakdown.aenTax>0,'AEN ventilé en deux postes');
+assert.ok(!('aen' in rAen[0].breakdown),'Le brut AEN n’entre pas comme coût');
+assert.ok(rAen[2].breakdown.compensation<0,'Compensation nette déduite');
+ev("base=estimates();view='report';draw()");
+assert.match(root.innerHTML,/AEN : cotisations salariales estimées/,'Ventilation AEN visible');
+console.log('OK : parcours, finance, moteur AEN-001 de recette et graphiques');
 
 
 
