@@ -15,7 +15,7 @@ const context=vm.createContext({
 vm.runInContext(js,context,{timeout:3000});
 const ev=(str)=>vm.runInContext(str,context);
 assert.match(root.innerHTML,/Commencer/,'Accueil présent');
-assert.equal(ev('qs.length'),24,'24 questions');
+assert.equal(ev('qs.length'),23,'23 questions : retrait de la recharge gratuite hors domicile');
 assert.ok(ev('uxCopy.budget[1]').includes('rendiez'),'Scénario personnel explicite');
 assert.ok(ev('uxCopy.years[1]').includes('rendiez'),'Durée rattachée au scénario');
 assert.ok(ev('uxCopy.persMotor[1]').includes('fonction'),'Motorisation rattachée au scénario');
@@ -27,12 +27,12 @@ assert.equal(ev("active().some(q=>q.id==='homeShare')"),false,'Recharge domicile
 assert.equal(ev("active().some(q=>q.id==='homePrice')"),false,'Tarif domicile masqué');
 ev("answers.home='Installation nécessaire'");
 assert.equal(ev("active().some(q=>q.id==='install')"),true,'Installation conditionnelle');
-ev("answers.budget='15 000 à 25 000 €';answers.years='5 à 6 ans';answers.comp='150 €/mois';answers.persMotor='Diesel';answers.motor='Diesel';answers.futureMotor='Électrique';answers.home='Déjà installée';answers.homeShare='25 à 50 %';answers.freeShare='10 %';answers.tax='30 %';answers.aen='200 €/mois';answers.aenFuture='200 €/mois'");
+ev("answers.budget='15 000 à 25 000 €';answers.years='5 à 6 ans';answers.comp='150 €/mois';answers.persMotor='Diesel';answers.motor='Diesel';answers.futureMotor='Électrique';answers.home='Déjà installée';answers.homeShare='25 à 50 %';answers.tax='30 %';answers.aen='200 €/mois';answers.aenFuture='200 €/mois'");
 const result=ev('calculate(estimates())');
 assert.equal(result.length,3,'Trois scénarios calculés');
 assert.ok(result.every(x=>Number.isFinite(x.cost)&&Number.isFinite(x.gain)),'Montants finis');
 assert.equal(result[0].gain,0,'Écart véhicule actuel = 0');
-assert.throws(()=>ev('calculate({...estimates(),homeShare:.8,freeShare:.5})'),/100/,'Contrôle du cumul recharge');
+assert.throws(()=>ev('calculate({...estimates(),homeShare:1.2})'),/100/,'Contrôle proportion domicile');
 ev("view='wizard'; step=active().findIndex(q=>q.id==='budget');draw()");
 assert.match(root.innerHTML,/Et si vous rendiez votre voiture de fonction/,'Introduction avant achat');
 // Contrôles du moteur financier : ventilation, financement distinct et remboursements.
@@ -71,6 +71,16 @@ ev("view='report';base=estimates();draw()");
 assert.match(root.innerHTML,/Comparaison des coûts économiques nets annuels/,'Graphique coûts visible');
 assert.match(root.innerHTML,/Analyses de sensibilité/,'Sensibilités visibles');
 assert.match(root.innerHTML,/Gains ou pertes de pouvoir d’achat/,'Graphique gains visible');
-console.log('OK : syntaxe, parcours, moteur par motorisation, sensibilités et graphiques');
+// Règle SUEZ de recharge : seules les charges à domicile sont payées par le salarié.
+assert.equal(ev("qs.some(q=>q.id==='freeShare')"),false,'Question inutile supprimée');
+ev("answers.futureMotor='Électrique';answers.persMotor='Électrique';answers.home='Impossible'");
+const zeroHome=ev('calculate({...estimates(),homeShare:0})');
+assert.equal(zeroHome[1].breakdown.commute+zeroHome[1].breakdown.privateEnergy,0,'Futur véhicule SUEZ : 0 % domicile = énergie offerte');
+assert.ok(zeroHome[2].breakdown.commute+zeroHome[2].breakdown.privateEnergy>0,'Véhicule personnel : charges publiques payantes');
+const fullHome=ev('calculate({...estimates(),homeShare:1})');
+assert.ok(fullHome[1].breakdown.commute+fullHome[1].breakdown.privateEnergy>0,'Futur SUEZ : part domicile payante');
+assert.equal(ev('active().some(q=>q.id==="freeShare")'),false,'Absence dans parcours conditionnel');
+console.log('OK : syntaxe, parcours, moteur financier, recharge SUEZ, sensibilités et graphiques');
+
 
 
