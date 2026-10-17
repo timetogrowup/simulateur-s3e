@@ -1,0 +1,99 @@
+SIMULATEUR S3E — CADRAGE DU RENFORCEMENT GITHUB ACTIONS
+Identifiant : EVOL-CI-001
+Version : 1.0 — 17/10/2026
+Statut : cadrage préalable à l'implémentation
+Responsable d'arbitrage : responsable humain du projet
+Références : docs/gouvernance_projet_chatgpt_github.txt ; docs/guide_developpement_supervise.txt
+
+1. OBJECTIF
+Mettre en place une chaîne automatisée de contrôle qualité du prototype S3E.
+Le code et les documents TXT restent versionnés sur GitHub. La CI vérifie
+une partie de leurs engagements et détecte les régressions avant toute
+déclaration de réussite technique.
+
+2. ETAT INITIAL OBSERVE
+- Dépôt : timetogrowup/simulateur-s3e.
+- Workflow existant : .github/workflows/s3e-tests.yml, push sur main et pull_request.
+- Commande actuelle : node tests/smoke.cjs (parcours et calculs sans navigateur).
+- GitHub Pages publie le site indépendamment ; cette évolution ne doit pas
+  laisser croire que Pages est conditionné par tous les contrôles.
+- Référentiels fictifs JS sous referentiels/ et guides TXT sous docs/.
+
+3. PERIMETRE DE CE LOT — IMPLEMENTATION IMMEDIATE
+CI-01  Conserver les tests de non-régression existants, séparément nommés.
+CI-02  Ajouter un contrôle structurel et numérique des référentiels TEST
+       (schéma, version, unité, montants, consommations, valeurs finies,
+       bornes pertinentes, statut FICTIF).
+CI-03  Ajouter un contrôle documentaire :
+       - présence des fichiers TXT majeurs de gouvernance, du guide et
+         de la présente fiche d'évolution ;
+       - format UTF-8 et contenu non vide ;
+       - présence d'identifiants de version et de mentions de limites ;
+       - si un fichier applicatif ou référentiel change, vérifier qu'au
+         moins un fichier docs/*.txt est modifié dans la même proposition
+         de modification (commit comparé via Git sur push, diff de PR).
+CI-04  Garder des scripts Node.js autonomes, sans dépendances externes.
+CI-05  Faire échouer la CI avec des messages explicites ; conserver les
+       mêmes validations sur push main et sur pull requests.
+CI-06  Documenter le fonctionnement et les réserves dans le guide TXT,
+       README.md et cette fiche.
+
+4. PERIMETRE ULTERIEUR (NON REALISE DANS CE LOT)
+CI-07  Tests en navigateur réel (Playwright ou équivalent), notamment
+       parcours smartphone, formulaires, impression et sauvegardes.
+CI-08  Recherche de secrets et de vulnérabilités adaptée au dépôt :
+       une analyse de sécurité ne garantit pas l'absence de faille.
+CI-09  Vérification des formats, des conventions et des artefacts
+       de livraison / versions.
+CI-10  Publication Pages conditionnée par les contrôles : implique une
+       décision distincte sur stratégie Pages, droits, règles de branche,
+       et protection des branches ; NE PAS changer cette configuration
+       implicitement.
+
+5. STRUCTURE CIBLE
+.github/workflows/s3e-tests.yml : orchestre les étapes.
+tests/smoke.cjs : tests fonctionnels existants.
+tests/validate-referentiels.cjs : validateur JS indépendant.
+tests/validate-docs.cjs : documentation et différence Git.
+docs/evolutions/EVOL-CI-001_github_actions.txt : présente fiche.
+docs/guide_developpement_supervise.txt : bilan et feuille de route.
+README.md : commandes de lancement et limites.
+
+6. EXEMPLES DE CRITERES D'ACCEPTATION
+A. Jeu TEST actuel valide.
+B. Barème vide, montant négatif, taux hors bornes, consommation
+   négative ou fichier absent provoquent un échec explicite.
+C. Document indispensable absent / vide -> échec.
+D. Modification d'index.html sans modification d'un TXT docs/
+   -> échec (pour les commits ou comparaisons dont le diff Git
+   est réellement disponible).
+E. Mise à jour conjointe du code et des TXT -> succès documentaire.
+F. Aucun faux verdict « tests navigateur réalisés ».
+G. Exécution GitHub Actions vérifiée sur la révision finale.
+H. Les tests des trois scénarios et de recharge publique restent verts.
+
+7. REGLES D'EXECUTION ET SECURITE
+- permissions : contents: read ; pas de jeton applicatif.
+- Pas de déploiement ni d'écriture sur GitHub depuis la CI.
+- Pas d'accès à des données personnelles ou à des barèmes SUEZ non publics.
+- Ne pas ajouter d'exécution eval d'un référentiel distant ou de PR externe
+  avec privilèges élevés.
+- Ne pas contourner un test en assouplissant artificiellement son attendu.
+- Si diff indisponible (recette locale sans base Git), le signaler et
+  valider au minimum l'existence et la cohérence des documents.
+
+8. LIMITES / POINTS DE GOUVERNANCE
+- Le contrôle documentaire est un contrôle de présence et d'évolution :
+  il ne prouve pas la qualité réelle d'une spécification.
+- La validation d'un référentiel TEST n'en fait pas une grille officielle.
+- La CI n'autorise pas à elle seule la diffusion métier.
+- Le déploiement GitHub Pages peut avoir un résultat distinct de la CI.
+- La validation en navigateur et la validation fiscale restent ouvertes.
+
+9. LIVRAISON
+Produire, dans cet ordre :
+(1) ce TXT enregistré dans docs/ ;
+(2) scripts de contrôles ;
+(3) workflow enrichi ;
+(4) mises à jour du guide TXT et README ;
+(5) observation des conclusions de workflow et compte rendu.
