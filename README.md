@@ -56,3 +56,9 @@ Le questionnaire rapide ne demande **pas** le tarif de recharge publique. Il app
 Le workflow [S3E - Contrôles qualité](.github/workflows/s3e-tests.yml) s'exécute à chaque push sur `main` et sur les pull requests. Il lance `node tests/smoke.cjs`, `node tests/validate-referentiels.cjs` et `node tests/validate-docs.cjs`. Le validateur documentaire contrôle les TXT obligatoires ; avec l'historique Git disponible, toute modification d'index.html ou des référentiels exige une mise à jour conjointe d'un TXT sous `docs/`. [Cadrage TXT](docs/evolutions/EVOL-CI-001_github_actions.txt).
 
 Ces tests n'évaluent pas encore un navigateur réel et **ne bloquent pas automatiquement la publication GitHub Pages**. Ils ne remplacent pas la recette métier ou fiscale.
+
+## Exports et portabilité — EVOL-EXPORT-001
+
+Le bilan permet d'exporter un **CSV détaillé** avec scénarios, postes, hypothèses, données fictives et comparatif éventuel entre premier bilan et bilan affiné. Un export **JSON versionné** permet de conserver une simulation et de l'importer depuis l'accueil sur un autre navigateur ou appareil. L'import crée une sauvegarde locale distincte, sans serveur ni transmission. Les contenus exportés peuvent comporter des réponses individuelles : les conserver de façon appropriée.
+
+Les contrôles automatisés couvrent les formats, écarts, avertissements et rejets des JSON invalides. Une recette sur téléphone reste nécessaire. Voir [le cadrage et bilan TXT](docs/evolutions/EVOL-EXPORT-001_exports_detailles.txt).
