@@ -23,7 +23,7 @@ for(const path of ['referentiels/aen_TEST.js','referentiels/compensations_TEST.j
 vm.runInContext(js,context,{timeout:3000});
 const ev=(str)=>vm.runInContext(str,context);
 assert.match(root.innerHTML,/Commencer/,'Accueil présent');
-assert.equal(ev('qs.length'),23,'23 questions : retrait de la recharge gratuite hors domicile');
+assert.equal(ev('qs.length'),25,'25 questions : ajout des recharges publiques payantes');
 assert.ok(ev('uxCopy.budget[1]').includes('rendiez'),'Scénario personnel explicite');
 assert.ok(ev('uxCopy.years[1]').includes('rendiez'),'Durée rattachée au scénario');
 assert.ok(ev('uxCopy.persMotor[1]').includes('fonction'),'Motorisation rattachée au scénario');
@@ -33,6 +33,8 @@ assert.equal(ev("active().some(q=>q.id==='home')"),false,'Recharge masquée si n
 ev("answers.futureMotor='Électrique';answers.home='Impossible'");
 assert.equal(ev("active().some(q=>q.id==='homeShare')"),false,'Recharge domicile impossible');
 assert.equal(ev("active().some(q=>q.id==='homePrice')"),false,'Tarif domicile masqué');
+assert.equal(ev("active().some(q=>q.id==='publicPaidShare')"),false,'Part publique imposée à 100 % si domicile impossible');
+assert.equal(ev("active().some(q=>q.id==='publicPrice')"),true,'Tarif public demandé si domicile impossible');
 ev("answers.home='Installation nécessaire'");
 assert.equal(ev("active().some(q=>q.id==='install')"),true,'Installation conditionnelle');
 ev("answers.budget='15 000 à 25 000 €';answers.years='5 à 6 ans';answers.comp='150 €/mois';answers.persMotor='Diesel';answers.motor='Diesel';answers.futureMotor='Électrique';answers.home='Déjà installée';answers.homeShare='25 à 50 %';answers.tax='30 %';answers.aen='200 €/mois';answers.aenFuture='200 €/mois'");
@@ -83,11 +85,22 @@ assert.match(root.innerHTML,/Gains ou pertes de pouvoir d’achat/,'Graphique ga
 assert.equal(ev("qs.some(q=>q.id==='freeShare')"),false,'Question inutile supprimée');
 ev("answers.futureMotor='Électrique';answers.persMotor='Électrique';answers.home='Impossible'");
 const zeroHome=ev('calculate({...estimates(),homeShare:0})');
-assert.equal(zeroHome[1].breakdown.commute+zeroHome[1].breakdown.privateEnergy,0,'Futur véhicule SUEZ : 0 % domicile = énergie offerte');
+assert.ok(zeroHome[1].breakdown.commute+zeroHome[1].breakdown.privateEnergy>0,'Sans domicile : bornes publiques payantes facturées au salarié');
 assert.ok(zeroHome[2].breakdown.commute+zeroHome[2].breakdown.privateEnergy>0,'Véhicule personnel : charges publiques payantes');
+const allPublic=ev('calculate({...estimates(),homeShare:0,publicPrice:.60})');
+const annualOutside=ev('estimates().trip+estimates().personal');
+const expectedOutside=annualOutside*.60*ev('estimates().consumptionElectric')/100;
+assert.ok(Math.abs(allPublic[1].breakdown.commute+allPublic[1].breakdown.privateEnergy-expectedOutside)<.00001,'100 % public payant = km × kWh/100 × prix public');
+ev("answers.home='Déjà installée';answers.publicPaidShare='0 %';answers.homeShare='0 %'");
+const freeSuez=ev('calculate({...estimates(),homeShare:0,publicPaidShare:0})');
+assert.equal(freeSuez[1].breakdown.commute+freeSuez[1].breakdown.privateEnergy,0,'Recharge hors domicile réellement prise en charge SUEZ sans coût');
+const halfPublic=ev('calculate({...estimates(),homeShare:0,publicPaidShare:.5,publicPrice:.60})');
+assert.ok(Math.abs((halfPublic[1].breakdown.commute+halfPublic[1].breakdown.privateEnergy)-expectedOutside/2)<.00001,'50 % des recharges hors domicile payantes');
+ev("answers.home='Impossible'");
 const fullHome=ev('calculate({...estimates(),homeShare:1})');
 assert.ok(fullHome[1].breakdown.commute+fullHome[1].breakdown.privateEnergy>0,'Futur SUEZ : part domicile payante');
 assert.equal(ev('active().some(q=>q.id==="freeShare")'),false,'Absence dans parcours conditionnel');
+assert.ok(ev('estimates().publicPaidShare')===1,'Sans domicile la part publique payante vaut 100 %');
 // Évolution AEN-001 : le brut n'est jamais une charge directe.
 const eAen=ev('estimates()');
 const impact=ev('netImpact(2400,estimates())');
