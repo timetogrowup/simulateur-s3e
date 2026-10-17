@@ -1,0 +1,63 @@
+SIMULATEUR S3E — CADRAGE DES TESTS NAVIGATEUR
+ID : EVOL-TEST-002
+Version : 1.0 — 17 octobre 2026
+Statut : CADRAGE préalable à l'implémentation
+Références : gouvernance_projet_chatgpt_github.txt ; guide_developpement_supervise.txt
+
+OBJECTIF
+Tester le fonctionnement réel de l'interface HTML/JavaScript dans Chromium,
+en configuration mobile Android simulée et sur une largeur de bureau.
+Compléter les tests unitaires existants, sans les remplacer.
+
+PÉRIMÈTRE DU LOT
+A. L'accueil s'affiche avec les avertissements de données fictives.
+B. Parcours du questionnaire conditionnel : choisir un futur véhicule électrique
+   et une recharge impossible à domicile ; vérifier l'absence de question sur
+   le tarif public initial, puis accéder au premier bilan.
+C. Sur la page d'affinage, le prix public par défaut est modifiable ;
+   recalcul du bilan affiné, comparaison présente et valeurs cohérentes.
+D. Sauvegarde locale nommée puis reprise depuis l'accueil (storage local).
+E. Téléchargement d'un CSV détaillé et d'un JSON, puis import JSON avec
+   confirmation utilisateur et reprise de la sauvegarde importée.
+F. Vérification de l'absence de débordement horizontal significatif de
+   l'interface sur un viewport mobile ; les tableaux peuvent défiler
+   horizontalement à l'intérieur de leurs conteneurs si nécessaire.
+G. Toute erreur JavaScript de page non attendue échoue le test.
+
+IMPLEMENTATION PROPOSÉE
+- Utiliser Playwright avec Chromium dans une GitHub Action.
+- Script : tests/browser.spec.cjs, exécuté par npx playwright test.
+- Dépendances npm de développement avec package-lock.json versionné.
+- Le test sert index.html + referentiels/ depuis un petit serveur local,
+  jamais depuis le site public, pour tester la version exacte du commit.
+- Le serveur est démarré automatiquement via Playwright webServer.
+- Traces ou captures d'écran déposées comme artefacts en cas d'échec,
+  sans données réelles de salariés.
+- Workflow existant : ajouter un job navigateur séparé du job actuel.
+- Pas de publication ni de changement GitHub Pages dans ce lot.
+
+CRITÈRES D'ACCEPTATION
+1. Parcours mobile complet fonctionnel jusqu'au bilan affiné.
+2. Le tarif public ne ralentit pas le questionnaire lorsque domicile impossible,
+   mais il est modifiable dans les hypothèses du bilan affiné.
+3. Sauvegarde, export CSV/JSON et import fonctionnent en vrai navigateur.
+4. Contrôle Chromium bureau simple et absence d'erreurs JS bloquantes.
+5. Tests GitHub Actions réussis sur le commit final.
+6. Documents TXT actualisés sur GitHub.
+
+RISQUES ET LIMITES
+- Une émulation de viewport ne remplace pas le test sur téléphone physique.
+- Le navigateur et ses dépendances sont téléchargés par GitHub Actions ;
+  tests plus coûteux/lents que les tests unitaires.
+- Les boîtes alert/prompt/confirm doivent être traitées explicitement.
+- Un test peut révéler un défaut existant à corriger avant clôture.
+- Le test visuel ne valide ni règles de paie ni source des barèmes fictifs.
+- Ne pas faire croire que GitHub Pages attend la réussite du workflow :
+  son déploiement est distinct.
+
+LIVRAISON PRÉVUE
+1. Ce TXT versionné avant tout code.
+2. package.json et configuration navigateur + tests.
+3. Adaptations éventuelles limitées de l'interface si tests démontrent un défaut.
+4. Workflow GitHub Actions enrichi.
+5. Tests observés, guide TXT et README à jour.
