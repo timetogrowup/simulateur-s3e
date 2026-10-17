@@ -43,19 +43,61 @@ function active(){return qs.filter(q=>{if(['home','install','homeShare','homePri
 const middle=(id,values,fallback)=>ix(id)>=0?values[ix(id)]??fallback:fallback;
 function estimates(){const trip=middle('distance',[5,15,30,50,75],15)*2*middle('days',[.5,1,2,3,4,5],3)*46;const professional=middle('proKm',[0,2500,7500,15000,25000,35000],7500);const personal=middle('privateKm',[1250,3750,7500,12500,17500],7500);
 return {trip,professional,personal,kms:trip+personal,years:middle('years',[2,3.5,5.5,7.5,10],5.5),purchase:middle('budget',[12000,20000,30000,40000,50000],20000),homeShare:answers.home==='Impossible'?0:middle('homeShare',[0,.125,.375,.63,.85,.4],.4),freeShare:middle('freeShare',[0,.1,.2,.3,.4,.5,.6,.7,.8,.9,1],0),homePrice:middle('homePrice',[.18,.25,.35,.44,.25],.25),install:answers.home==='Installation nécessaire'?middle('install',[350,750,1250,1750,2500,1000],1000):0,insurance:700,maintenance:800,resale:null,dieselPrice:1.75,electricPublic:.5,annualFixed:0,tax:middle('tax',[0,.11,.3,.41,.45,.3],.3),social:.22};}
-function calculate(e){const aen1=middle('aen',[100,200,300,400],200)*12, aen2=middle('aenFuture',[100,200,300,400],200)*12;const c=middle('comp',[0,150,300,450],150)*12*(1-e.social)*(1-e.tax);const costKm=(motor,km)=>motor==='Électrique'?km*.2*(e.homeShare*e.homePrice+e.freeShare*0+(1-e.homeShare-e.freeShare)*e.electricPublic):km*.06*e.dieselPrice;
-if(e.homeShare+e.freeShare>1.0001)throw Error('Les parts de recharge dépassent 100 %. Corrige les réponses.');
-const ownFuel=costKm(answers.motor,e.kms),payer=answers.commutePayer==='SUEZ'&&answers.privatePayer==='SUEZ'?0:answers.commutePayer==='Salarié'&&answers.privatePayer==='Salarié'?1:.5;
-const s1=aen1*(e.social+e.tax)+ownFuel*payer;
-const futureFuel=costKm(answers.futureMotor,e.kms);const s2=aen2*(e.social+e.tax)+futureFuel+(answers.subsidy==='Oui totalement'?0:e.install/e.years);
-const resale=e.resale==null?e.purchase*.38:e.resale;
-const s3=(e.purchase-resale)/e.years+e.insurance+e.maintenance+e.annualFixed+costKm(answers.persMotor,e.kms)-c+(answers.persMotor==='Électrique'?e.install/e.years:0);
-return [s1,s2,s3].map((cost,i)=>({id:i,label:['Situation actuelle','Demain avec une voiture de fonction','Demain sans voiture de fonction'][i],cost,gain:s1-cost}));}
+function calculate(e){
+  // Moteur de recette : les montants fiscaux/AEN et la grille de compensation restent fictifs.
+  // Les kilomètres de missions sont intégralement pris en charge par SUEZ et exclus des frais du salarié.
+  const aen1=middle('aen',[100,200,300,400],200)*12;
+  const aen2=middle('aenFuture',[100,200,300,400],200)*12;
+  const compGross=middle('comp',[0,150,300,450],150)*12;
+  const compNet=compGross*(1-e.social)*(1-e.tax); // Hypothèse de recette, non validée fiscalement.
+  if(!Number.isFinite(e.years)||e.years<=0)throw Error('Durée de détention invalide.');
+  if(e.homeShare<0||e.freeShare<0||e.homeShare+e.freeShare>1.000001)throw Error('Les parts de recharge dépassent 100 %. Corrige les réponses.');
+  const taxable=(amount)=>amount*(e.social+e.tax); // Approximation pédagogique, ne pas diffuser comme calcul officiel.
+  const energy=(motor,km)=>{
+    if(motor==='Électrique'){
+      const mix=e.homeShare*e.homePrice+e.freeShare*0+(1-e.homeShare-e.freeShare)*e.electricPublic;
+      return km*.2*mix;
+    }
+    return km*.06*e.dieselPrice; // Essence/hybride/PHEV provisoirement assimilés au barème 6 L/100 km.
+  };
+  const share=(value)=>value==='SUEZ'?0:value==='Salarié'?1:.5; // 'Partagé' : hypothèse 50 %, modifiable ultérieurement.
+  const oldCommute=energy(answers.motor,e.trip)*share(answers.commutePayer);
+  const oldPrivate=energy(answers.motor,e.personal)*share(answers.privatePayer);
+  const oldAen=taxable(aen1);
+  const newAen=taxable(aen2);
+  // Par convention de recette, le salarié finance ses kilomètres domicile-travail et privés futurs.
+  const newCommute=energy(answers.futureMotor,e.trip);
+  const newPrivate=energy(answers.futureMotor,e.personal);
+  const futureInstall=answers.futureMotor==='Électrique'&&answers.home==='Installation nécessaire'&&answers.subsidy!=='Oui totalement'?e.install/e.years:0;
+  const resale=e.resale==null?e.purchase*.38:e.resale;
+  const depreciation=(e.purchase-resale)/e.years;
+  const privateInstall=answers.persMotor==='Électrique'&&answers.home==='Installation nécessaire'?e.install/e.years:0;
+  const personalCommute=energy(answers.persMotor,e.trip);
+  const personalPrivate=energy(answers.persMotor,e.personal);
+  const breakdowns=[
+    {aen:oldAen,commute:oldCommute,privateEnergy:oldPrivate},
+    {aen:newAen,commute:newCommute,privateEnergy:newPrivate,installation:futureInstall},
+    {depreciation,insurance:e.insurance,maintenance:e.maintenance,other:e.annualFixed,commute:personalCommute,privateEnergy:personalPrivate,installation:privateInstall,compensation:-compNet}
+  ];
+  const labels=['Situation actuelle','Demain avec une voiture de fonction','Demain sans voiture de fonction'];
+  const annual=breakdowns.map(items=>Object.values(items).reduce((a,b)=>a+b,0));
+  return annual.map((cost,i)=>({id:i,label:labels[i],cost,gain:annual[0]-cost,breakdown:breakdowns[i]}));
+}
 function draw(){if(view==='home'){root.innerHTML='<article><h1>Votre véhicule, votre pouvoir d’achat</h1><p>Simulez vos trois solutions avec un questionnaire rapide, puis affinez les hypothèses.</p><p class="warn">Toutes les grilles AEN et compensation sont fictives. Les calculs fiscaux sont des approximations pour tester le parcours.</p><div class="buttons"><button onclick="start()">Commencer</button><button class="secondary" onclick="load()">Reprendre une sauvegarde</button></div></article>';return}
 if(view==='wizard'){const list=active();step=Math.min(step,list.length-1);const q=list[step];const ux=uxCopy[q.id]||['Questionnaire',q.title,''];const intro=q.id==='budget'?'<section class="scenario-intro"><strong>Et si vous rendiez votre voiture de fonction SUEZ ?</strong><p>Dans ce troisième scénario, vous n’utilisez plus de véhicule fourni par SUEZ : vous achetez et entretenez votre propre voiture. Une compensation SUEZ peut éventuellement être versée selon la grille applicable. Les questions suivantes concernent uniquement cette hypothèse.</p></section>':'';root.innerHTML='<article><p class="muted">'+ux[0]+' · Question '+(step+1)+' / '+list.length+'</p><div class="progress"><div style="width:'+((step+1)/list.length*100)+'%"></div></div>'+intro+'<h2>'+ux[1]+'</h2><p class="muted" style="line-height:1.5">'+ux[2]+'</p>'+q.options.map((v,i)=>'<label class="opt"><input type="radio" name="choice" '+(answers[q.id]===v?'checked':'')+' onchange="pickIndex('+i+')">'+v+'</label>').join('')+'<div class="buttons"><button class="secondary" onclick="prev()">Précédent</button><button onclick="next()">Suivant</button></div></article>';return}
 if(view==='recap'){root.innerHTML='<article><h1>Récapitulatif</h1><p>Vérifie les réponses avant le calcul.</p>'+active().map((q,i)=>'<p><span class="muted">'+q.title+'</span><br><b>'+ (answers[q.id]||'Non renseigné')+'</b> <button class="secondary" onclick="edit('+i+')">Modifier</button></p>').join('')+'<div class="buttons"><button onclick="first()">Calculer le premier bilan</button></div></article>';return}
 if(view==='refine'){const d={...base,...detail};const fields=[['trip','Km domicile-travail / an'],['professional','Km professionnels / an'],['personal','Km privés / an'],['years','Durée de détention (années)'],['purchase','Prix du véhicule personnel (€)'],['resale','Revente estimée (€)'],['insurance','Assurance annuelle (€)'],['maintenance','Entretien annuel (€)'],['homeShare','Part recharges domicile (0 à 1)'],['freeShare','Part recharges gratuites (0 à 1)'],['homePrice','Prix kWh domicile (€)'],['electricPublic','Prix kWh public (€)'],['dieselPrice','Prix litre carburant (€)'],['install','Installation (€)'],['tax','TMI (0 à 1)'],['social','Cotisations estimées (0 à 1)']];root.innerHTML='<article><h1>Affiner le bilan</h1><p>Chiffres indicatifs préremplis et modifiables. Calcul uniquement après validation.</p><form id="detail">'+fields.map(([key,label])=>'<label class="field"><span class="label">'+label+'</span><input type="number" step="any" name="'+key+'" value="'+(d[key]??Math.round(d.purchase*.38))+'"></label>').join('')+'<div class="buttons"><button type="submit">Recalculer le bilan affiné</button><button type="button" class="secondary" onclick="view=\'report\';draw()">Retour</button></div></form></article>';$('detail').onsubmit=ev=>{ev.preventDefault();detail={...Object.fromEntries(new FormData(ev.target).entries())};for(let k in detail)detail[k]=Number(detail[k]);if(!Object.values(detail).every(Number.isFinite)||detail.years<=0||detail.purchase<=0||detail.resale<0||detail.resale>detail.purchase||detail.homeShare<0||detail.homeShare>1||detail.freeShare<0||detail.freeShare>1||detail.homeShare+detail.freeShare>1||detail.insurance<0||detail.maintenance<0||detail.install<0||detail.homePrice<0||detail.electricPublic<0||detail.dieselPrice<0||detail.tax<0||detail.tax>1||detail.social<0||detail.social>1||detail.trip<0||detail.personal<0||detail.professional<0){alert('Vérifiez les valeurs : montants positifs, revente au plus égale au prix d’achat, taux entre 0 et 1 et proportions de recharge cumulées au plus égales à 100 %.');return}last=calculate({...base,...detail,kms:detail.trip+detail.personal});view='refined';draw()};return}
-const res=view==='refined'?last:calculate(base);const min=Math.min(...res.map(x=>x.cost));root.innerHTML='<article><h1>'+(view==='refined'?'Bilan affiné':'Premier bilan estimatif')+'</h1><p class="warn">Valeurs de TEST fictives, fiscalité simplifiée non validée.</p><div class="cards">'+res.map(s=>'<div class="card">'+s.label+'<b>'+fmt(s.cost/12)+'/mois</b><span class="'+(s.gain>=0?'positive':'negative')+'">'+(s.gain>0?'+':'')+fmt(s.gain/12)+'/mois vs actuel</span></div>').join('')+'</div><h2>Coût annuel comparé</h2><table><tr><th>Solution</th><th>Annuel</th><th>Écart annuel</th></tr>'+res.map(s=>'<tr><td>'+s.label+'</td><td>'+fmt(s.cost)+'</td><td>'+fmt(s.gain)+'</td></tr>').join('')+'</table><p>Coût le plus faible selon ces hypothèses : <b>'+res.find(x=>x.cost===min).label+'</b>.</p><h2>Projection économique</h2><p>Durée : '+Math.round((view==='refined'?detail.years:base.years)*10)/10+' ans</p><div class="cards">'+res.map(s=>'<div class="card">'+s.label+'<b>'+fmt(s.cost*(view==='refined'?detail.years:base.years))+'</b></div>').join('')+'</div><details><summary>Hypothèses du calcul</summary><pre style="white-space:pre-wrap;overflow:auto">'+JSON.stringify(view==='refined'?{...base,...detail}:base,null,2)+'</pre></details><div class="buttons"><button onclick="view=\'refine\';draw()">Affiner mon bilan</button><button class="secondary" onclick="window.print()">Imprimer</button><button class="secondary" onclick="save()">Sauvegarder</button><button class="secondary" onclick="exportCSV()">Exporter CSV</button></div></article>';}
+const res=view==='refined'?last:calculate(base);const min=Math.min(...res.map(x=>x.cost));root.innerHTML='<article><h1>'+(view==='refined'?'Bilan affiné':'Premier bilan estimatif')+'</h1><p class="warn">Valeurs de TEST fictives, fiscalité simplifiée non validée.</p><div class="cards">'+res.map(s=>'<div class="card">'+s.label+'<b>'+fmt(s.cost/12)+'/mois</b><span class="'+(s.gain>=0?'positive':'negative')+'">'+(s.gain>0?'+':'')+fmt(s.gain/12)+'/mois vs actuel</span></div>').join('')+'</div><h2>Coût annuel comparé</h2><table><tr><th>Solution</th><th>Annuel</th><th>Écart annuel</th></tr>'+res.map(s=>'<tr><td>'+s.label+'</td><td>'+fmt(s.cost)+'</td><td>'+fmt(s.gain)+'</td></tr>').join('')+'</table><h2>Détail des postes annuels</h2><p class="muted">Les déplacements professionnels sont pris en charge par SUEZ et ne sont pas comptabilisés dans les dépenses personnelles. Les postes fiscaux et certaines consommations sont encore des estimations.</p><table><tr><th>Poste</th><th>Situation actuelle</th><th>Avec fonction</th><th>Sans fonction</th></tr>'+[
+['aen','AEN : estimation fiscale et sociale'],
+['commute','Énergie domicile–travail'],
+['privateEnergy','Énergie usages privés'],
+['depreciation','Dépréciation du véhicule personnel'],
+['insurance','Assurance'],
+['maintenance','Entretien'],
+['other','Autres frais'],
+['installation','Installation annualisée'],
+['compensation','Compensation SUEZ (déduite)']
+].map(([key,label])=>'<tr><td>'+label+'</td>'+res.map(x=>'<td>'+fmt(x.breakdown[key]||0)+'</td>').join('')+'</tr>').join('')+'</table><p>Coût le plus faible selon ces hypothèses : <b>'+res.find(x=>x.cost===min).label+'</b>.</p><h2>Projection économique</h2><p>Durée : '+Math.round((view==='refined'?detail.years:base.years)*10)/10+' ans</p><div class="cards">'+res.map(s=>'<div class="card">'+s.label+'<b>'+fmt(s.cost*(view==='refined'?detail.years:base.years))+'</b></div>').join('')+'</div><details><summary>Hypothèses du calcul</summary><pre style="white-space:pre-wrap;overflow:auto">'+JSON.stringify(view==='refined'?{...base,...detail}:base,null,2)+'</pre></details><div class="buttons"><button onclick="view=\'refine\';draw()">Affiner mon bilan</button><button class="secondary" onclick="window.print()">Imprimer</button><button class="secondary" onclick="save()">Sauvegarder</button><button class="secondary" onclick="exportCSV()">Exporter CSV</button></div></article>';}
 function start(){view='wizard';step=0;draw()}function pick(id,v){answers[id]=v;if(id==='futureMotor'&&v!=='Électrique'){delete answers.home;delete answers.install;delete answers.homeShare;delete answers.homePrice;delete answers.freeShare;delete answers.subsidy;}if(id==='aen')answers.aenFuture=v;if(id==='proKm')answers.energyCard=v==='Aucun'?'Non':'Oui';if(id==='home'&&v==='Impossible')answers.homeShare='0 %';draw()}
 function pickIndex(i){const q=active()[step];if(!q||!q.options[i])return;pick(q.id,q.options[i])}
 function prev(){step=Math.max(0,step-1);draw()}function next(){const list=active();if(!answers[list[step].id])return alert('Choisis une réponse.');if(step<list.length-1)step++;else view='recap';draw()}
