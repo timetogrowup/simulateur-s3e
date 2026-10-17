@@ -185,7 +185,7 @@ const refineGroups=[
   {name:'Fiscalité et hypothèses',fields:[['tax','Taux marginal d’imposition (0 à 1)'],['social','Taux estimé de cotisations (0 à 1)'],['socialDeductibleShare','Part déductible estimée (0 à 1)']]}
 ];
 function refineInitial(){
-  const original={...base,resale:base.resale==null?base.purchase*REF.assumptions.revente.fractionPrixAchat:base.resale};
+  const original={...base,publicPaidShare:base.publicPaidShare??(answers.home==='Impossible'?1:0),publicPrice:base.publicPrice??base.electricPublic??REF.assumptions.prix.kwhPublic,resale:base.resale==null?base.purchase*REF.assumptions.revente.fractionPrixAchat:base.resale};
   return {original,values:{...original,...detail}};
 }
 function refineFieldChanged(input){
@@ -359,6 +359,16 @@ function restoreSave(id){
   if(!item||!validSnapshot(item.data))throw Error('Simulation introuvable ou invalide.');
   const x=JSON.parse(JSON.stringify(item.data));
   ({answers,step,view,base,detail,last}=x);
+  // Les résultats d'une sauvegarde peuvent dater d'une ancienne règle métier.
+  // Toujours recalculer les bilans selon le moteur actuel avant de les afficher.
+  if(base&&['report','refine','refined'].includes(view)){
+    calculate(base);
+    if(view==='refined'){
+      const refined={...base,...detail};
+      last=calculate(refined);
+      cashflowSchedule(refined,last);
+    }
+  }
   refineDraft=null;
   if(view==='refine')view='report';
   draw();
