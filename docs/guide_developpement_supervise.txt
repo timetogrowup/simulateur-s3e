@@ -1,5 +1,5 @@
 SIMULATEUR S3E — GUIDE TXT DE DÉVELOPPEMENT SUPERVISÉ
-Version 2.1 — 18/10/2026
+Version 2.2 — 18/10/2026
 Statut : guide de projet et journal de recette, non validation métier ni fiscale.
 
 DOCUMENTS MAÎTRES
@@ -148,3 +148,10 @@ Fichiers livrés : tests/profils/profils_s3e_TEST.json (10 profils PR-01 à PR-1
 Intégration : job GitHub Actions existant pour contrôles à chaque push et pull request, sans déclenchement supplémentaire ni calendrier périodique.
 ATTENTION : les jeux d'essai chiffrés sont fictifs et décrivent des cas de calcul élémentaires indépendants du moteur. Ils ne constituent pas encore dix scénarios Playwright exécutés de bout en bout ni une validation de la paie ou de la fiscalité. Les distances choisies dans les oracles ne sont pas forcément les médianes du questionnaire ; un rapprochement explicite sera nécessaire dans le lot suivant.
 Prochaine étape proposée : raccordement des profils aux tests de calcul et aux parcours Playwright, avec rapports par profil. Calendrier d'exécution toujours différé.
+
+EVOL-TEST-003 — LOT C : RAPPROCHEMENT DES PROFILS AU MOTEUR (18/10/2026)
+Cadrage : docs/evolutions/EVOL-TEST-003_lot_C_comparaison_moteur.txt.
+Script : tests/compare-profils.cjs. Il charge les dix profils synthétiques, calcule les trois scénarios avec le moteur actuel, puis confronte une grandeur financière par profil à sa référence chiffrée distincte. Il utilise des paramètres d'affinage explicitement alignés sur les exemples arithmétiques, distincts des valeurs médianes du questionnaire.
+Rapports produits par exécution : report/recette-profils.txt et report/recette-profils.json, joints comme artefact de l'action GitHub « recette-profils-s3e » (14 jours). Verdicts : OK, ECART_CONNU, ECHEC ; un ECHEC fait échouer CI, un ECART_CONNU doit rester apparent.
+Vigilance PR-03 : l'aide à l'installation partielle n'est actuellement pas proratisée par le moteur. Son contrôle enregistre cette limitation métier comme écart connu plutôt que de prétendre à une concordance.
+Ce lot N'EST PAS dix parcours navigateur paramétrés ; ceux-ci restent à développer. Aucun calendrier supplémentaire activé.
