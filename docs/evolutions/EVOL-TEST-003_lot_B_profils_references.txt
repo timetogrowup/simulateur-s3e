@@ -1,0 +1,41 @@
+SIMULATEUR S3E — EVOL-TEST-003 — LOT B
+CADRAGE DES JEUX DE PROFILS FICTIFS ET ATTENDUS INDÉPENDANTS
+Version 1.0 — 18/10/2026
+Statut : CADRAGE PRÉALABLE AU CODE
+Références : EVOL-TEST-003_besoins_fonctionnels.txt et EVOL-TEST-003_methode_envisagee.txt.
+
+OBJECTIF
+Créer tests/profils/profils_s3e_TEST.json et
+tests/references/attendus_s3e_TEST.json, versions séparées du simulateur,
+sans donnée personnelle réelle et sans modifier les règles métier.
+
+MODÈLE
+Chaque profil a un ID PR-01 à PR-10, un cas d'usage, des réponses
+aux questions existantes, des données numériques d'essai indépendantes
+(mesures de km, prix, consommation, parts de recharge, etc.)
+et des contrôles attendus de nature différente selon le scénario.
+Les attendus sont figés dans un second fichier et peuvent être
+recalculés manuellement à partir des formules décrites dans la méthode.
+Les tests de ce lot valident : format JSON et unicité des profils,
+compatibilité des libellés de réponses avec le questionnaire actuel,
+valeurs bornées, cohérence arithmétique des références sans importer
+le moteur de production et présence des dix profils.
+
+PRUDENCE
+Les réponses et les valeurs numériques de vérification sont deux vues
+de la même intention d'essai. Elles ne produisent pas automatiquement
+des entrées identiques dans le moteur actuel car le questionnaire
+utilise des fourchettes converties en valeurs médianes. Les profils
+ne constituent pas encore une campagne Playwright paramétrée et
+les comparaisons chiffrées avec la sortie du simulateur seront faites
+dans une évolution ultérieure avec une adaptation explicite aux
+fourchettes. Les exemples d'énergie n'homologuent pas les frais annexes,
+l'AEN ou l'impôt.
+
+RECETTE ET GOUVERNANCE
+Pas de scheduling, workflow_dispatch, changement de cadence ni
+modification de la publication Pages dans ce lot. Les tests ajoutés
+sont intégrés aux actions sur push/PR déjà existantes. Un futur lot
+traitera l'exécution réelle des profils dans l'application et les
+captures/rapports par scénario. Les documents et leurs conclusions
+sont versionnés dans GitHub.
