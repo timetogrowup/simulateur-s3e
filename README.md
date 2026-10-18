@@ -45,7 +45,7 @@ Le document de référence est [docs/gouvernance_projet_chatgpt_github.txt](docs
 
 ## Recharge publique payante — EVOL-RECHARGE-002
 
-Lorsque la recharge du futur véhicule électrique SUEZ à domicile est impossible, la simulation considère les bornes publiques payantes comme étant à la charge du salarié et demande leur tarif. Si le domicile est accessible, le questionnaire distingue la recharge à domicile et les recharges extérieures payées personnellement. Seules les charges extérieures effectivement couvertes par SUEZ sont sans coût pour le salarié. Les prix sont fictifs. Voir [la décision métier détaillée](docs/evolutions/EVOL-RECHARGE-002_recharge_publique_payante.txt).
+Lorsque la recharge du futur véhicule électrique SUEZ à domicile est impossible, la simulation considère les bornes publiques payantes comme étant à la charge du salarié et applique un tarif fictif par défaut, modifiable uniquement lors de l’affinage. Si le domicile est accessible, le questionnaire distingue la recharge à domicile et les recharges extérieures payées personnellement. Seules les charges extérieures effectivement couvertes par SUEZ sont sans coût pour le salarié. Les prix sont fictifs. Voir [la décision métier détaillée](docs/evolutions/EVOL-RECHARGE-002_recharge_publique_payante.txt).
 
 ### Si la recharge à domicile est impossible
 
@@ -55,7 +55,7 @@ Le questionnaire rapide ne demande **pas** le tarif de recharge publique. Il app
 
 Le workflow [S3E - Contrôles qualité](.github/workflows/s3e-tests.yml) s'exécute à chaque push sur `main` et sur les pull requests. Il lance `node tests/smoke.cjs`, `node tests/validate-referentiels.cjs` et `node tests/validate-docs.cjs`. Le validateur documentaire contrôle les TXT obligatoires ; avec l'historique Git disponible, toute modification d'index.html ou des référentiels exige une mise à jour conjointe d'un TXT sous `docs/`. [Cadrage TXT](docs/evolutions/EVOL-CI-001_github_actions.txt).
 
-Ces tests n'évaluent pas encore un navigateur réel et **ne bloquent pas automatiquement la publication GitHub Pages**. Ils ne remplacent pas la recette métier ou fiscale.
+Les tests unitaires sont complétés par Playwright sur **Chromium mobile émulé et bureau**, mais **ne bloquent pas automatiquement la publication GitHub Pages**. Ils ne remplacent pas la recette métier ou fiscale.
 
 ## Exports et portabilité — EVOL-EXPORT-001
 
@@ -66,3 +66,9 @@ Les contrôles automatisés couvrent les formats, écarts, avertissements et rej
 ## Tests en navigateur — EVOL-TEST-002
 
 Une recette automatique Playwright utilise **Chromium** avec un profil mobile Pixel 7 émulé et un profil bureau. Le test couvre le questionnaire, le scénario de recharge publique, l'affinage, les exports CSV/JSON, les sauvegardes et l'import. Il tourne contre un serveur local alimenté par le code du commit, dans le job `Parcours Chromium mobile et bureau` de GitHub Actions. Commande locale après installation : `npm install --no-package-lock && npx playwright install chromium && npm run test:browser`. Cette émulation ne remplace pas une validation sur téléphone réel. [Cadrage TXT](docs/evolutions/EVOL-TEST-002_tests_navigateur.txt).
+
+## Suivi des bilans et stabilisation — 18 octobre 2026
+
+Chaque bilan d'étape est désormais archivé dans [docs/suivi/](docs/suivi/) et référencé dans [l'index de suivi](docs/suivi/index.txt), selon la [gouvernance v1.1](docs/gouvernance_projet_chatgpt_github.txt). Premier bilan : [18 octobre 2026](docs/suivi/2026-10-18_etat_des_lieux.txt).
+
+Le projet entre en phase de fiabilisation. La [première étape](docs/evolutions/EVOL-FIAB-001_stabilisation_recette.txt) consiste à consolider la documentation et à réaliser une recette physique sur un téléphone Samsung. Les tests automatiques Chromium mobile et bureau ont réussi au commit `1dabda17`, mais ils ne remplacent pas la recette physique. Les données métier et fiscales restent fictives ou non validées.
