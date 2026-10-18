@@ -22,6 +22,8 @@ jobs:
         run: node tests/smoke.cjs
       - name: Contrôler les référentiels fictifs
         run: node tests/validate-referentiels.cjs
+      - name: Valider les profils et les attendus de référence fictifs
+        run: node tests/validate-profils.cjs
       - name: Contrôler les documents TXT et les évolutions
         env:
           S3E_DIFF_BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
