@@ -1,0 +1,180 @@
+SIMULATEUR S3E — EXPRESSION DE BESOIN
+EVOL-TEST-004 — PLANIFICATION PÉRIODIQUE ET HISTORISATION DES RECETTES
+Édition : 1.0 — 18 octobre 2026
+Statut : BESOIN EXPRIMÉ / À DÉVELOPPER — AUCUNE NOUVELLE PLANIFICATION ACTIVÉE
+Décision du responsable : prévoir des exécutions toutes les X heures,
+avec un premier essai toutes les 1/6 d'heure, soit 10 minutes.
+Références :
+- docs/evolutions/EVOL-TEST-003_besoins_fonctionnels.txt
+- docs/evolutions/EVOL-TEST-003_methode_envisagee.txt
+- docs/evolutions/EVOL-TEST-003_lot_C_comparaison_moteur.txt
+- docs/gouvernance_projet_chatgpt_github.txt
+
+1. OBJET
+Automatiser le déclenchement périodique de la recette S3E déjà présente
+dans GitHub, recueillir ses résultats et les historiser de façon horodatée,
+de manière à vérifier le bon fonctionnement du robot avant la définition
+d'une fréquence de surveillance de régime permanent.
+
+2. FRÉQUENCE FONCTIONNELLE ET PHASE PILOTE
+PF-01 : paramètre de période P exprimé en heures, y compris fractions
+d'heure compatibles avec l'ordonnanceur GitHub.
+PF-02 : premier réglage d'essai P = 1/6 heure = 10 minutes.
+PF-03 : une campagne demandée toutes les dix minutes tant que la
+phase pilote est explicitement activée : 00, 10, 20, 30, 40 et 50 minutes
+de chaque heure, en fuseau UTC pour le planificateur.
+PF-04 : valeurs possibles ultérieures : toutes les 1, 2, 3, 4, 6, 12
+ou 24 heures, ou une autre période techniquement réalisable.
+PF-05 : les décisions de durée de la phase pilote, fréquence définitive,
+heures de surveillance, éventuels jours exclus et seuils d'alerte
+restent à prendre.
+PF-06 : maintenir un déclenchement à la demande si l'accès GitHub
+le permet, sans dépendre de l'exécution périodique.
+PF-07 : le dispositif doit pouvoir être suspendu sans altérer les
+résultats précédemment archivés.
+PF-08 : prévenir les campagnes simultanées : stratégie de concurrence
+à définir (annulation de doublon ou non-chevauchement), en conservant
+une trace des exécutions annulées/ignorées.
+PF-09 : ne pas modifier les déclencheurs push/pull_request existants
+sans décision distincte.
+
+3. MÉTHODE TECHNIQUE ENVISAGÉE
+- GitHub Actions « schedule » avec expression cron, sur la branche par
+  défaut. Pour le pilote de 10 minutes :
+      cron: '*/10 * * * *'
+- Les expressions cron de GitHub Actions sont en UTC.
+- Le calendrier est porté par le fichier YAML du workflow ; la période
+  n'est pas un simple nombre JSON ajustable à l'exécution. Une modification
+  de P implique la mise à jour contrôlée de l'expression cron ou un
+  mécanisme externe à définir explicitement.
+- Conserver l'exécution des tests de calcul, des référentiels, des 10
+  profils et des parcours Chromium déjà développés.
+- Une optimisation après mesure du coût peut séparer un « contrôle
+  rapide » récurrent et une « recette complète » plus coûteuse.
+- GitHub Actions ne garantit PAS une exécution à la minute exacte :
+  retards voire exécutions omises en période de forte charge sont
+  possibles. Le robot doit enregistrer heures prévues et réelles
+  plutôt que présumer l'absence de dérive.
+
+4. DONNÉES A ENREGISTRER POUR CHAQUE CAMPAGNE
+HI-01 : identifiant unique de campagne, run_id et run_attempt GitHub,
+        nom du workflow, événement déclencheur, SHA/branche.
+HI-02 : horodatage UTC ISO-8601 précis, heure de début et de fin,
+        et heure locale affichée avec son fuseau si utile.
+HI-03 : fréquence P utilisée, heure théorique de référence si
+        connue, durée réelle, retard constaté, résultat de lancement.
+HI-04 : version du moteur, référentiels fictifs, outils et navigateurs.
+HI-05 : pour chacun des profils PR-01 à PR-10, attendu, obtenu,
+        écart numérique, unité et verdict OK / ECART_CONNU / ECHEC.
+HI-06 : bilan des autres contrôles : non-régression, structure des
+        référentiels, documentation, scénarios navigateur, déploiement
+        Pages seulement si ce dernier a été effectivement vérifié.
+HI-07 : résumé : nombres de cas OK, connus, en échec, non exécutés,
+        anomalies et éventuelles causes techniques.
+HI-08 : liens de traçabilité vers les logs, rapports JSON/TXT,
+        captures/traces et artefacts disponibles.
+HI-09 : distinction obligatoire entre SUCCESS technique et défaut
+        métier connu (ex. PR-03 installation partiellement aidée).
+HI-10 : statut d'une campagne manquée, interrompue, annulée ou
+        dépassant son délai, si l'information est accessible.
+
+5. NOMMAGE ET STOCKAGE HORODATÉ
+Un dossier logique par campagne :
+  YYYY/MM/DD/YYYY-MM-DDTHH-mm-ssZ_run-RUNID_attempt-N/
+avec au minimum :
+  metadata.json
+  rapport-profils.json
+  rapport-profils.txt
+  statut-campagne.txt
+et, lorsque disponibles :
+  rapport-navigateur/, captures/, traces/.
+Les noms de fichiers et les métadonnées doivent permettre de distinguer
+deux exécutions même si elles se produisent pendant la même minute.
+Les résultats ne doivent pas être écrasés par la campagne suivante.
+
+STOCKAGE NIVEAU A — MINIMUM POUR LA PHASE PILOTE
+Conserver un artefact GitHub Actions par campagne, comportant
+l'horodatage et les identifiants d'exécution.
+Prévoir une durée de conservation explicite (proposition : 14 jours
+pour les résultats et 7 jours pour les traces navigateur, sous réserve
+des limites et réglages de rétention GitHub).
+Les rapports actuels sont téléchargeables en artefacts ; leur
+conservation n'est pas permanente.
+
+STOCKAGE NIVEAU B — HISTORIQUE DURABLE (OPTION À ARBITRER)
+Si l'on souhaite conserver tous les résultats au-delà des délais
+des artefacts, prévoir un stockage durable distinct :
+branche ou dossier d'historique dédié, objet stockage, ou autre
+dispositif approuvé.
+Ne pas commiter automatiquement dans main les résultats de chaque
+campagne : à dix minutes, cela ferait environ 144 commits par jour
+et peut causer des workflows récursifs et une croissance excessive.
+Définir séparément le support, ses droits d'écriture, la rétention,
+l'archivage périodique et la confidentialité avant implémentation.
+La règle de gouvernance d'archivage des bilans significatifs dans
+docs/suivi/ demeure applicable, sans imposer un commit à chaque run.
+
+6. RAPPORTS ET CONSULTATION
+RF-01 : un rapport daté lisible en TXT et exploitable en JSON.
+RF-02 : une synthèse GitHub Actions des verdicts et écarts connus.
+RF-03 : une possibilité de comparer les exécutions successives sur
+SHA identique et sur SHA différent.
+RF-04 : calcul du taux d'exécution effective par rapport aux lancements
+attendus, sans masquer les retards ou campagnes non exécutées.
+RF-05 : possibilité d'identifier la première campagne qui détecte
+un nouvel échec et la dernière campagne conforme.
+RF-06 : notification optionnelle à discuter ultérieurement ;
+aucune destination de notification n'est définie ici.
+
+7. CRITÈRES D'ACCEPTATION DE LA PHASE PILOTE
+CA-01 : fréquence demandée configurée à 1/6 heure (10 minutes).
+CA-02 : plusieurs campagnes consécutives identifiables, chacune avec
+        run_id, horodatage et résultat distincts.
+CA-03 : zéro écrasement ou confusion des rapports et artefacts.
+CA-04 : les sorties des dix profils sont conservées et consultables.
+CA-05 : les écarts connus restent visibles dans chaque exécution.
+CA-06 : le coût et la durée moyenne des campagnes sont mesurés ;
+        les chevauchements et omissions éventuelles sont signalés.
+CA-07 : suspendre/reprendre la périodicité est documenté et testé.
+CA-08 : conserver la CI sur push/PR et ses tests préexistants.
+CA-09 : les rapports annoncés comme stockés sont effectivement
+        retrouvables dans l'emplacement décidé.
+CA-10 : toute limite de GitHub Actions est explicitement communiquée.
+
+8. CHARGE PRÉVISIONNELLE ET RISQUES
+À P = 10 minutes, viser 6 campagnes/heure, 144 campagnes/jour et
+environ 1 008 campagnes/7 jours en théorie, si le planificateur
+déclenche tous les créneaux. La durée de campagne inclut notamment
+l'installation du navigateur Chromium ; le temps GitHub Actions
+et les volumes d'artefacts peuvent devenir significatifs.
+La politique de concurrence évitera de superposer inutilement des
+runs complets. La charge et les quotas seront mesurés avant décision
+de prolonger ce régime ; GitHub peut retarder/omettre des runs planifiés.
+À la différence d'un service de mesure temps réel, GitHub Actions
+n'est pas une horloge de précision.
+
+9. PHASAGE PROPOSÉ
+A. Valider la présente expression de besoin et la destination exacte
+   des résultats horodatés.
+B. Ajouter les métadonnées horodatées et un stockage par campagne.
+C. Tester manuellement la persistance et la comparaison des rapports.
+D. Préparer la configuration cron et la prévention des chevauchements.
+E. Activer le pilote toutes les 10 minutes après validation humaine.
+F. Constater plusieurs exécutions et mesurer ponctualité, durée, coûts,
+   résultat des dix profils, taille et pérennité des rapports.
+G. Arbitrer une cadence de régime permanent et les notifications.
+
+10. DECISIONS NON ENCORE ARBITREES
+- Date et durée de démarrage du pilote.
+- Fréquence pérenne après démonstration technique.
+- Stockage historique durable au-delà des artefacts temporaires.
+- Allègement éventuel des tests navigateur lors des campagnes fréquentes.
+- Seuils d'alerte et canal des notifications.
+- Politique de concurrence, coûts/quota et droits de publication.
+
+11. DÉCISION ET ÉTAT D'IMPLÉMENTATION
+La fréquence cible de PILOTE toutes les dix minutes est demandée.
+Le présent lot est DOCUMENTAIRE : il n'active ni cron, ni workflow
+supplémentaire ni stockage automatique durable. Sa réalisation nécessitera
+une intervention ultérieure explicite sur la configuration et les scripts.
+L'exécution existante sur push/pull_request n'est pas modifiée.
