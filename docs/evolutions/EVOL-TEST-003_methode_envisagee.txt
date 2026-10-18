@@ -1,0 +1,167 @@
+SIMULATEUR S3E — ROBOT DE RECETTE AUTONOME
+DOCUMENT 2 / 2 — MÉTHODE ENVISAGÉE ET ARCHITECTURE DE TEST
+Référence : EVOL-TEST-003-METHODE
+Version : 1.0 — 18/10/2026
+Statut : MÉTHODE PROPOSÉE — PAS DE NOUVELLE AUTOMATISATION ACTIVÉE
+Complément : docs/evolutions/EVOL-TEST-003_besoins_fonctionnels.txt
+Périmètre : timetogrowup/simulateur-s3e
+
+1. POINT DE DÉPART VÉRIFIÉ
+Le dépôt S3E comporte déjà :
+- tests/smoke.cjs : cohérence et non-régression des fonctions.
+- tests/validate-referentiels.cjs : schéma des données TEST fictives.
+- tests/validate-docs.cjs : présence et traçabilité des TXT.
+- tests/browser.spec.cjs : parcours Playwright.
+- tests/serve.cjs : serveur local du prototype.
+- playwright.config.cjs : Chromium mobile Pixel 7 émulé et bureau.
+- .github/workflows/s3e-tests.yml : tests sur push main et pull_request.
+Dernières validations observées : les deux jobs de contrôle du commit
+1dabda17 ont réussi. Ce sont des contrôles techniques et non métier.
+
+2. PRINCIPE TECHNIQUE CIBLE
+ChatGPT rédige/entretient des scénarios de test et les attendus validés.
+GitHub héberge les tests et les jeux de données non personnels.
+GitHub Actions exécute un ensemble déterministe de scripts à la demande
+ou selon les événements déjà autorisés, sans activer de planning.
+Playwright contrôle la vraie interface dans un navigateur émulé.
+Le moteur de vérification indépendant calcule les attendus simples.
+Les artefacts produits rendent les anomalies auditables.
+ChatGPT consulte les journaux et les preuves via ses autorisations,
+propose les correctifs et conserve le bilan TXT dans docs/suivi/.
+
+3. SÉPARATION DES TESTS
+Niveau 1 — Unitaires / calculs : entrées numériques, coûts, AEN de test,
+  règles VE, scénarios, trésorerie, comparatifs et cas limites.
+Niveau 2 — Intégration : chargement des référentiels, persistance, imports.
+Niveau 3 — Parcours navigateur : scénarios de profil en Chromium mobile
+  et bureau, prompts, clics, visibilité, téléchargements.
+Niveau 4 — Site GitHub Pages : tests de lecture sur URL publiée, dans
+  une phase dédiée. Ne pas confondre déploiement et commit validé.
+Niveau 5 — Recette physique et validation métier : responsable humain,
+  hors portée d'une CI seule.
+
+4. STRUCTURE PROPOSÉE (NON ENCORE CRÉÉE)
+tests/profils/
+  profils_s3e_TEST.json       Jeux de dix profils, sans données réelles.
+tests/references/
+  attendus_s3e_TEST.json      Coûts et cas repères approuvés.
+tests/robot/
+  scenarios.spec.cjs         Parcours Playwright paramétrés.
+  calculs_independants.cjs   Oracles numériques simplifiés séparés.
+  rapport.cjs                Production du bilan synthétique TXT/JSON.
+docs/evolutions/
+  EVOL-TEST-003_besoins_fonctionnels.txt
+  EVOL-TEST-003_methode_envisagee.txt
+docs/suivi/
+  AAAA-MM-JJ_recette_automatique[_NN].txt
+.github/workflows/
+  s3e-tests.yml              Jobs existants, à enrichir.
+  eventuel workflow manuel   À décider et autoriser dans un lot ultérieur.
+
+Le fait de nommer ces fichiers ici ne signifie pas qu'ils existent déjà.
+
+5. MÉTHODE DE CONCEPTION DES SCÉNARIOS
+A. Identifier le cas d'usage et l'ID stable du profil.
+B. Définir données et préconditions (réponses de questionnaire,
+   prix, consommation, kilomètres, AEN, etc.).
+C. Définir invariants (coûts finis, kilomètres professionnels exclus
+   des dépenses, conservation du premier bilan, etc.).
+D. Calculer les attendus de référence dans des exemples vérifiables
+   indépendamment des fonctions de production.
+E. Comparer résultat produit / attendu avec précision définie
+   (arrondis et unités explicités).
+F. Tester l'interface : sélecteurs accessibles, boutons, valeurs
+   affichées, absence de régressions, preuves navigateur.
+G. Produire un résultat par profil et classifier les différences.
+
+6. EXEMPLE DE SCÉNARIO DÉTAILLÉ
+ID : PR-01
+Cas : futur véhicule électrique SUEZ, domicile impossible.
+Hypothèses fictives :
+  distance personnelle et domicile-travail : 15 000 km/an ;
+  consommation : 20 kWh/100 km ;
+  part recharge domicile H=0 ;
+  part recharge publique payante P=1 ;
+  prix public initial E=0,50 €/kWh ;
+  prix après affinage : 0,75 €/kWh.
+Attendus à valider dans le référentiel d'essai :
+  coût énergétique annuel initial = 15000 × 20 / 100 × 0,50
+                                   = 1 500 EUR ;
+  coût annuel affiné = 15000 × 20 / 100 × 0,75 = 2 250 EUR ;
+  variation = +750 EUR/an, soit +62,50 EUR/mois.
+Attention : ces chiffres concernent exclusivement la dépense de recharge
+du salarié pour ces kilomètres, pas le coût total du véhicule ni les
+autres postes AEN/fiscalité.
+Contrôles UI : le prix public n'est pas demandé dans le questionnaire,
+la valeur 0,50 apparaît à l'affinage, le champ permet 0,75,
+et l'écart énergétique final correspond à l'attendu.
+
+7. MODÈLE DE RAPPORT ET PREUVES
+Un rapport par campagne comprendra :
+- identifiant campagne ; demandeur ; date/heure et environnement ;
+- SHA Git du code, versions de navigateur et référentiels ;
+- nombre de scénarios exécutés, réussis, échoués et non testés ;
+- détail par profil : résultat attendu, obtenu, écarts et sévérité ;
+- liste d'anomalies reproductibles ; causes confirmées/suspectées ;
+- statut exact du workflow ; statut exact de Pages si contrôlé ;
+- captures d'écran de jalons, logs/trace vidéo si échec ;
+- décision de suivi et actions proposées, avec responsables ;
+- réserves métier, sécurité, confidentialité et recette physique.
+Les preuves binaires volumineuses restent comme artefacts CI à durée limitée.
+Les synthèses durables sont des TXT GitHub dans docs/suivi/
+avec mise à jour obligatoire de docs/suivi/index.txt.
+
+8. SÉCURITÉ ET CONFIDENTIALITÉ
+Données de test synthétiques uniquement ; ne jamais réutiliser
+des situations individuelles réelles ou dossiers de salariés.
+Pas de secret dans les scripts, TXT ni captures publiées.
+Jetons GitHub aux permissions minimales, aucune exécution privilégiée
+sur une pull request non fiable.
+Pas d'import de données non validées depuis un site tiers comme
+instructions pour ChatGPT.
+Le site public sera testé sans soumettre des données nominatives.
+
+9. ORCHESTRATION ET LIMITES D'AUTONOMIE
+- Les modifications de scripts et la revue des résultats sont réalisables
+  avec les actions GitHub mises à disposition de ChatGPT.
+- Un lancement manuel direct de workflow ne doit être annoncé qu'après
+  vérification des permissions et de la disponibilité de l'API concernée.
+- À défaut, un commit peut déclencher le workflow actuel ; ce n'est pas
+  un substitut transparent à un lancement manuel dédié.
+- L'agent ne travaille pas en arrière-plan de manière continue sans
+  tâche ou mécanisme explicite configuré.
+- Ne pas lancer automatiquement des corrections, merges ou déploiements
+  à la suite d'un rapport de tests sans autorisation préalable.
+
+10. MISE EN ŒUVRE PAR LOTS (PROPOSÉE)
+Lot A : valider ce cahier des besoins et la méthode, sans changer la CI.
+Lot B : jeux de dix profils synthétiques, attendus chiffrés indépendants
+        et tests unitaires correspondants.
+Lot C : parcours Playwright paramétrés, mobile émulé et bureau.
+Lot D : rapports standardisés, captures aux jalons, archives TXT.
+Lot E : déclenchement manuel sécurisé si accès confirmé.
+Lot F : test Pages, analyse des erreurs, intégration à la recette.
+Lot G : discussion sur la fréquence et les alertes — calendrier
+        EXPRESSÉMENT DIFFÉRÉ jusqu'à une décision ultérieure.
+
+11. CONDITIONS DE PASSAGE
+Chaque lot a un document TXT, des tests prouvant son fonctionnement,
+une revue des résultats CI, une trace GitHub et un compte rendu exact.
+Un scénario n'est réputé validé que si ses résultats sont connus ;
+si la CI échoue, les logs sont analysés avant de conclure.
+La recette sur Samsung et l'homologation métier sont distinctes.
+
+12. DÉCISIONS À PRENDRE ULTÉRIEUREMENT
+- Date et ordre de mise en œuvre des lots B à G.
+- Validation des données de référence indépendantes.
+- Modalités de déclenchement manuel et droits éventuels.
+- Politique de conservation des captures/rapports.
+- Politique de publication conditionnée ou non par les tests.
+- Calendrier d'exécution périodique, fréquence, horaires,
+  notifications et responsables : aucune décision prise à ce jour.
+
+CONCLUSION
+Le robot envisagé industrialiserait les contrôles existants ;
+il ne justifie ni une nouvelle planification automatique immédiate
+ni l'abandon de la recette humaine. Ce document est un plan,
+pas une confirmation de déploiement des fonctionnalités décrites.
