@@ -1,0 +1,57 @@
+SIMULATEUR S3E — BILAN DE BASCULE VERS LA RECETTE QUOTIDIENNE
+Date : 18 octobre 2026
+Statut : CONFIGURATION ET PREMIER RUN PUSH VALIDÉS ; PLANIFICATION QUOTIDIENNE À OBSERVER
+
+DÉCISION
+Utilisateur : remplacer le pilote aux 10 minutes par un test quotidien
+à 05:00, heure de PARIS. Conservation des résultats sur 30 jours
+glissants. Ancienne décision pilote : conserver les trois derniers
+artefacts ; le régime pilote est désormais arrêté.
+
+PRÉPARATION DOCUMENTAIRE
+docs/evolutions/EVOL-TEST-004_lot_B_quotidien_05h_Paris.txt
+docs/evolutions/EVOL-TEST-004_frequence_horodatage.txt v1.4
+docs/guide_developpement_supervise.txt v2.9
+
+IMPLÉMENTATION
+- Workflow .github/workflows/s3e-pilote.yml :
+  nom « S3E - Recette quotidienne 05h Paris ».
+- Cron UTC : 0 3 * * * et 0 4 * * * ; filtrage via script
+  tests/select-paris-slot.cjs pour ne lancer la recette que
+  lorsque le créneau correspond à 05:00 Europe/Paris.
+- Tests de passage été/hiver :
+  tests/test-paris-slot.cjs (huit dates-créneaux et mode manuel).
+- Rapports JSON/TXT avec horodatages UTC/Paris via
+  tests/archive-campaign.cjs.
+- Artefacts nommés recette-quotidienne-RUNID-ATTEMPT :
+  upload-artifact retention-days:30 ; purge API ciblée >30 jours
+  via tests/rotate-daily-artifacts.cjs après stockage vérifié.
+- Anciennes archives recette-pilote distinctes, non supprimées
+  par la routine quotidienne.
+- Tests préexistants push/PR conservés.
+
+RECETTE FACTUELLE IMMÉDIATE
+Run GitHub : 39155987873
+URL : https://github.com/timetogrowup/simulateur-s3e/actions/runs/39155987873
+Type d'événement : push après modification workflow, PAS schedule.
+Job « Sélectionner 05h Europe/Paris » : SUCCESS.
+Job « Calculs et Chromium — quotidien » : SUCCESS.
+Tests du changement d'heure : SUCCESS.
+Calculs/profils/référentiels : SUCCESS.
+Parcours navigateur : SUCCESS.
+Création rapport, téléversement et purge >30 jours : SUCCESS.
+Artefact GitHub constaté : recette-quotidienne-39155987873-1
+identifiant 12147340274, non expiré, taille 206541 octets.
+
+LIMITES ET PROCHAIN CONTRÔLE
+Le premier push ne démontre PAS que GitHub lancera effectivement
+la recette chaque matin à 05:00 heure Paris ; GitHub schedule peut
+retarder ou omettre un déclenchement.
+Le script de sélection horaire est testé pour les dates de changement
+été/hiver, mais le fonctionnement du scheduler ne sera confirmé
+que par un futur run event=schedule.
+Le mécanisme de purge n'a pas encore supprimé une archive réellement
+âgée de >30 jours : la règle est implémentée et étape réussie,
+mais ce scénario n'a pas été testé en situation réelle.
+Les référentiels métiers et les chiffres fiscaux restent fictifs ;
+le profil PR-03 comporte un écart connu nécessitant arbitrage.
