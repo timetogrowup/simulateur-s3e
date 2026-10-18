@@ -1,11 +1,12 @@
-name: S3E - Pilote recette horodatée
+name: S3E - Recette quotidienne 05h Paris
 on:
   push:
     branches: [main]
     paths:
       - '.github/workflows/s3e-pilote.yml'
   schedule:
-    - cron: '3-59/10 * * * *'
+    - cron: '0 3 * * *'
+    - cron: '0 4 * * *'
   workflow_dispatch:
 
 permissions:
@@ -13,30 +14,62 @@ permissions:
   actions: write
 
 concurrency:
-  group: s3e-recette-pilote
+  group: s3e-recette-quotidienne
   cancel-in-progress: false
 
 jobs:
-  recette-pilote:
-    name: Recette pilote - profils et Chromium
+  calendrier:
+    name: Sélectionner 05h Europe/Paris
+    runs-on: ubuntu-latest
+    outputs:
+      run_tests: ${{ steps.slot.outputs.run_tests }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Vérifier heure été/hiver de Paris
+        id: slot
+        env:
+          S3E_EVENT: ${{ github.event_name }}
+          S3E_CRON: ${{ github.event.schedule }}
+        run: |
+          set +e
+          node tests/select-paris-slot.cjs "$S3E_EVENT" "$S3E_CRON"
+          status=$?
+          set -e
+          if [ "$status" = 0 ]; then
+            echo "run_tests=true" >> "$GITHUB_OUTPUT"
+          elif [ "$status" = 2 ]; then
+            echo "run_tests=false" >> "$GITHUB_OUTPUT"
+          else
+            exit "$status"
+          fi
+
+  recette:
+    name: Calculs et Chromium — quotidien
+    needs: calendrier
+    if: needs.calendrier.outputs.run_tests == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 18
     steps:
-      - name: Récupérer le code du projet
+      - name: Récupérer le code
         uses: actions/checkout@v4
       - name: Installer Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Vérifier les calculs, profils et référentiels
+      - name: Tester le changement d'heure Paris
+        id: timezone
+        continue-on-error: true
+        run: node tests/test-paris-slot.cjs
+      - name: Vérifier calculs, profils et référentiels
         id: calculs
         continue-on-error: true
         run: |
+          set -e
           node tests/smoke.cjs
           node tests/validate-referentiels.cjs
           node tests/validate-profils.cjs
           node tests/compare-profils.cjs
-      - name: Installer Playwright
+      - name: Installer Playwright et Chromium
         id: dependances
         continue-on-error: true
         run: |
@@ -47,19 +80,21 @@ jobs:
         if: steps.dependances.outcome == 'success'
         continue-on-error: true
         run: npm run test:browser
-      - name: Créer le rapport horodaté
+      - name: Créer les rapports horodatés
         id: horodatage
         if: always()
         env:
+          S3E_PHASE: quotidien
+          S3E_CAMPAIGN_PREFIX: recette-quotidienne
           S3E_UNIT_OUTCOME: ${{ steps.calculs.outcome }}
           S3E_BROWSER_OUTCOME: ${{ steps.navigateur.outcome }}
         run: node tests/archive-campaign.cjs
-      - name: Conserver le jeu de résultats horodaté
+      - name: Conserver les rapports pendant 30 jours
         id: upload
         if: always() && steps.horodatage.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
-          name: recette-pilote-${{ github.run_id }}-${{ github.run_attempt }}
+          name: recette-quotidienne-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             report/recette-profils.json
             report/recette-profils.txt
@@ -68,20 +103,21 @@ jobs:
             test-results/
           retention-days: 30
           if-no-files-found: error
-      - name: Garder seulement les trois derniers résultats pilote
+      - name: Supprimer les archives quotidiennes âgées de plus de 30 jours
         id: rotation
         if: always() && steps.upload.outcome == 'success'
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: node tests/rotate-pilot-artifacts.cjs
-      - name: Statut final véridique de la campagne
+        run: node tests/rotate-daily-artifacts.cjs
+      - name: Statut final de la recette quotidienne
         if: always()
         env:
+          TZ_TEST: ${{ steps.timezone.outcome }}
           TESTS: ${{ steps.calculs.outcome }}
           INSTALL: ${{ steps.dependances.outcome }}
           BROWSER: ${{ steps.navigateur.outcome }}
           ARCHIVE: ${{ steps.upload.outcome }}
           ROTATION: ${{ steps.rotation.outcome }}
         run: |
-          echo "Calculs: $TESTS | Installation: $INSTALL | Navigateur: $BROWSER | Archivage: $ARCHIVE | Rotation: $ROTATION"
-          test "$TESTS" = success && test "$INSTALL" = success && test "$BROWSER" = success && test "$ARCHIVE" = success && test "$ROTATION" = success
+          echo "Paris DST: $TZ_TEST | Calculs: $TESTS | Install: $INSTALL | Navigateur: $BROWSER | Archive: $ARCHIVE | Rotation: $ROTATION"
+          test "$TZ_TEST" = success && test "$TESTS" = success && test "$INSTALL" = success && test "$BROWSER" = success && test "$ARCHIVE" = success && test "$ROTATION" = success
