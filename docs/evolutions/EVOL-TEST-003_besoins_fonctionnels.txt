@@ -1,0 +1,150 @@
+SIMULATEUR S3E — ROBOT DE RECETTE AUTONOME
+DOCUMENT 1 / 2 — EXPRESSION DES BESOINS FONCTIONNELS
+Référence : EVOL-TEST-003-BF
+Version : 1.0 — 18/10/2026
+Statut : BESOIN CADRÉ — EN ATTENTE DE VALIDATION POUR DÉVELOPPEMENT
+Responsable des arbitrages : responsable humain du projet
+Périmètre : simulateur S3E, dépôt timetogrowup/simulateur-s3e
+Documents associés : EVOL-TEST-003-METHODE, EVOL-TEST-002, guide de développement et gouvernance.
+
+1. CONTEXTE ET FINALITÉ
+Les tests Playwright en Chromium mobile émulé et bureau existent déjà
+et s'exécutent à chaque modification du dépôt. Le responsable souhaite
+réduire davantage les tests manuels et permettre à ChatGPT de préparer,
+déclencher par les mécanismes GitHub autorisés, consulter, analyser et
+documenter des campagnes plus complètes de tests du simulateur.
+
+Objectifs fonctionnels :
+- identifier automatiquement les régressions visibles et calculatoires ;
+- couvrir plusieurs profils d'utilisation, pas un parcours unique ;
+- vérifier la vraisemblance et la reproductibilité des résultats ;
+- produire des preuves auditables et des rapports lisibles ;
+- distinguer erreurs du logiciel, écarts de données fictives, défauts
+  du scénario de test et validations métier non réalisées.
+
+2. ACTEURS ET RESPONSABILITÉS
+Responsable projet : choisit les profils, valide les résultats attendus
+qui reposent sur des règles métier, autorise les évolutions et priorise
+les anomalies.
+ChatGPT : élabore les scripts et jeux d'essai, déclenche une campagne
+lorsque les capacités GitHub le permettent, analyse résultats et logs,
+propose corrections, archive bilans et réserves dans les TXT du dépôt.
+GitHub Actions : exécute les tests, rend les statuts et conserve les
+artefacts disponibles selon les règles de rétention.
+Playwright : pilote le navigateur Chromium mobile émulé et bureau.
+Testeur humain : confirme le comportement sur téléphone Samsung réel,
+la lisibilité et les règles métier non automatisables à ce stade.
+
+3. RÈGLES DE DÉCLENCHEMENT — DÉCISION DIFFÉRÉE
+DÉCISION EXPLICITE DU 18/10/2026 : aucun calendrier récurrent
+(quotidien, hebdomadaire, etc.) ne doit être décidé ou activé maintenant.
+Les contrôles actuellement automatiques sur push et pull_request sont
+maintenus sans modification de fréquence.
+Le futur robot doit pouvoir être lancé à la demande, sous réserve de
+disposer des permissions et moyens de déclenchement GitHub adéquats.
+Un éventuel workflow_dispatch et des paramètres d'exécution devront
+être spécifiés et approuvés avant implémentation.
+La décision concernant une exécution programmée, la fréquence,
+les horaires et les notifications fera l'objet d'un arbitrage ultérieur.
+
+4. PARCOURS ET FONCTIONNALITÉS À TESTER
+BF-01  Chargement, navigation, absence d'erreurs JavaScript, lisibilité.
+BF-02  Questionnaire dynamique, ordre/visibilité des questions,
+       réponses obligatoires, Précédent/Suivant et récapitulatif.
+BF-03  Trois situations de mobilité : actuelle, future voiture
+       de fonction, future voiture personnelle avec compensation.
+BF-04  Recharge VE : possible au domicile, installation nécessaire,
+       impossible, tarif public par défaut et ajustement à l'affinage,
+       recharge publique payante / effectivement prise en charge par SUEZ.
+BF-05  Calcul du premier bilan, décomposition des coûts et gains,
+       cohérence des unités et signes.
+BF-06  Affinage, réinitialisation, limites numériques, recalcul explicite,
+       conservation du bilan initial et écarts attendus.
+BF-07  Trésorerie pluriannuelle : achat, installation, revente,
+       coûts récurrents et rapprochement avec coût économique.
+BF-08  Sauvegardes multiples : création, reprise, suppression,
+       sauvegarde ancienne et données incorrectes.
+BF-09  Exports CSV détaillés : postes, hypothèses, comparaison,
+       unités et neutralisation des formules de tableur.
+BF-10  Export/import JSON versionné : format, limite, refus d'import
+       invalide, non-écrasement des données et recalcul.
+BF-11  Mobile émulé / bureau : boutons, navigation, absence de
+       débordement global, tableaux défilants, téléchargements.
+BF-12  Version réellement publiée sur Pages : contrôle de disponibilité
+       et parcours de lecture ; ne pas saisir de données personnelles.
+BF-13  Erreurs et limites : affichage du caractère fictif des barèmes,
+       erreurs gérées et absence de console error non expliquée.
+
+5. PREMIER JEU DE PROFILS À SPÉCIFIER (CIBLE : 10)
+PR-01  VE de fonction, recharge domicile impossible, prix public
+       par défaut 0,50 €/kWh, affinage 0,75 €/kWh.
+PR-02  VE de fonction, recharge à domicile installée, forte part domicile.
+PR-03  VE de fonction, installation nécessaire, coût d'installation
+       et prise en charge partielle ou totale.
+PR-04  VE de fonction, recharge hors domicile mixte : part payante
+       par salarié et part couverte par SUEZ.
+PR-05  Véhicule de fonction thermique par dérogation.
+PR-06  Gros rouleur : kilomètres professionnels élevés et trajets longs.
+PR-07  Voiture personnelle diesel, achat puis revente, coûts d'entretien.
+PR-08  Voiture personnelle électrique, frais de recharge publique.
+PR-09  Taux fiscal de test faible puis élevé, AEN et compensation.
+PR-10  Sauvegarde ancienne, réimport JSON et modifications d'hypothèses.
+
+Ce catalogue est un point de départ et non une validation de dix cas
+par l'utilisateur. Les données sont entièrement fictives.
+
+6. EXIGENCES SUR LES RÉSULTATS ET LES RAPPORTS
+R-01  Un bilan par campagne : date, révision/commit, environnement,
+      version du simulateur et référentiels, déclencheur et durée.
+R-02  Pour chaque profil : identifiant stable, préconditions,
+      entrées, résultats attendus, obtenus et statut OK/KO/NON TESTÉ.
+R-03  Les valeurs financières attendues seront calculées selon une
+      référence indépendante du code d'affichage et du moteur testé.
+R-04  Captures pertinentes au moins aux étapes importantes ;
+      traces, logs et vidéo si utile et autorisé, en particulier en KO.
+R-05  Synthèse du nombre de tests réussis/échoués, détails et
+      anomalies reproductibles, avec liens vers artefacts et commit.
+R-06  Les rapports d'une campagne significative sont conservés
+      sous forme TXT datée dans docs/suivi/ et indexés ; ne pas
+      commiter des fichiers binaires lourds dans le dépôt.
+R-07  Aucun « succès global » ne doit masquer un échec critique,
+      ni être confondu avec une validation officielle.
+R-08  Aucune donnée réelle de salarié, secret ni identifiant personnel
+      dans les jeux d'essai, captures ou rapports publiés.
+
+7. NON-FONCTIONNEL, LIMITES ET EXCLUSIONS
+- Tests déterministes et reproductibles autant que possible.
+- Durées et coûts de CI maîtrisés ; signaler le temps des campagnes.
+- Prévenir les faux positifs (attentes arbitraires, sélecteurs fragiles).
+- Différencier test sur code du commit et test du site publié.
+- Protection contre les fichiers JSON/CSV hostiles ou mal formés.
+- Tests d'accessibilité plus complets à spécifier ultérieurement.
+- Émulation Pixel/Chromium ≠ Samsung S24 physique.
+- Tests techniques ≠ validation paie, réglementation ou fiscalité.
+- Le robot ne modifie pas les paramètres officiels ni les barèmes fictifs
+  pour obtenir un résultat attendu sans décision humaine.
+- Le robot ne publie, ne corrige et ne fusionne pas du code
+  automatiquement sans cadre d'autorisation distinct.
+
+8. CRITÈRES D'ACCEPTATION DE L'ÉVOLUTION FUTURE
+A. Dix profils décrits et exécutés à la demande au minimum.
+B. Chaque profil dispose de données explicites et d'attendus.
+C. Le moteur et l'interface sont testés indépendamment autant que possible.
+D. Un échec donne un diagnostic accessible sans lire tout le log brut.
+E. Les captures/traces sont conservées pendant une durée définie.
+F. Le rapport récapitulatif est généré et archivable selon la gouvernance.
+G. Les tests existants restent fonctionnels.
+H. Aucune fréquence récurrente activée tant que non décidée.
+
+9. DÉCISIONS OUVERTES
+- Validation définitive des dix profils et de leurs attendus.
+- Format de tableau de bord et stratégie des preuves.
+- Paramètres des lancements à la demande.
+- Rétention et volume des artefacts au-delà des 7 jours actuels.
+- Politique de réparation, autorisation des actions et revue de code.
+- Calendrier d'exécution : EXPRESSÉMENT REPORTÉ.
+
+10. STATUT FINAL DE CE DOCUMENT
+Spécification fonctionnelle rédigée, destinée à une future mise en œuvre.
+Aucun nouveau script, workflow programmé ni calendrier de test n'est
+réputé implémenté du seul fait de cette documentation.
