@@ -1,0 +1,76 @@
+SIMULATEUR S3E — BILAN D'ÉTAPE ARCHIVÉ
+Date du constat : 18 octobre 2026 (matin)
+Nature : suivi de projet — photographie de l'état constaté, non recette métier
+Statut : ARCHIVÉ — état vérifié via GitHub le 18/10/2026
+Commit de référence AVANT archivage : 1dabda17 (main)
+Responsable des décisions : responsable du projet
+Source : dépôt GitHub timetogrowup/simulateur-s3e et historique Actions.
+
+1. SYNTHÈSE
+Le simulateur S3E constitue un prototype public de comparaison des solutions
+de mobilité, avec premier bilan, affinage, projections, sauvegardes et exports.
+Ce prototype fonctionne au niveau des scénarios automatisés vérifiés et reste
+NON VALIDÉ pour une décision individuelle officielle. Les données AEN,
+compensations, consommations et paramètres fiscaux sont fictifs ou approximés.
+
+2. FONCTIONS DÉVELOPPÉES
+- Questionnaire rapide conditionnel, trois situations : véhicule actuel,
+  future voiture de fonction, future voiture personnelle avec compensation.
+- Première estimation, affinage chiffré puis comparaison des deux bilans.
+- Coûts économiques annuels, pouvoir d'achat, ventilation et trésorerie.
+- Recharge publique payante au salarié, dont tarif fictif par défaut
+  0,50 €/kWh si domicile impossible, ajustable à l'affinage.
+- Gestion locale de plusieurs simulations nommées et reprise.
+- Exports CSV détaillés et simulation JSON exportable/importable.
+- Référentiels TEST séparés du fichier principal.
+- Pas de transmission serveur des réponses dans le fonctionnement actuel.
+
+3. QUALITÉ — PREUVES OBSERVÉES
+Le 18/10/2026, dernières Actions du commit 1dabda17 :
+- « S3E - Contrôles qualité » : SUCCESS, run 39010978397.
+  Jobs « Tests, référentiels et documentation » et
+  « Parcours Chromium mobile et bureau » : SUCCESS.
+- « pages build and deployment » : SUCCESS, run 39010977621.
+- Tests navigateur automatisés avec Chromium Pixel 7 émulé et bureau :
+  questionnaire, recharge, affinage, stockage, CSV et JSON.
+- Aucun essai physique sur Samsung confirmé ici ; aucune validation métier
+  ou fiscale externe attestée.
+
+4. LIMITES ET RISQUES
+PRIORITÉ HAUTE :
+- AEN, cotisations salariales, fiscalité et régime de la compensation
+  non validés par des spécialistes / référentiels officiels.
+- Grilles SUEZ et catalogue officiels indisponibles dans ce prototype.
+- Recette utilisateur sur Samsung physique et contrôle des résultats chiffrés
+  indépendants à effectuer.
+- Les calculs sont encore concentrés dans index.html.
+PRIORITÉ MOYENNE :
+- GitHub Pages publie indépendamment du succès du workflow qualité.
+- Documentation existante comportant des phrases historiques « à faire »
+  désormais obsolètes, sans page de suivi courant consolidée.
+- Sécurisation des livraisons, modularisation, impression et ergonomie mobile.
+
+5. DÉCISION DU 18 OCTOBRE
+- La gouvernance générale impose désormais d'archiver chaque bilan d'étape
+  dans docs/suivi/ en document TXT daté, référencé dans un index.
+- Accord pour avancer « étape par étape » dans un cycle de fiabilisation,
+  plutôt que poursuivre immédiatement l'ajout de fonctionnalités.
+
+6. FEUILLE DE ROUTE PRIORISÉE
+ÉTAPE 1 — STABILISATION : remettre à jour les documents vivants et leur
+index, préparer une recette sur téléphone réel, vérifier exports et cas
+chiffrés représentatifs. Pilote : ChatGPT pour documents/tests, responsable
+de projet pour recette physique et arbitrages.
+ÉTAPE 2 — MOTEUR MÉTIER : inventaire des règles, cas de référence calculés
+indépendamment, suivi des hypothèses fiscales/paie ; validation métier humaine
+avant revendication de justesse.
+ÉTAPE 3 — VERSION PILOTE : modularisation progressive, stratégie de
+publication contrôlée, sécurisation des versions et panel utilisateur.
+
+7. RÉFÉRENCES
+Dépôt : https://github.com/timetogrowup/simulateur-s3e
+Site : https://timetogrowup.github.io/simulateur-s3e/
+Gouvernance : docs/gouvernance_projet_chatgpt_github.txt
+Guide courant : docs/guide_developpement_supervise.txt
+Tests navigateur : docs/evolutions/EVOL-TEST-002_tests_navigateur.txt
+Cette archive n'efface pas les anciennes décisions.
