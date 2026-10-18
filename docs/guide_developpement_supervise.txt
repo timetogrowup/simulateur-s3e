@@ -1,5 +1,5 @@
 SIMULATEUR S3E — GUIDE TXT DE DÉVELOPPEMENT SUPERVISÉ
-Version 1.9 — 18/10/2026
+Version 2.0 — 18/10/2026
 Statut : guide de projet et journal de recette, non validation métier ni fiscale.
 
 DOCUMENTS MAÎTRES
@@ -132,3 +132,12 @@ cadrage docs/evolutions/EVOL-FIAB-001_stabilisation_recette.txt.
 ÉTAPE 2 : audit indépendant des formules, limites AEN/paie/fiscalité.
 ÉTAPE 3 : modularisation, contrôles de publication et version pilote.
 ATTENTION : les textes historiques ci-dessus décrivent les décisions de leurs dates ; utiliser la section ÉTAT ACTUEL pour le statut des fonctions.
+
+CADRAGE EVOL-TEST-003 — ROBOT DE RECETTE AUTONOME (18/10/2026)
+Décision : définir les besoins fonctionnels et la méthode d'automatisation, sans encore développer le robot complet ni fixer un calendrier récurrent.
+Document besoins : docs/evolutions/EVOL-TEST-003_besoins_fonctionnels.txt.
+Document méthode : docs/evolutions/EVOL-TEST-003_methode_envisagee.txt.
+Périmètre envisagé : 10 profils synthétiques, scénarios Playwright paramétrés, attendus financiers indépendants, contrôles de l'interface et du site publié, captures et traces de test, synthèses archivées en TXT dans docs/suivi/.
+État réel : les deux documents de cadrage sont enregistrés ; aucun nouveau script ou workflow de robot autonome n'est encore implémenté.
+Déclenchements actuels inchangés : GitHub Actions sur push main et pull_request. Aucune programmation périodique, fréquence ou notification supplémentaire activée.
+Prochain jalon : validation du cadrage, puis développement des jeux de profils et valeurs de référence avant la généralisation des tests navigateur.
