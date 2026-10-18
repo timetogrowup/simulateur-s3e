@@ -1,0 +1,65 @@
+SIMULATEUR S3E — EVOL-TEST-004 — LOT B
+PASSAGE À LA RECETTE QUOTIDIENNE À 05 H 00, HEURE DE PARIS
+Version 1.0 — 18 octobre 2026
+Statut : spécification préalable au changement de code
+Décisions utilisateur : cadence quotidienne, heure de référence Paris,
+conservation horodatée 30 jours glissants, suppression des anciennes versions.
+
+1. FINALITÉ
+Remplacer immédiatement la planification expérimentale toutes les 10
+minutes par un unique contrôle quotidien à 05:00 Europe/Paris, heure
+d'été ET heure d'hiver. Maintenir les déclenchements manuels et un
+premier test de vérification suite à la modification du workflow.
+
+2. GESTION DU CHANGEMENT D'HEURE
+GitHub Actions schedule en UTC ne fixe pas directement une heure Paris
+dans le cron existant. Programmer deux créneaux UTC possibles :
+- 03:00 UTC quotidien (05:00 à Paris en été) ;
+- 04:00 UTC quotidien (05:00 à Paris en hiver).
+Un garde-fou de calendrier doit écarter la campagne du créneau ne
+correspondant pas au jour civil à 05:00 à Paris. Il doit utiliser
+le fuseau Europe/Paris (IANA) et le créneau cron reçu par GitHub.
+L'événement workflow_dispatch/push contourne ce garde-fou pour vérification.
+Le garde-fou doit être testé aux dates de passage été/hiver.
+
+3. HISTORIQUE ET ROTATION
+Chaque contrôle réellement exécuté en régime quotidien enregistre
+run ID, tentative, SHA, horodatage UTC, heure Europe/Paris,
+verdict calcul/navigateur et résultats des profils PR-01 à PR-10.
+Artefacts sous préfixe réservé recette-quotidienne-<id>-<tentative>.
+Rétention de 30 jours et purge ciblée des artefacts plus anciens que
+30 jours ; jamais des rapports d'une autre famille. La purge doit
+avoir lieu après publication et vérification du rapport du run courant.
+La conservation « 30 jours glissants » est temporelle (pas exactement
+30 versions si GitHub saute une campagne). L'historique des runs
+GitHub Actions et leurs logs peut subsister séparément.
+Les trois artefacts recette-pilote- existants ne sont pas concernés
+par la rotation quotidienne.
+
+4. COMPATIBILITÉ
+Conserver tests unitaires et dix profils, Playwright mobile/desktop,
+rapports détaillés et distinction ECART_CONNU / ECHEC.
+Conserver la CI push/PR distincte, ne pas modifier le site publié.
+Éviter les doubles campagnes dues aux deux créneaux UTC :
+une seule doit satisfaire la condition « 05:00 Paris ».
+La période pilote à dix minutes est arrêtée à la mise en place.
+Sur le premier push de migration, autoriser une campagne de vérification,
+sans la présenter comme preuve de ponctualité du schedule.
+
+5. RECETTE D'ACCEPTATION
+- Cron à 10 min absent ; deux crons de 03 et 04 UTC présents.
+- Contrôle démontrant qu'un seul créneau est choisi toute l'année
+  et aux transitions DST, à partir de dates fixes.
+- Exécution initiale par push/manuelle ; résultats et artefact visibles.
+- Exécutions planifiées constatées ensuite sur plusieurs jours à
+  proximité de 05:00 Paris, sans promesse de ponctualité exacte :
+  GitHub peut les retarder, voire les omettre.
+- Rétention 30 jours vérifiable dès que des archives ont cet âge.
+- Rapport de bilan daté inscrit dans docs/suivi/index.txt.
+
+6. LIMITES
+GitHub peut retarder/omettre le déclenchement quotidien. Une campagne
+dépassant 05:00 en heure réelle reste légitime si le créneau cron
+assigné correspond bien au jour local prévu. Absence d'observabilité
+à la minute exacte de GitHub : ne pas garantir une SLA à 05:00.
+Les données métier restent fictives ; PR-03 reste ECART_CONNU.
