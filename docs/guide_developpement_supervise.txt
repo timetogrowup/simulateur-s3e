@@ -1,5 +1,5 @@
 SIMULATEUR S3E — GUIDE TXT DE DÉVELOPPEMENT SUPERVISÉ
-Version 1.8 — 17/10/2026
+Version 1.9 — 18/10/2026
 Statut : guide de projet et journal de recette, non validation métier ni fiscale.
 
 DOCUMENTS MAÎTRES
@@ -33,11 +33,13 @@ TESTS ATTENDUS
 7. Rejet des bilans incomplets et conservation des tests de non-régression.
 Porte de sortie : GitHub Actions réussi pour le dernier code.
 
-PROCHAINS LOTS
-Sauvegardes locales multiples et reprise robuste.
-Export détaillé des postes, des hypothèses et des deux bilans.
-Modularisation progressive du fichier HTML/JS, tests de non-régression et recette mobile.
-Contrôle de validité des référentiels et intégration des données officielles lorsqu'elles seront disponibles.
+ÉTAT ACTUEL DES LOTS (18/10/2026)
+Sauvegardes locales multiples : réalisées et testées automatiquement.
+Exports CSV détaillés et JSON : réalisés et testés automatiquement.
+Tests de non-régression et de référentiels : réalisés.
+Tests navigateur Chromium mobile émulé et bureau : réalisés, GitHub Actions success.
+Recette physique Samsung : NON RÉALISÉE, à conduire suivant EVOL-FIAB-001.
+Modularisation : à faire. Intégration des données officielles : à faire lorsque disponibles.
 
 LIMITES
 Toutes les grilles SUEZ sont fictives. Fiscalité, régime social de la compensation, AEN et hypothèse de déductibilité restent à valider. Les frais de financement et l'inflation ne sont pas encore traités. Les tests automatiques ne remplacent pas une recette utilisateur dans le navigateur.
@@ -113,8 +115,20 @@ Export JSON : format S3E_SIMULATION v2, titre, versions des référentiels, cont
 Limites : recette mobile en attente, aucune synchronisation serveur, pas de validation fiscale ou paie. Prochain lot prioritaire : tests navigateurs et accessibilité mobile, avec cadrage TXT préalable.
 
 LOT EVOL-TEST-002 — PARCOURS NAVIGATEUR AUTOMATISÉ
-17/10/2026 — script Playwright en cours de recette technique.
+17/10/2026 — tests Playwright mobile émulé et bureau RÉUSSIS en GitHub Actions (run 39010978397, commit 1dabda17). Recette physique toujours à faire.
 Cadrage conservé : docs/evolutions/EVOL-TEST-002_tests_navigateur.txt.
 Fichiers : package.json, playwright.config.cjs, tests/serve.cjs, tests/browser.spec.cjs et .github/workflows/s3e-tests.yml.
 Deux profils : Chromium mobile Pixel 7 émulé et Chromium bureau. Vérifications : questionnaire recharge impossible, prix public prérempli et modifié, bilan affiné, sauvegarde locale, téléchargements CSV/JSON, import JSON, erreurs JavaScript et absence de débordement majeur.
 GitHub Actions ajoute un job navigateur indépendant des contrôles de calcul/référentiels/docs. Artefacts d'échec Playwright conservés 7 jours. Le déploiement GitHub Pages demeure distinct.
+
+CYCLE DE FIABILISATION — SITUATION DU 18/10/2026
+Décision : consolider le prototype avant toute nouvelle fonction métier.
+Archives des bilans : docs/suivi/, index docs/suivi/index.txt.
+Gouvernance : édition 1.1, archivage TXT obligatoire de chaque bilan d'étape.
+Bilan de référence : docs/suivi/2026-10-18_etat_des_lieux.txt.
+ÉTAPE 1A (DOCUMENTATION) : création des archives et de la checklist de recette,
+cadrage docs/evolutions/EVOL-FIAB-001_stabilisation_recette.txt.
+ÉTAPE 1B (RECETTE PHYSIQUE) : à effectuer sur Samsung réel, avec bilan archivé.
+ÉTAPE 2 : audit indépendant des formules, limites AEN/paie/fiscalité.
+ÉTAPE 3 : modularisation, contrôles de publication et version pilote.
+ATTENTION : les textes historiques ci-dessus décrivent les décisions de leurs dates ; utiliser la section ÉTAT ACTUEL pour le statut des fonctions.
