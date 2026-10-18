@@ -1,5 +1,5 @@
 SIMULATEUR S3E — GUIDE TXT DE DÉVELOPPEMENT SUPERVISÉ
-Version 2.0 — 18/10/2026
+Version 2.1 — 18/10/2026
 Statut : guide de projet et journal de recette, non validation métier ni fiscale.
 
 DOCUMENTS MAÎTRES
@@ -141,3 +141,10 @@ Périmètre envisagé : 10 profils synthétiques, scénarios Playwright paramét
 État réel : les deux documents de cadrage sont enregistrés ; aucun nouveau script ou workflow de robot autonome n'est encore implémenté.
 Déclenchements actuels inchangés : GitHub Actions sur push main et pull_request. Aucune programmation périodique, fréquence ou notification supplémentaire activée.
 Prochain jalon : validation du cadrage, puis développement des jeux de profils et valeurs de référence avant la généralisation des tests navigateur.
+
+EVOL-TEST-003 — LOT B : JEUX D'ESSAI SÉPARÉS (18/10/2026)
+Cadrage : docs/evolutions/EVOL-TEST-003_lot_B_profils_references.txt.
+Fichiers livrés : tests/profils/profils_s3e_TEST.json (10 profils PR-01 à PR-10) ; tests/references/attendus_s3e_TEST.json (attendus numériques distincts) ; tests/validate-profils.cjs (validation structurelle, options du questionnaire et formules arithmétiques indépendantes).
+Intégration : job GitHub Actions existant pour contrôles à chaque push et pull request, sans déclenchement supplémentaire ni calendrier périodique.
+ATTENTION : les jeux d'essai chiffrés sont fictifs et décrivent des cas de calcul élémentaires indépendants du moteur. Ils ne constituent pas encore dix scénarios Playwright exécutés de bout en bout ni une validation de la paie ou de la fiscalité. Les distances choisies dans les oracles ne sont pas forcément les médianes du questionnaire ; un rapprochement explicite sera nécessaire dans le lot suivant.
+Prochaine étape proposée : raccordement des profils aux tests de calcul et aux parcours Playwright, avec rapports par profil. Calendrier d'exécution toujours différé.
