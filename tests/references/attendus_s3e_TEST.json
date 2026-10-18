@@ -1,0 +1,100 @@
+{
+  "format": "S3E_TEST_REFERENCES",
+  "schemaVersion": 1,
+  "statut": "FICTIF",
+  "purpose": "Attendus arithmétiques élémentaires indépendants de l'implémentation et non coûts complets du simulateur",
+  "references": [
+    {
+      "id": "PR-01",
+      "kind": "electric",
+      "measure": "cout_energie_eur_an",
+      "value": 1500,
+      "unit": "EUR/an",
+      "tolerance": 0.000001,
+      "source": "Calcul manuel indépendant selon les hypothèses synthétiques du profil; aucune validation métier",
+      "refinedValue": 2250,
+      "refinedDelta": 750
+    },
+    {
+      "id": "PR-02",
+      "kind": "electric",
+      "measure": "cout_energie_eur_an",
+      "value": 720,
+      "unit": "EUR/an",
+      "tolerance": 0.000001,
+      "source": "Calcul manuel indépendant selon les hypothèses synthétiques du profil; aucune validation métier"
+    },
+    {
+      "id": "PR-03",
+      "kind": "installation",
+      "measure": "installation_restant_salarie",
+      "value": 625,
+      "unit": "EUR",
+      "tolerance": 0.000001,
+      "source": "Calcul manuel indépendant selon les hypothèses synthétiques du profil; aucune validation métier"
+    },
+    {
+      "id": "PR-04",
+      "kind": "electric",
+      "measure": "cout_energie_eur_an",
+      "value": 1080,
+      "unit": "EUR/an",
+      "tolerance": 0.000001,
+      "source": "Calcul manuel indépendant selon les hypothèses synthétiques du profil; aucune validation métier"
+    },
+    {
+      "id": "PR-05",
+      "kind": "thermal",
+      "measure": "cout_thermique_eur_an",
+      "value": 1312.5,
+      "unit": "EUR/an",
+      "tolerance": 0.000001,
+      "source": "Calcul manuel indépendant selon les hypothèses synthétiques du profil; aucune validation métier"
+    },
+    {
+      "id": "PR-06",
+      "kind": "professionalExclusion",
+      "measure": "surcout_salarie_missions",
+      "value": 0,
+      "unit": "EUR/an",
+      "tolerance": 0.000001,
+      "source": "Calcul manuel indépendant selon les hypothèses synthétiques du profil; aucune validation métier"
+    },
+    {
+      "id": "PR-07",
+      "kind": "depreciation",
+      "measure": "amortissement_simple",
+      "value": 3000,
+      "unit": "EUR/an",
+      "tolerance": 0.000001,
+      "source": "Calcul manuel indépendant selon les hypothèses synthétiques du profil; aucune validation métier"
+    },
+    {
+      "id": "PR-08",
+      "kind": "electric",
+      "measure": "cout_energie_eur_an",
+      "value": 1750,
+      "unit": "EUR/an",
+      "tolerance": 0.000001,
+      "source": "Calcul manuel indépendant selon les hypothèses synthétiques du profil; aucune validation métier"
+    },
+    {
+      "id": "PR-09",
+      "kind": "aen",
+      "measure": "impact_aen_fictif",
+      "value": 2720.928,
+      "unit": "EUR/an",
+      "tolerance": 0.000001,
+      "source": "Calcul manuel indépendant selon les hypothèses synthétiques du profil; aucune validation métier"
+    },
+    {
+      "id": "PR-10",
+      "kind": "portable",
+      "measure": "version_json",
+      "value": 2,
+      "unit": "schema",
+      "tolerance": 0.000001,
+      "source": "Calcul manuel indépendant selon les hypothèses synthétiques du profil; aucune validation métier"
+    }
+  ]
+}
