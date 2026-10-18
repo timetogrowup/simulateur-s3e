@@ -1,0 +1,54 @@
+SIMULATEUR S3E — BILAN DE RECETTE AUTOMATISÉE DES PROFILS
+Date : 18 octobre 2026
+Type : bilan de suivi, archive immuable
+Version testée : 57a52221aded847e5111576b40e0bdf22026b029
+GitHub Actions : 39109811724 — SUCCESS (2 jobs)
+Rapport d'origine : artefact recette-profils-s3e (TXT et JSON, rétention 14 jours)
+Source de preuve : logs du job « Tests, référentiels et documentation ».
+
+OBJET
+Lot C EVOL-TEST-003 : relier les dix profils de test au moteur
+de simulation et comparer une grandeur numérique par profil à
+un résultat attendu enregistré indépendamment.
+
+RESULTATS CONSTATÉS
+Total 10 profils : 9 OK, 1 ECART_CONNU, 0 ECHEC.
+PR-01  OK : recharge publique 1500 €/an, affichage affiné 2250 €/an.
+PR-02  OK : recharge mixte domicile/public 720 €/an.
+PR-03  ECART_CONNU : subvention partielle installation.
+       Coût attendu 625 €, coût moteur 1250 €, écart +625 €.
+       Le moteur ne tient pas compte d'une prise en charge
+       partielle au prorata ; problème métier à arbitrer.
+PR-04  OK : recharge publique mixte 1080 €/an.
+PR-05  OK : carburant thermique de dérogation 1312,50 €/an.
+PR-06  OK : kilométrage professionnel, surcoût salarié 0 €.
+PR-07  OK : dépréciation véhicule personnel 3000 €/an.
+PR-08  OK : énergie véhicule personnel électrique 1750 €/an.
+PR-09  OK : impact fictif de l'AEN 2720,928 €/an.
+PR-10  OK : export portable JSON schéma version 2.
+
+CONTRÔLES EXÉCUTÉS
+Le script tests/compare-profils.cjs charge la simulation dans un
+contexte JavaScript isolé, injecte les réponses synthétiques,
+calcule les trois scénarios pour vérifier leur finitude, puis
+calcule les postes pertinents avec les valeurs numériques
+précises du profil, plutôt que les médianes des fourchettes.
+Un rapport TXT/JSON est produit en artefact GitHub Actions.
+Le workflow quality et le job navigateur Chromium ont conclu SUCCESS.
+
+RÉSERVES
+- Statut SUCCESS technique malgré un écart métier volontairement suivi.
+- Les validations indépendantes portent sur les postes choisis, PAS
+  sur les coûts complets ni la justesse réglementaire/fiscale.
+- Aucun nouveau jeu de dix parcours Playwright n'est encore exécuté.
+- Aucune vérification supplémentaire sur Samsung physique dans ce lot.
+- Aucun calendrier de tests programmés n'est activé.
+
+SUITES PRIORITAIRES
+1. Arbitrer la règle de prise en charge partielle de l'installation,
+   sans corriger arbitrairement les calculs.
+2. Étendre les tests à dix parcours navigateur paramétrés et produire
+   les rapports par scénario, avec captation des anomalies.
+3. Renforcer les références financières du coût complet, sous validation.
+Documents : docs/evolutions/EVOL-TEST-003_lot_C_comparaison_moteur.txt
+et docs/guide_developpement_supervise.txt.
