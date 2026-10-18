@@ -1,0 +1,13 @@
+SIMULATEUR S3E — INDEX DES DOCUMENTS DE SUIVI
+Date de création : 18/10/2026
+Gouvernance : docs/gouvernance_projet_chatgpt_github.txt, §13.
+
+RÈGLE
+Chaque bilan demandé ou réalisé est archivé comme TXT immuable dans docs/suivi/.
+Créer une nouvelle archive pour toute revue ultérieure, sans remplacer la précédente.
+Ne pas confondre archive historique et guide de développement courant.
+
+BILANS ARCHIVÉS
+2026-10-18 | Etat des lieux du projet, prototype opérationnel, validations
+CI et Pages réussies au commit 1dabda17, priorités de fiabilisation.
+Fichier : docs/suivi/2026-10-18_etat_des_lieux.txt
