@@ -1,0 +1,53 @@
+SIMULATEUR S3E — BILAN D'ACTIVATION PILOTE DES TESTS AUTOMATIQUES
+Date du bilan : 18/10/2026
+Gouvernance : docs/gouvernance_projet_chatgpt_github.txt
+Cadrage préalable : docs/evolutions/EVOL-TEST-004_lot_A_pilote_implementation.txt
+Statut : PREMIÈRE EXÉCUTION TECHNIQUE VALIDÉE ; ROTATION À 3 EN ATTENTE DE 4 EXÉCUTIONS
+
+CONFIGURATION IMPLÉMENTÉE
+Workflow : .github/workflows/s3e-pilote.yml.
+Cadence pilote : toutes les 10 minutes (cron */10 * * * *, UTC).
+Lancement manuel également possible (workflow_dispatch).
+Premier essai : déclenchement par push restreint au workflow.
+Tests : smoke, référentiels fictifs, 10 profils, Chromium mobile
+et bureau, rapports métier synthétiques et traces en cas d'échec.
+Script d'horodatage : tests/archive-campaign.cjs.
+Script de rotation : tests/rotate-pilot-artifacts.cjs,
+conservation des trois derniers artefacts portant le préfixe
+« recette-pilote- », après archivage du résultat courant.
+Permissions du workflow : contents:read, actions:write.
+Concurrence : 1 campagne pilote à la fois.
+La CI classique push/pull_request reste inchangée.
+
+CONSTAT RÉEL DU PREMIER RUN
+Run GitHub Actions : 39125896795
+URL : https://github.com/timetogrowup/simulateur-s3e/actions/runs/39125896795
+Commit testé : 271e8e5ec1c0f84f0c5f1fc6306f015db510d280
+Événement : push de première recette.
+Verdict GitHub Actions : COMPLETED / SUCCESS.
+Étape « Vérifier les calculs, profils et référentiels » : SUCCESS.
+Installation Playwright, Chromium mobile et bureau : SUCCESS.
+Création des métadonnées horodatées : SUCCESS.
+Téléversement des résultats : SUCCESS.
+Rotation des artefacts : SUCCESS.
+Statut final : SUCCESS.
+Artefact réellement consulté : recette-pilote-39125896795-1
+(identifiant 12135778804 ; non expiré à la vérification).
+
+LIMITES DE LA VALIDATION
+La suppression du quatrième-ancien jeu N'EST PAS encore validée :
+une première exécution ne permet pas de vérifier la rotation à trois.
+La régularité des déclenchements « schedule » à 10 minutes n'a
+pas encore été démontrée par plusieurs campagnes consécutives.
+GitHub schedule est sans garantie de ponctualité.
+Le mécanisme ne supprime pas l'historique/logs des workflow runs.
+Les tests financiers sont fictifs : PR-03 écart métier connu.
+Les vrais essais sur Samsung restent séparés.
+
+SUITE
+Observer plusieurs exécutions schedule puis vérifier la présence
+des seuls trois derniers artefacts après la quatrième campagne.
+Enregistrer l'observation dans un nouveau bilan sans écraser celui-ci.
+Cadence CIBLE déjà décidée : une campagne par jour avec conservation
+des résultats sur les 30 derniers jours. Le basculement quotidien
+n'est pas encore implémenté.
