@@ -1,5 +1,5 @@
 SIMULATEUR S3E — GUIDE TXT DE DÉVELOPPEMENT SUPERVISÉ
-Version 2.3 — 18/10/2026
+Version 2.4 — 18/10/2026
 Statut : guide de projet et journal de recette, non validation métier ni fiscale.
 
 DOCUMENTS MAÎTRES
@@ -162,3 +162,9 @@ Besoin exprimé : définir une période X en heures ; phase pilote toutes les 1/
 Proposition technique : cron GitHub Actions « */10 * * * * » en UTC ; sans garantie de ponctualité. Une modification de X requiert une mise à jour contrôlée du workflow (pas un paramètre cron dynamique natif).
 Rapports : un jeu TXT/JSON par campagne avec horodatage UTC, run_id, SHA, statuts des dix profils et historique identifiable ; artefacts à rétention limitée, stockage durable à arbitrer.
 État au 18/10/2026 : expression de besoin seulement. Aucun planning périodique activé, aucune nouvelle collecte horodatée automatisée déployée. Les tests push et pull_request restent inchangés.
+
+RECTIFICATIF EVOL-TEST-004 — CADENCE CIBLE VALIDÉE (18/10/2026)
+Le rythme toutes les dix minutes (1/6 h) est réservé aux PREMIERS TESTS pour valider le déclenchement et l'horodatage.
+La cible opérationnelle est UNE CAMPAGNE PAR JOUR (24 h). L'heure quotidienne et la durée de la phase pilote restent à décider.
+Document EVOL-TEST-004 passé en v1.1. À une campagne par jour, environ 365 rapports par an ; les artefacts GitHub suffisent à la recette temporaire, et une archive durable consolidée pourra être choisie séparément.
+Pas de cron ni de tâche périodique activés à ce stade ; les exécutions push/PR restent inchangées.
