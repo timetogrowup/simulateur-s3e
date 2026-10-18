@@ -1,0 +1,31 @@
+SIMULATEUR S3E — JOURNAL DE RECETTE PHYSIQUE SAMSUNG S24
+Date : 18 octobre 2026
+Référence : docs/evolutions/EVOL-FIAB-001_stabilisation_recette.txt
+Environnement : Samsung S24, essai réel signalé par le responsable du projet.
+Navigateur exact / version : à confirmer.
+Statut : RECETTE EN COURS — résultat de l'étape 1 consigné.
+
+ÉTAPE 1 / 5 — ACCUEIL ET DÉMARRAGE
+Résultat : OK (confirmation explicite utilisateur du 18/10/2026).
+Périmètre confirmé : écran d'accueil affiché correctement, bouton Commencer fonctionnel, questionnaire démarré.
+Preuve : retour d'essai du responsable de projet dans la conversation.
+Réserve : pas de capture d'écran ; ne vaut pas validation du reste du questionnaire.
+
+ÉTAPE 2 / 5 — QUESTIONNAIRE ET RECHARGE IMPOSSIBLE
+Statut : À TESTER.
+Vérifier le parcours jusqu'à « Motorisation future SUEZ » : Électrique ;
+puis « Recharge possible à domicile » : Impossible.
+Attendus : questionnaire continue normalement ; aucune question sur la part
+de recharge au domicile ni sur le prix des bornes publiques payantes
+n'apparaît. Le tarif fictif de 0,50 €/kWh doit être proposé seulement
+dans l'étape d'affinage ultérieure.
+Noter tout blocage, texte incohérent ou mauvaise présentation.
+
+ÉTAPES 3 À 5
+À conduire après retour de l'étape 2 : premier bilan, affinage, sauvegardes
+et exports/imports, affichage mobile et limites.
+Les étapes non réalisées restent NON TESTÉES.
+
+RÈGLE DE SUIVI
+Ne déclarer validé que ce que le responsable a réellement testé et confirmé.
+Chaque retour enrichit ce journal TXT dans GitHub.
