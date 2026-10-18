@@ -1,0 +1,79 @@
+SIMULATEUR S3E — PLAN DE FIABILISATION / ETAPE 1
+Identifiant : EVOL-FIAB-001
+Version 1.0 — 18 octobre 2026
+Statut : CADRAGE ET CHECKLIST DISPONIBLES ; RECETTE PHYSIQUE À RÉALISER
+Responsable de projet : humain, avec assistance ChatGPT.
+Références :
+- docs/gouvernance_projet_chatgpt_github.txt
+- docs/suivi/2026-10-18_etat_des_lieux.txt
+- docs/evolutions/EVOL-TEST-002_tests_navigateur.txt
+
+OBJECTIF
+Stabiliser la version prototype déjà développée sans ajouter de règle
+financière non approuvée. Consolider la documentation courante et préparer
+une recette vérifiable sur téléphone Samsung réel, distincte de l'émulation.
+
+PÉRIMÈTRE DE CETTE PREMIÈRE SOUS-ÉTAPE (1A)
+- Archiver le bilan du 18 octobre en TXT et créer l'index de suivi.
+- Ajouter l'archivage obligatoire des bilans à la gouvernance.
+- Réconcilier le guide actuel avec les fonctions réellement réalisées.
+- Établir un plan de tests manuel et des conditions de réussite.
+- Ne modifier ni les formules financières ni le parcours utilisateur.
+
+SOUS-ÉTAPE 1B — RECETTE PHYSIQUE À EFFECTUER
+Environnement à consigner : modèle et navigateur du téléphone,
+date, version du site/commit si affichée, capture éventuelle sans données
+confidentielles.
+
+SCÉNARIO A : QUESTIONNAIRE
+1. Ouvrir https://timetogrowup.github.io/simulateur-s3e/
+2. Démarrer une nouvelle simulation et vérifier la lisibilité portrait.
+3. Choisir le futur véhicule SUEZ électrique et la recharge domicile impossible.
+4. Vérifier qu'aucune question sur le tarif public n'est posée dans le parcours
+   rapide et que le bilan peut être calculé.
+5. Vérifier la navigation Précédent/Suivant et les textes d'avertissement.
+
+SCÉNARIO B : BILAN ET AFFINAGE
+6. Dans le premier bilan, vérifier les trois scénarios.
+7. Cliquer « Affiner mon bilan » ; vérifier que le tarif public vaut
+   0,50 €/kWh par défaut (référentiel fictif actuel).
+8. Saisir 0,75 €/kWh et déclencher « Recalculer le bilan affiné ».
+9. Vérifier que le coût futur de recharge augmente et que le tableau
+   de comparaison initial/affiné est affiché.
+10. Vérifier que la largeur de page n'oblige pas à défiler horizontalement
+    hors des tableaux ; tester les cartes, graphiques et boutons.
+
+SCÉNARIO C : SAUVEGARDE ET EXPORT
+11. Enregistrer une simulation avec un nom, recharger la page et la retrouver.
+12. Exporter le CSV : vérifier téléchargement, trois scénarios, unités,
+    postes et hypothèses.
+13. Exporter le JSON : vérifier téléchargement et transfert possible.
+14. Importer le JSON depuis l'accueil, confirmer et retrouver la simulation.
+15. Supprimer une sauvegarde et vérifier la confirmation.
+
+SCÉNARIO D : IMPRESSION ET CONFIDENTIALITÉ
+16. Tester aperçu d'impression/PDF si disponible sur le téléphone.
+17. Vérifier que les limitations « FICTIF » sont lisibles.
+18. Vérifier qu'aucune réponse nominative ou sensible n'est publiée.
+19. Refaire un parcours très court après rotation portrait/paysage.
+
+FICHE DE CONSTAT À RENSEIGNER APRÈS CHAQUE SCÉNARIO
+Date, appareil/navigateur, scénario, résultat (OK/KO/NON TESTÉ),
+comportement observé, résultat attendu, capture anonymisée éventuelle,
+sévérité, ticket/correctif, date de revalidation.
+
+CRITÈRES DE PASSAGE À L'ÉTAPE 2
+- Aucun défaut bloquant constaté en recette physique ou défaut accepté
+  explicitement par le responsable.
+- Exports et sauvegardes vérifiés.
+- Les calculs de référence les plus simples ont été confrontés à un
+  calcul indépendant ; leurs hypothèses sont visibles.
+- Les réserves fiscales et de données officielles demeurent signalées.
+- Les tests GitHub Actions restent réussis après tout correctif.
+- Les résultats de recette sont archivés dans docs/suivi/ et indexés.
+
+LIMITES
+Un téléphone réel ne peut pas être testé uniquement par les tests automatiques
+Chromium Pixel 7. L'utilisateur doit effectuer les manipulations physiques ou
+transmettre des observations. Le document ne signifie pas que la recette a été
+réalisée. Il n'autorise ni communication officielle ni validation fiscale.
