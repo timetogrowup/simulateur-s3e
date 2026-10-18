@@ -21,3 +21,6 @@ Fichier : docs/suivi/2026-10-18_activation_pilote_10_minutes.txt
 
 2026-10-18 | Diagnostic d'absence de lancement planifié du pilote ; essai de décalage des minutes cron, résultat schedule à vérifier.
 Fichier : docs/suivi/2026-10-18_diagnostic_schedule_pilote.txt
+
+2026-10-18 | Vérification des traces du pilote : 4 runs réussis, 2 schedule trop espacés, 9 OK / 1 écart connu / 0 échec, rotation des 3 derniers artefacts prouvée.
+Fichier : docs/suivi/2026-10-18_verification_traces_pilote.txt
