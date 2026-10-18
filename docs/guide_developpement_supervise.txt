@@ -1,5 +1,5 @@
 SIMULATEUR S3E — GUIDE TXT DE DÉVELOPPEMENT SUPERVISÉ
-Version 2.8 — 18/10/2026
+Version 2.9 — 18/10/2026
 Statut : guide de projet et journal de recette, non validation métier ni fiscale.
 
 DOCUMENTS MAÎTRES
@@ -196,3 +196,9 @@ EVOL-TEST-004 — DIAGNOSTIC DU DÉCLENCHEMENT (18/10/2026)
 Le run 39125896795 était un push réussi, sans exécution schedule observée jusqu'à 12:37 UTC. Diagnostic conservé avant changement : docs/evolutions/EVOL-TEST-004_diagnostic_planification.txt.
 Mesure expérimentale autorisée : cron décalé de « */10 * * * * » vers « 3-59/10 * * * * » en UTC, soit 03/13/23/33/43/53. Le lancement push de vérification 39128185658 a été observé, en cours lors de la première consultation.
 ATTENTION : ce push ne prouve pas le bon fonctionnement du schedule ; attendre au moins deux runs dont event=schedule. Vérifier la rotation après quatre artefacts. Cible ultérieure quotidienne et fenêtre 30 jours inchangées.
+
+EVOL-TEST-004 — LOT B : RECETTE À 05:00 HEURE DE PARIS (18/10/2026)
+Spécification avant code : docs/evolutions/EVOL-TEST-004_lot_B_quotidien_05h_Paris.txt ; document EVOL-TEST-004 v1.4.
+Workflow .github/workflows/s3e-pilote.yml renommé logiquement « S3E - Recette quotidienne 05h Paris ». Ancien cron pilote 10 minutes remplacé par 0 3 * * * et 0 4 * * * en UTC ; job calendrier choisit uniquement la correspondance à 05:00 Europe/Paris via tests/select-paris-slot.cjs. Tests de dates été/hiver : tests/test-paris-slot.cjs.
+Métadonnées rapports : tests/archive-campaign.cjs avec phase quotidien, horodatage UTC et Paris ; archive recette-quotidienne-RUNID-ATTEMPT par campagne (rétention 30 jours), purge ciblée >30 jours après archivage actuel confirmé via tests/rotate-daily-artifacts.cjs. Les anciennes archives « recette-pilote » sont hors de la rotation quotidienne et restent indépendantes.
+Essai initial du nouveau workflow : run 39155987873 (push de modification du workflow), test de calendrier et calculs déjà passés lors du premier contrôle ; conclusion du run complet à confirmer. Les prochains schedule prouveront la cadence réelle uniquement après observation ; GitHub peut retarder/omettre ses jobs.
