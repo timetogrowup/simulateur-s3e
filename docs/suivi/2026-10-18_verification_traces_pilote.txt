@@ -1,0 +1,47 @@
+SIMULATEUR S3E — BILAN DE VÉRIFICATION DES TRACES DU PILOTE
+Date : 18/10/2026 — vérification des runs jusqu'à 18:38 UTC
+Référentiel : docs/evolutions/EVOL-TEST-004_frequence_horodatage.txt
+Correction du cron : docs/evolutions/EVOL-TEST-004_diagnostic_planification.txt
+
+CONSTAT FACTUEL, 4 CAMPAGNES
+- 39125896795 | 12:06:06 UTC | événement push | SUCCESS
+- 39128185658 | 12:39:18 UTC | événement push | SUCCESS
+- 39143647660 | 16:08:24 UTC | événement schedule | SUCCESS
+- 39155024756 | 18:37:46 UTC | événement schedule | SUCCESS
+
+Les heures de Dubaï sont respectivement 16:06, 16:39, 20:08 et 22:37.
+La fenêtre théorique du pilote est de 10 minutes (cron '3-59/10 * * * *').
+Les seules campagnes schedule trouvées sont espacées d'environ 2 h 29 min.
+La fréquence attendue n'est donc pas tenue malgré le bon fonctionnement
+des campagnes déclenchées. La cause exacte des déclenchements rares n'a
+pas pu être déterminée avec les outils consultés.
+
+TESTS
+Dans les deux dernières campagnes schedule, logs des jobs :
+Résultats profils : OK=9, ECART_CONNU=1, ECHEC=0.
+L'écart connu PR-03 concerne la participation partielle à l'installation
+de la recharge à domicile (n'a pas été corrigé ni validé métier).
+Calculs, installation, navigateur, archivage et rotation : SUCCESS.
+
+RÉTENTION GLISSANTE VALIDÉE SUR QUATRE CAMPAGNES
+Dernier run 39155024756, logs horodatés 18:38:27 UTC :
+« Ancien résultat pilote supprimé : recette-pilote-39125896795-1
+   #12135778804 »
+Puis 18:38:28 UTC :
+« Rotation OK : 3 artefact(s) pilote restant(s) ; limite 3. »
+Vérification indépendante par la liste d'artefacts de chaque run :
+- premier run : aucun artefact restant
+- run 39128185658 : recette-pilote-39128185658-1
+- run 39143647660 : recette-pilote-39143647660-1
+- run 39155024756 : recette-pilote-39155024756-1
+Le critère de conservation des trois derniers jeux est donc satisfait.
+Cette rotation n'efface ni les métadonnées des runs GitHub ni les logs.
+
+CONCLUSION
+La qualité des contrôles, la production horodatée des rapports et le
+nettoyage glissant des résultats du pilote sont vérifiés.
+La périodicité effective de 10 minutes n'est PAS validée.
+Éviter d'annoncer une surveillance fiable toutes les dix minutes.
+Prévoir investigation supplémentaire des limitations du schedule GitHub
+avant bascule vers une cadence quotidienne. Aucune action correctrice
+supplémentaire n'a été engagée lors de cette vérification.
