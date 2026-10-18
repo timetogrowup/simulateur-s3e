@@ -1,6 +1,6 @@
 SIMULATEUR S3E — EXPRESSION DE BESOIN
 EVOL-TEST-004 — PLANIFICATION PÉRIODIQUE ET HISTORISATION DES RECETTES
-Édition : 1.1 — 18 octobre 2026
+Édition : 1.2 — 18 octobre 2026
 Statut : BESOIN EXPRIMÉ / À DÉVELOPPER — AUCUNE NOUVELLE PLANIFICATION ACTIVÉE
 Décision du responsable : prévoir des exécutions toutes les X heures,
 avec un premier essai toutes les 1/6 d'heure, soit 10 minutes,
@@ -97,16 +97,42 @@ Les noms de fichiers et les métadonnées doivent permettre de distinguer
 deux exécutions même si elles se produisent pendant la même minute.
 Les résultats ne doivent pas être écrasés par la campagne suivante.
 
-STOCKAGE NIVEAU A — MINIMUM POUR LA PHASE PILOTE
-Conserver un artefact GitHub Actions par campagne, comportant
-l'horodatage et les identifiants d'exécution.
-Prévoir une durée de conservation explicite (proposition : 14 jours
-pour les résultats et 7 jours pour les traces navigateur, sous réserve
-des limites et réglages de rétention GitHub).
-Les rapports actuels sont téléchargeables en artefacts ; leur
-conservation n'est pas permanente.
+STOCKAGE NIVEAU A — PHASE PILOTE : FENETRE GLISSANTE DE TROIS
+DECISION EXPLICITE DU RESPONSABLE (18/10/2026) :
+- pendant le pilote cadencé à 10 minutes, ne conserver que les
+  TROIS DERNIERS JEUX DE RESULTATS de campagnes PILOTES achevées ;
+- les trois derniers sont déterminés par ordre chronologique
+  d'achèvement, puis par run_id/run_attempt en cas d'égalité ;
+- un jeu comprend JSON, TXT, métadonnées et preuves utiles ;
+- les résultats en échec sont inclus dans les trois, sans exception :
+  un test en échec ne doit pas être silencieusement exclu ;
+- à la quatrième campagne PILOTE achevée, conserver le nouveau jeu
+  et retirer le plus ancien ; laisser inchangés les artefacts des
+  exécutions push/PR et les archives métier distinctes ;
+- étiqueter les artefacts de façon unique, horodatée et identifiable
+  par environnement « pilote », pour éviter de supprimer d'autres
+  jeux ; assurer la rotation seulement après vérification du stockage
+  réussi du nouveau jeu ;
+- en cas d'échec de nettoyage, lever une alerte visible dans le
+  rapport ; ne jamais annoncer « exactement trois conservés »
+  sans contrôle effectif de l'inventaire ;
+- les rapports résiduels restent soumis à la durée de rétention
+  maximale autorisée par GitHub.
 
-STOCKAGE NIVEAU B — HISTORIQUE DURABLE (OPTION À ARBITRER)
+IMPORTANT : une durée de conservation d'artefact de 1 ou 7 jours
+ne garantit PAS la conservation des trois derniers seulement.
+Il faut un mécanisme de nettoyage ciblé, avec droit de suppression
+des artefacts GitHub Actions et contrôle d'inventaire, à autoriser
+avant mise en œuvre. Les logs et métadonnées des runs GitHub peuvent
+demeurer visibles séparément des artefacts : on ne promet PAS
+l'effacement intégral de l'historique des workflows.
+
+La fenêtre glissante permet de limiter le stockage des résultats
+détaillés, indépendamment de la durée du pilote, mais NE SUPPRIME PAS
+les quotas d'exécution, temps de calcul, installations Playwright,
+retards de planification ou autres limites GitHub.
+
+STOCKAGE NIVEAU B — RÉGIME QUOTIDIEN : HISTORIQUE DURABLE (OPTION À ARBITRER)
 Si l'on souhaite conserver tous les résultats au-delà des délais
 des artefacts, prévoir un stockage durable distinct :
 branche ou dossier d'historique dédié, objet stockage, ou autre
@@ -135,7 +161,10 @@ aucune destination de notification n'est définie ici.
 CA-01 : fréquence demandée configurée à 1/6 heure (10 minutes).
 CA-02 : plusieurs campagnes consécutives identifiables, chacune avec
         run_id, horodatage et résultat distincts.
-CA-03 : zéro écrasement ou confusion des rapports et artefacts.
+CA-03 : zéro écrasement ou confusion des rapports et artefacts ;
+        en PILOTE, constater exactement les trois dernières
+        campagnes achevées après au moins quatre exécutions,
+        sous réserve des artefacts du pilote seulement.
 CA-04 : les sorties des dix profils sont conservées et consultables.
 CA-05 : les écarts connus restent visibles dans chaque exécution.
 CA-06 : le coût et la durée moyenne des campagnes sont mesurés ;
@@ -144,6 +173,9 @@ CA-07 : suspendre/reprendre la périodicité est documenté et testé.
 CA-08 : conserver la CI sur push/PR et ses tests préexistants.
 CA-09 : les rapports annoncés comme stockés sont effectivement
         retrouvables dans l'emplacement décidé.
+CA-11 : la rotation conserve aussi les résultats KO ou interrompus
+        disposant d'un jeu de résultats, signale les nettoyages KO
+        et préserve les artefacts CI ordinaires.
 CA-10 : toute limite de GitHub Actions est explicitement communiquée.
 
 8. CHARGE PRÉVISIONNELLE ET RISQUES
@@ -177,7 +209,10 @@ G. Basculer à une cadence de régime permanent QUOTIDIENNE, après
 - Date et durée de démarrage du pilote.
 - Fréquence pérenne : DÉCIDÉE, 1 exécution par jour.
 - Heure de la campagne quotidienne : à choisir.
-- Stockage historique durable au-delà des artefacts temporaires.
+- Stockage historique durable en régime quotidien ; en pilote,
+  seulement trois derniers jeux de résultats sont conservés.
+- Autorisations GitHub minimales permettant le nettoyage sélectif
+  des artefacts du pilote et la vérification du résultat.
 - Allègement éventuel des tests navigateur lors des campagnes fréquentes.
 - Seuils d'alerte et canal des notifications.
 - Politique de concurrence, coûts/quota et droits de publication.
@@ -195,3 +230,9 @@ L'exécution existante sur push/pull_request n'est pas modifiée.
 HISTORIQUE DE VERSION
 - v1.1 — 18/10/2026 : correction explicite du régime cible : un test
   par jour ; le pas de dix minutes ne concerne que les premiers essais.
+
+HISTORIQUE COMPLÉMENTAIRE
+- v1.2 — 18/10/2026 : en cadence pilote de dix minutes, ne garder
+  que les trois dernières campagnes terminées et leurs résultats
+  horodatés, par nettoyage glissant ciblé. Les quotas d'exécution
+  GitHub continuent de s'appliquer ; cible quotidienne inchangée.
