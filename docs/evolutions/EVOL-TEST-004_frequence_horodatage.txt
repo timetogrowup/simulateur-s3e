@@ -1,6 +1,6 @@
 SIMULATEUR S3E — EXPRESSION DE BESOIN
 EVOL-TEST-004 — PLANIFICATION PÉRIODIQUE ET HISTORISATION DES RECETTES
-Édition : 1.2 — 18 octobre 2026
+Édition : 1.3 — 18 octobre 2026
 Statut : BESOIN EXPRIMÉ / À DÉVELOPPER — AUCUNE NOUVELLE PLANIFICATION ACTIVÉE
 Décision du responsable : prévoir des exécutions toutes les X heures,
 avec un premier essai toutes les 1/6 d'heure, soit 10 minutes,
@@ -132,18 +132,45 @@ détaillés, indépendamment de la durée du pilote, mais NE SUPPRIME PAS
 les quotas d'exécution, temps de calcul, installations Playwright,
 retards de planification ou autres limites GitHub.
 
-STOCKAGE NIVEAU B — RÉGIME QUOTIDIEN : HISTORIQUE DURABLE (OPTION À ARBITRER)
-Si l'on souhaite conserver tous les résultats au-delà des délais
-des artefacts, prévoir un stockage durable distinct :
-branche ou dossier d'historique dédié, objet stockage, ou autre
-dispositif approuvé.
-Ne pas commiter automatiquement dans main les résultats de chaque
-campagne : à dix minutes, cela ferait environ 144 commits par jour
-et peut causer des workflows récursifs et une croissance excessive.
-Définir séparément le support, ses droits d'écriture, la rétention,
-l'archivage périodique et la confidentialité avant implémentation.
-La règle de gouvernance d'archivage des bilans significatifs dans
-docs/suivi/ demeure applicable, sans imposer un commit à chaque run.
+STOCKAGE NIVEAU B — RÉGIME QUOTIDIEN : FENÊTRE GLISSANTE D'UN MOIS
+DÉCISION EXPLICITE DU RESPONSABLE (18/10/2026) :
+- la cible est UNE campagne par jour ; conserver les résultats
+  détaillés uniquement sur le dernier MOIS GLISSANT ;
+- interprétation opérationnelle : conservation des 30 derniers jours
+  calendaires révolus, calculée par rapport à l'heure UTC de nettoyage
+  (soit normalement environ 30 ou 31 jeux suivant les frontières
+  temporelles), et NON archivage par mois civil ;
+- chaque nouvelle campagne horodatée est écrite sous une clé unique :
+  ne jamais écraser le fichier du jour courant si plusieurs runs
+  sont déclenchés ; effectuer ensuite une rotation supprimant les
+  jeux plus anciens que la fenêtre retenue ;
+- les campagnes en échec, interrompues ou présentant un écart connu
+  restent dans la fenêtre, au même titre que les campagnes réussies ;
+- un échec d'archivage ne doit pas provoquer la suppression de
+  l'ancien jeu ; contrôler d'abord la réussite du nouveau stockage ;
+- ne supprimer QUE les archives du flux des tests quotidiens, et
+  préserver les tests push/PR et les bilans métier docs/suivi/ ;
+- distinguer suppression du fichier actif et purge réelle de
+  l'historique Git : supprimer un fichier versionné sur une branche
+  ne supprime PAS ses anciennes versions des commits. Pour une
+  rétention réellement limitée à un mois, préférer les artefacts
+  GitHub Actions à durée de vie limitée ou un stockage externe avec
+  politique de suppression ; ne pas promettre d'effacement complet
+  si une branche Git versionnée est utilisée.
+
+VOLUME
+Un test par jour représente environ 30 jeux conservés sur une fenêtre
+glissante de trente jours, avec variation transitoire possible.
+La rotation est déterminée par dates d'exécution ; elle n'entraîne
+pas une limitation générale du nombre historique de runs GitHub.
+Les logs et métadonnées de GitHub Actions peuvent conserver une
+durée différente de celle des artefacts.
+
+RÈGLE DISTINCTE DU PILOTE
+La phase de démarrage à 10 minutes conserve uniquement les
+TROIS derniers jeux de résultats pilotes ; elle ne mélange pas
+sa rotation avec les résultats quotidiens.
+
 
 6. RAPPORTS ET CONSULTATION
 RF-01 : un rapport daté lisible en TXT et exploitable en JSON.
@@ -209,8 +236,11 @@ G. Basculer à une cadence de régime permanent QUOTIDIENNE, après
 - Date et durée de démarrage du pilote.
 - Fréquence pérenne : DÉCIDÉE, 1 exécution par jour.
 - Heure de la campagne quotidienne : à choisir.
-- Stockage historique durable en régime quotidien ; en pilote,
-  seulement trois derniers jeux de résultats sont conservés.
+- Stockage RÉSOLU POUR LA DURÉE : en régime quotidien,
+  conserver un mois glissant puis supprimer les archives plus anciennes ;
+  en pilote, trois derniers jeux de résultats seulement.
+- Support technique du stockage encore à arbitrer, pour garantir
+  la suppression effective et éviter la persistance dans Git.
 - Autorisations GitHub minimales permettant le nettoyage sélectif
   des artefacts du pilote et la vérification du résultat.
 - Allègement éventuel des tests navigateur lors des campagnes fréquentes.
@@ -236,3 +266,10 @@ HISTORIQUE COMPLÉMENTAIRE
   que les trois dernières campagnes terminées et leurs résultats
   horodatés, par nettoyage glissant ciblé. Les quotas d'exécution
   GitHub continuent de s'appliquer ; cible quotidienne inchangée.
+
+HISTORIQUE COMPLÉMENTAIRE
+- v1.3 — 18/10/2026 : régime cible de 1 test/jour avec conservation
+  des résultats sur 30 jours glissants et suppression au fil de l'eau
+  après stockage du plus récent. Les archives du pilote restent
+  limitées aux trois derniers jeux. Aucun cron ni mécanisme de purge
+  n'est encore implémenté.
