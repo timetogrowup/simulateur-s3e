@@ -1,5 +1,5 @@
 SIMULATEUR S3E — GUIDE TXT DE DÉVELOPPEMENT SUPERVISÉ
-Version 2.4 — 18/10/2026
+Version 2.5 — 18/10/2026
 Statut : guide de projet et journal de recette, non validation métier ni fiscale.
 
 DOCUMENTS MAÎTRES
@@ -168,3 +168,8 @@ Le rythme toutes les dix minutes (1/6 h) est réservé aux PREMIERS TESTS pour v
 La cible opérationnelle est UNE CAMPAGNE PAR JOUR (24 h). L'heure quotidienne et la durée de la phase pilote restent à décider.
 Document EVOL-TEST-004 passé en v1.1. À une campagne par jour, environ 365 rapports par an ; les artefacts GitHub suffisent à la recette temporaire, et une archive durable consolidée pourra être choisie séparément.
 Pas de cron ni de tâche périodique activés à ce stade ; les exécutions push/PR restent inchangées.
+
+DÉCISION EVOL-TEST-004 — RÉTENTION GLISSANTE PILOTE (18/10/2026)
+Le pilote à 10 minutes ne doit conserver que les TROIS DERNIERS jeux de résultats horodatés de campagnes pilotes achevées. Après la quatrième, suppression ciblée du plus ancien après stockage vérifié du nouveau ; conserver y compris les rapports en échec. Ne pas toucher aux rapports des push/PR ni aux bilans significatifs archivés dans docs/suivi/.
+Nécessite un mécanisme de nettoyage des artefacts avec autorisation GitHub appropriée ; la seule durée de rétention ne suffit pas. Les métadonnées/logs des runs peuvent subsister ; la rotation limite le stockage des jeux de résultats mais pas les quotas de minutes CI.
+Document EVOL-TEST-004 version 1.2. Cible maintenue : une exécution PAR JOUR après pilote. Aucun cron ni nettoyage automatique activé pour l'instant.
