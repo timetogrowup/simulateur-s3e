@@ -1,0 +1,83 @@
+name: S3E - Pilote recette horodatée
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: s3e-recette-pilote
+  cancel-in-progress: false
+
+jobs:
+  recette-pilote:
+    name: Recette pilote - profils et Chromium
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - name: Récupérer le code du projet
+        uses: actions/checkout@v4
+      - name: Installer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Vérifier les calculs, profils et référentiels
+        id: calculs
+        continue-on-error: true
+        run: |
+          node tests/smoke.cjs
+          node tests/validate-referentiels.cjs
+          node tests/validate-profils.cjs
+          node tests/compare-profils.cjs
+      - name: Installer Playwright
+        id: dependances
+        continue-on-error: true
+        run: |
+          npm install --no-package-lock
+          npx playwright install --with-deps chromium
+      - name: Tester Chromium mobile et bureau
+        id: navigateur
+        if: steps.dependances.outcome == 'success'
+        continue-on-error: true
+        run: npm run test:browser
+      - name: Créer le rapport horodaté
+        id: horodatage
+        if: always()
+        env:
+          S3E_UNIT_OUTCOME: ${{ steps.calculs.outcome }}
+          S3E_BROWSER_OUTCOME: ${{ steps.navigateur.outcome }}
+        run: node tests/archive-campaign.cjs
+      - name: Conserver le jeu de résultats horodaté
+        id: upload
+        if: always() && steps.horodatage.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: recette-pilote-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            report/recette-profils.json
+            report/recette-profils.txt
+            report/campagne/
+            playwright-report/
+            test-results/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Garder seulement les trois derniers résultats pilote
+        id: rotation
+        if: always() && steps.upload.outcome == 'success'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node tests/rotate-pilot-artifacts.cjs
+      - name: Statut final véridique de la campagne
+        if: always()
+        env:
+          TESTS: ${{ steps.calculs.outcome }}
+          INSTALL: ${{ steps.dependances.outcome }}
+          BROWSER: ${{ steps.navigateur.outcome }}
+          ARCHIVE: ${{ steps.upload.outcome }}
+          ROTATION: ${{ steps.rotation.outcome }}
+        run: |
+          echo "Calculs: $TESTS | Installation: $INSTALL | Navigateur: $BROWSER | Archivage: $ARCHIVE | Rotation: $ROTATION"
+          test "$TESTS" = success && test "$INSTALL" = success && test "$BROWSER" = success && test "$ARCHIVE" = success && test "$ROTATION" = success
