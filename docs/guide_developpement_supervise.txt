@@ -1,5 +1,5 @@
 SIMULATEUR S3E — GUIDE TXT DE DÉVELOPPEMENT SUPERVISÉ
-Version 2.6 — 18/10/2026
+Version 2.7 — 18/10/2026
 Statut : guide de projet et journal de recette, non validation métier ni fiscale.
 
 DOCUMENTS MAÎTRES
@@ -178,3 +178,11 @@ DÉCISION EVOL-TEST-004 — HISTORIQUE QUOTIDIEN SUR 1 MOIS (18/10/2026)
 Régime permanent : UNE exécution par jour, conservation des résultats sur une fenêtre glissante de 30 jours (environ 30 jeux), puis suppression automatique des archives les plus anciennes après sauvegarde confirmée de la campagne nouvelle. Les campagnes KO sont conservées sur la même durée. Le pilote à 10 minutes conserve toujours uniquement ses trois derniers jeux.
 Règle de séparation : n'effacer ni les artefacts des runs push/PR, ni les archives de bilan dans docs/suivi/. Une branche Git avec suppression de fichiers ne garantit PAS la disparition des anciennes versions dans l'historique Git ; privilégier une rétention d'artefacts ou un stockage avec véritable expiration pour respecter la politique d'un mois.
 Référence mise à jour : docs/evolutions/EVOL-TEST-004_frequence_horodatage.txt v1.3. La fréquence quotidienne, la période pilote et les règles de rétention sont spécifiées, mais le mécanisme de rotation et la programmation périodique ne sont PAS encore implémentés.
+
+EVOL-TEST-004 — LOT A IMPLÉMENTÉ (18/10/2026)
+Document de cadrage avant code : docs/evolutions/EVOL-TEST-004_lot_A_pilote_implementation.txt.
+Workflow créé : .github/workflows/s3e-pilote.yml ; cron GitHub UTC « */10 * * * * », déclenchement manuel workflow_dispatch et push limité à la modification du workflow (essai initial). Une seule campagne pilote à la fois, pas d'annulation automatique des runs en cours.
+Fonctionnement : tests calculs/profils et Chromium, production report/campagne/metadata.json et statut-campagne.txt. Artefact « recette-pilote-RUNID-ATTEMPT » horodaté ; script tests/rotate-pilot-artifacts.cjs liste les artefacts GitHub Actions, ne supprime que le préfixe pilote après upload confirmé, n'en garde que trois. Script tests/archive-campaign.cjs pour les métadonnées.
+Sécurité : permissions du workflow contents:read et actions:write nécessaires à la purge ciblée ; la CI existante push/PR n'est pas modifiée. La rotation ne purge pas les logs ni l'historique GitHub Actions et ne supprime pas les bilans docs/suivi/.
+État de recette : une première exécution a été lancée par push du workflow, run 39125896795 ; vérifier conclusion et archivage avant toute déclaration de fonctionnement complet. GitHub schedule peut retarder ou omettre un passage.
+Régime quotidien futur : une campagne par jour, fenêtre de rétention 30 jours, encore à mettre en œuvre après validation pilote et choix de l'heure quotidienne.
