@@ -24,3 +24,6 @@ Fichier : docs/suivi/2026-10-18_diagnostic_schedule_pilote.txt
 
 2026-10-18 | Vérification des traces du pilote : 4 runs réussis, 2 schedule trop espacés, 9 OK / 1 écart connu / 0 échec, rotation des 3 derniers artefacts prouvée.
 Fichier : docs/suivi/2026-10-18_verification_traces_pilote.txt
+
+2026-10-18 | Bascule des tests S3E à 05h Paris, gestion été/hiver et rétention 30 jours ; premier run push 39155987873 réussi. Schedule et purge effective à confirmer.
+Fichier : docs/suivi/2026-10-18_bascule_quotidienne_05h_Paris.txt
