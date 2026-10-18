@@ -1,0 +1,46 @@
+SIMULATEUR S3E — DIAGNOSTIC DU PLANIFICATEUR PILOTE
+Date : 18 octobre 2026
+Statut : DIAGNOSTIC PARTIEL — CORRECTIF DE CADENCEMENT À VÉRIFIER
+Référence : EVOL-TEST-004, première exécution GitHub 39125896795
+
+CONSTAT VÉRIFIÉ
+À 12:37 UTC le 18 octobre, recherche dans 233 exécutions GitHub Actions :
+une seule campagne « S3E - Pilote recette horodatée », run 39125896795,
+déclenchée par événement « push » à 12:06:06 UTC, conclusion SUCCESS.
+Aucune campagne avec événement « schedule » ; trois créneaux 12:10,
+12:20 et 12:30 UTC théoriquement échus sans lancement observable.
+Le workflow .github/workflows/s3e-pilote.yml est présent dans main
+et son expression initiale « */10 * * * * » est valide.
+Le premier run a réussi ses tests, son archivage et l'étape de rotation.
+
+HYPOTHÈSES — NON DÉMONTRÉES
+GitHub documente des retards ou omissions possibles des déclenchements
+« schedule », notamment aux débuts d'heure.
+L'état individuel activé/désactivé du workflow n'a pas pu être consulté
+avec les API disponibles. Les paramètres Actions du dépôt doivent être
+contrôlés dans l'interface par le propriétaire si l'absence persiste.
+Aucune preuve ne permet d'attribuer aujourd'hui la panne au script
+de rotation, aux tests de navigateur, ou à une erreur du cron.
+
+MESURE CONSERVATRICE
+Décaler les créneaux planifiés aux minutes 03, 13, 23, 33, 43 et 53
+de chaque heure UTC ; garder une cadence de dix minutes, mais éviter
+le début exact de l'heure.
+Expression cron : « 3-59/10 * * * * ».
+Cette intervention reste un essai de résolution, pas une preuve
+que l'ordonnanceur GitHub a réellement démarré.
+
+PROCÉDURE DE VÉRIFICATION
+1. Observer la création d'un run dont event = schedule.
+2. Observer plusieurs campagnes successives et leurs horodatages réels.
+3. Vérifier succès/échecs et présence des artefacts recette-pilote-*.
+4. À la quatrième campagne, vérifier qu'il reste trois artefacts pilote.
+5. En cas d'absence prolongée, faire contrôler le statut Active du
+   workflow dans Actions et les paramètres du dépôt par son propriétaire.
+6. Consigner le constat effectif dans un bilan ultérieur daté.
+
+LIMITES ET DÉCISIONS
+Le cron demandé à 10 minutes est réservé à la phase pilote.
+La cible reste 1 test par jour avec conservation 30 jours glissants.
+Les tests push/PR sont distincts, inchangés. Les règles fiscales
+et financières demeurent fictives, PR-03 garde un écart métier connu.
