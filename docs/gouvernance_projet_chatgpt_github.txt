@@ -1,5 +1,5 @@
 GOUVERNANCE D’UN PROJET DÉVELOPPÉ AVEC CHATGPT ET GITHUB
-Référentiel de méthode — édition 1.0 du 17 octobre 2026
+Référentiel de méthode — édition 1.1 du 18 octobre 2026
 Cas fondateur : simulateur S3E
 Emplacement de référence : docs/gouvernance_projet_chatgpt_github.txt
 Statut : PROPOSITION DE GOUVERNANCE, applicable à partir de son adoption par le responsable du projet.
@@ -391,3 +391,42 @@ Autorité d’approbation : responsable humain du projet.
 Historique :
 - v1.0 — 17/10/2026 : rédaction initiale à partir du travail ChatGPT/GitHub
   mené pour le simulateur S3E. Proposition soumise à approbation.
+
+======================================================================
+13. ARCHIVAGE OBLIGATOIRE DES BILANS D'ÉTAPE — REGLE ADOPTEE
+======================================================================
+Décision explicite du responsable du projet du 18/10/2026.
+
+À CHAQUE demande ou réalisation d'un bilan à date (état des lieux, revue du
+projet, bilan de sprint, point d'avancement, audit de situation, bilan avant
+une décision), ChatGPT doit en conserver une copie TXT durable et datée
+dans GitHub, sous docs/suivi/.
+
+Nommage : docs/suivi/AAAA-MM-JJ_etat_des_lieux[_theme].txt ; ajouter un
+suffixe distinct en cas de plusieurs bilans le même jour. Ne jamais écraser
+un bilan historique : créer un nouveau fichier, et utiliser l'historique Git.
+
+Contenu obligatoire du document :
+- date de constat et source de vérification (commit, CI, déploiement) ;
+- objectif, périmètre et situation du projet à cette date ;
+- fonctions développées, testées, publiées et réellement validées ;
+- résultats des contrôles avec preuves et limites ;
+- décisions prises, risques, blocages, dettes techniques et points à confirmer ;
+- plan d'action priorisé, responsable et prochain jalon ;
+- liens vers les documents de référence ;
+- distinction explicite entre constats vérifiés, hypothèses et propositions.
+
+Procédure : vérifier le dépôt et la CI, rédiger le bilan dans la conversation,
+créer immédiatement le TXT sous docs/suivi/, inscrire l'archive dans
+l'index de suivi docs/suivi/index.txt et la citer dans le compte rendu.
+La règle s'applique même si aucun code n'est modifié pendant la revue.
+Les archives ne doivent contenir aucune donnée personnelle ou confidentielle.
+Si GitHub est inaccessible, prévenir le responsable : le bilan n'est pas
+considéré comme archivé tant que sa création n'est pas vérifiée.
+
+Le guide de développement affiche les travaux courants mais ne remplace pas
+les bilans historiques figés. Un nouveau bilan peut corriger les constats
+d'un précédent sans réécrire celui-ci.
+
+Historique complémentaire :
+- v1.1 — 18/10/2026 : archivage systématique des bilans d'étape dans docs/suivi/, règle explicitement décidée par le responsable du projet.
