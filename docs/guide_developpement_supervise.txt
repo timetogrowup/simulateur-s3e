@@ -191,3 +191,8 @@ DIAGNOSTIC SCHEDULE — 18/10/2026
 Constat : aucun événement schedule du workflow pilote dans 233 runs GitHub contrôlés ; un seul push du pilote à 12:06:06 UTC, SUCCESS. Chronologie conservée dans docs/suivi/2026-10-18_diagnostic_schedule_pilote.txt.
 Mesure de diagnostic appliquée : décalage du cron de « */10 * * * * » à « 3-59/10 * * * * » pour lancer aux minutes 03/13/23/33/43/53 UTC en évitant le début d'heure. Le changement déclenche un push de recette ; celui-ci ne prouve PAS la bonne exécution par schedule. À valider par observation d'un vrai événement schedule.
 Cible inchangée : une campagne quotidienne après la phase pilote, avec conservation des 30 derniers jours. Rotation des trois artefacts pilote également à vérifier après plusieurs exécutions.
+
+EVOL-TEST-004 — DIAGNOSTIC DU DÉCLENCHEMENT (18/10/2026)
+Le run 39125896795 était un push réussi, sans exécution schedule observée jusqu'à 12:37 UTC. Diagnostic conservé avant changement : docs/evolutions/EVOL-TEST-004_diagnostic_planification.txt.
+Mesure expérimentale autorisée : cron décalé de « */10 * * * * » vers « 3-59/10 * * * * » en UTC, soit 03/13/23/33/43/53. Le lancement push de vérification 39128185658 a été observé, en cours lors de la première consultation.
+ATTENTION : ce push ne prouve pas le bon fonctionnement du schedule ; attendre au moins deux runs dont event=schedule. Vérifier la rotation après quatre artefacts. Cible ultérieure quotidienne et fenêtre 30 jours inchangées.
