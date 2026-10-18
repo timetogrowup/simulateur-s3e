@@ -1,5 +1,5 @@
 SIMULATEUR S3E — GUIDE TXT DE DÉVELOPPEMENT SUPERVISÉ
-Version 2.5 — 18/10/2026
+Version 2.6 — 18/10/2026
 Statut : guide de projet et journal de recette, non validation métier ni fiscale.
 
 DOCUMENTS MAÎTRES
@@ -173,3 +173,8 @@ DÉCISION EVOL-TEST-004 — RÉTENTION GLISSANTE PILOTE (18/10/2026)
 Le pilote à 10 minutes ne doit conserver que les TROIS DERNIERS jeux de résultats horodatés de campagnes pilotes achevées. Après la quatrième, suppression ciblée du plus ancien après stockage vérifié du nouveau ; conserver y compris les rapports en échec. Ne pas toucher aux rapports des push/PR ni aux bilans significatifs archivés dans docs/suivi/.
 Nécessite un mécanisme de nettoyage des artefacts avec autorisation GitHub appropriée ; la seule durée de rétention ne suffit pas. Les métadonnées/logs des runs peuvent subsister ; la rotation limite le stockage des jeux de résultats mais pas les quotas de minutes CI.
 Document EVOL-TEST-004 version 1.2. Cible maintenue : une exécution PAR JOUR après pilote. Aucun cron ni nettoyage automatique activé pour l'instant.
+
+DÉCISION EVOL-TEST-004 — HISTORIQUE QUOTIDIEN SUR 1 MOIS (18/10/2026)
+Régime permanent : UNE exécution par jour, conservation des résultats sur une fenêtre glissante de 30 jours (environ 30 jeux), puis suppression automatique des archives les plus anciennes après sauvegarde confirmée de la campagne nouvelle. Les campagnes KO sont conservées sur la même durée. Le pilote à 10 minutes conserve toujours uniquement ses trois derniers jeux.
+Règle de séparation : n'effacer ni les artefacts des runs push/PR, ni les archives de bilan dans docs/suivi/. Une branche Git avec suppression de fichiers ne garantit PAS la disparition des anciennes versions dans l'historique Git ; privilégier une rétention d'artefacts ou un stockage avec véritable expiration pour respecter la politique d'un mois.
+Référence mise à jour : docs/evolutions/EVOL-TEST-004_frequence_horodatage.txt v1.3. La fréquence quotidienne, la période pilote et les règles de rétention sont spécifiées, mais le mécanisme de rotation et la programmation périodique ne sont PAS encore implémentés.
