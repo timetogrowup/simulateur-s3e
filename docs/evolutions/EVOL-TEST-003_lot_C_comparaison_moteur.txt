@@ -1,0 +1,45 @@
+SIMULATEUR S3E — EVOL-TEST-003 LOT C
+RACCORDEMENT DES 10 PROFILS AU MOTEUR ET RAPPORT AUTOMATISÉ
+Version 1.0 — 18/10/2026
+Statut : CADRAGE PRÉALABLE AU DÉVELOPPEMENT
+
+OBJECTIF
+Chaque profil JSON déjà enregistré dans tests/profils/ doit être chargé
+dans le moteur de simulation exécuté en contexte JavaScript isolé.
+Les grandeurs financières produites sont rapprochées des valeurs
+indépendantes figurant dans tests/references/.
+
+CONVENTION D'ADAPTATION
+Le questionnaire utilise des tranches : ses valeurs médianes ne sont
+pas les valeurs exactes des cas de référence. Pour ne pas changer
+le questionnaire ni falsifier les attendus, le test conserve les
+réponses du profil mais remplace EXPLICITEMENT et SEULEMENT dans les
+hypothèses de calcul les grandeurs numériques de l'oracle nécessaires
+à l'égalité. Le rapport signale cet « essai affinage numérique ».
+Un autre contrôle conserve les valeurs issues du questionnaire,
+la finitude des trois scénarios et les invariants d'ensemble.
+
+CONTROLES PAR TYPE DE PROFIL
+- electric : frais énergétiques commute+privateEnergy du scénario
+  électrique visé ; avec dérivée après modification de publicPrice.
+- installation : installation totale et reste après compensation :
+  attention, la règle « Oui partiellement » ne dispose pas encore
+  de taux de subvention dans le moteur ; si l'attendu ne concorde
+  pas, enregistrer un ECART CONNU, sans revendiquer un succès métier.
+- thermal : énergie du scénario dérogatoire.
+- professionalExclusion : différence de coûts lorsque seuls les
+  kilomètres de mission varient, attendue nulle.
+- depreciation : poste depreciation du scénario personnel.
+- aen : somme des postes aenSocial + aenTax du scénario futur.
+- portable : structure et intégrité des données à exporter/importer.
+
+RESULTATS ET GOUVERNANCE
+Les verdicts sont OK, ECART_CONNU ou ECHEC. Un échec nouveau
+fait échouer le job CI. Un écart connu ne doit pas être masqué :
+il apparaît distinctement dans le rapport et le résumé Actions.
+Les rapports générés à chaque run sont des artefacts téléchargeables ;
+leur conservation dans docs/suivi/ exige ensuite une opération
+GitHub explicitement réalisée conformément à la gouvernance.
+Ne pas ajouter de planning, notification ni nouveau déclencheur.
+La campagne n'est pas un ensemble de dix parcours navigateur de bout
+en bout ; cette extension reste prévue dans un lot ultérieur.
