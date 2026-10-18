@@ -11,3 +11,7 @@ BILANS ARCHIVÉS
 2026-10-18 | Etat des lieux du projet, prototype opérationnel, validations
 CI et Pages réussies au commit 1dabda17, priorités de fiabilisation.
 Fichier : docs/suivi/2026-10-18_etat_des_lieux.txt
+
+2026-10-18 | Recette automatique des 10 profils ; 9 OK, 1 écart connu
+Fichier : docs/suivi/2026-10-18_recette_automatique_profils.txt
+CI : https://github.com/timetogrowup/simulateur-s3e/actions/runs/39109811724
