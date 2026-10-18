@@ -1,0 +1,44 @@
+SIMULATEUR S3E — DIAGNOSTIC ET CORRECTIF EXPÉRIMENTAL DE PLANIFICATION
+Version 1.0 — 18 octobre 2026
+État : diagnostic du défaut de déclenchement automatique ; correctif accepté par le responsable.
+Document maître : docs/evolutions/EVOL-TEST-004_frequence_horodatage.txt
+
+OBSERVATIONS
+- Workflow pilote .github/workflows/s3e-pilote.yml présent sur la branche principale main.
+- Cron initial : */10 * * * * (minutes 00, 10, 20, 30, 40, 50 UTC).
+- Premier run 39125896795 déclenché par push le 18/10/2026 à 12:06:06 UTC.
+- Run initial SUCCESS, tests/rapports/artefacts/étape de rotation SUCCESS.
+- À 12:37 UTC, aucun run schedule visible parmi 233 runs GitHub du dépôt.
+- Trois déclenchements 12:10, 12:20, 12:30 UTC attendus mais non observés.
+- Le dépôt est public, actif et sa branche par défaut est main.
+
+DIAGNOSTIC
+Le code de test est opérationnel dans le premier run ; absence de lancement
+planifié constatée. Cause racine non déterminée. GitHub Actions peut retarder
+ou omettre les schedule ; état interne du planificateur non vérifiable avec
+les droits GitHub disponibles. La surcharge aux débuts d'heure est un facteur
+possible, mais ne démontre pas la cause des absences.
+
+CORRECTIF EXPÉRIMENTAL AUTORISÉ
+Décaler les créneaux de trois minutes : cron '3-59/10 * * * *',
+soit 03, 13, 23, 33, 43, 53 UTC. L'intervalle de 10 min est conservé.
+Ne pas toucher aux étapes de tests, au mécanisme de conservation des trois
+derniers artefacts ni à la CI ordinaire. Ne pas affirmer que ce changement
+garantit des déclenchements exacts.
+
+RECETTE DU CORRECTIF
+1. Vérifier l'exécution push suite à la modification du workflow.
+2. Vérifier l'apparition d'exécutions avec event=schedule sur au moins deux
+   créneaux ultérieurs, et distinguer des événements push.
+3. Confirmer, après quatre campagnes, que seuls trois artefacts de pilote
+   sont conservés ; les logs des runs GitHub subsisteront éventuellement.
+4. Documenter les observations dans un bilan de suivi GitHub.
+
+SUITE SI ÉCHEC
+Vérifier l'état du workflow dans GitHub Actions, les permissions et les
+notifications de désactivation. Envisager une solution alternative si les
+déclenchements programmés restent absents, après validation humaine.
+
+CIBLE INCHANGÉE
+Après phase pilote : 1 exécution par jour, rétention 30 jours glissants.
+Aucune modification de la fréquence quotidienne cible.
