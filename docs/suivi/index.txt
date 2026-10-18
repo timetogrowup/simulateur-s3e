@@ -15,3 +15,6 @@ Fichier : docs/suivi/2026-10-18_etat_des_lieux.txt
 2026-10-18 | Recette automatique des 10 profils ; 9 OK, 1 écart connu
 Fichier : docs/suivi/2026-10-18_recette_automatique_profils.txt
 CI : https://github.com/timetogrowup/simulateur-s3e/actions/runs/39109811724
+
+2026-10-18 | Activation du pilote toutes les 10 minutes ; premier run 39125896795 SUCCESS, artefact horodaté créé ; rotation à 3 à confirmer après au moins 4 runs.
+Fichier : docs/suivi/2026-10-18_activation_pilote_10_minutes.txt
