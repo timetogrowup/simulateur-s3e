@@ -1,9 +1,10 @@
 SIMULATEUR S3E — EXPRESSION DE BESOIN
 EVOL-TEST-004 — PLANIFICATION PÉRIODIQUE ET HISTORISATION DES RECETTES
-Édition : 1.0 — 18 octobre 2026
+Édition : 1.1 — 18 octobre 2026
 Statut : BESOIN EXPRIMÉ / À DÉVELOPPER — AUCUNE NOUVELLE PLANIFICATION ACTIVÉE
 Décision du responsable : prévoir des exécutions toutes les X heures,
-avec un premier essai toutes les 1/6 d'heure, soit 10 minutes.
+avec un premier essai toutes les 1/6 d'heure, soit 10 minutes,
+puis UN TEST PAR JOUR en régime cible (décision du 18/10/2026).
 Références :
 - docs/evolutions/EVOL-TEST-003_besoins_fonctionnels.txt
 - docs/evolutions/EVOL-TEST-003_methode_envisagee.txt
@@ -13,8 +14,8 @@ Références :
 1. OBJET
 Automatiser le déclenchement périodique de la recette S3E déjà présente
 dans GitHub, recueillir ses résultats et les historiser de façon horodatée,
-de manière à vérifier le bon fonctionnement du robot avant la définition
-d'une fréquence de surveillance de régime permanent.
+de manière à vérifier le bon fonctionnement du robot avant le passage à une fréquence de surveillance de régime permanent
+DÉJÀ CHOISIE : une fois par jour, à une heure restant à décider.
 
 2. FRÉQUENCE FONCTIONNELLE ET PHASE PILOTE
 PF-01 : paramètre de période P exprimé en heures, y compris fractions
@@ -23,11 +24,12 @@ PF-02 : premier réglage d'essai P = 1/6 heure = 10 minutes.
 PF-03 : une campagne demandée toutes les dix minutes tant que la
 phase pilote est explicitement activée : 00, 10, 20, 30, 40 et 50 minutes
 de chaque heure, en fuseau UTC pour le planificateur.
-PF-04 : valeurs possibles ultérieures : toutes les 1, 2, 3, 4, 6, 12
-ou 24 heures, ou une autre période techniquement réalisable.
-PF-05 : les décisions de durée de la phase pilote, fréquence définitive,
-heures de surveillance, éventuels jours exclus et seuils d'alerte
-restent à prendre.
+PF-04 : cadence définitive retenue : 24 heures, soit un test par jour.
+L'heure de déclenchement quotidienne n'est pas encore définie.
+D'autres périodes X ne seraient appliquées que sur nouvelle décision.
+PF-05 : la durée de la phase pilote, l'heure de lancement quotidienne,
+les éventuels jours exclus et les seuils d'alerte restent à définir.
+La fréquence cible, elle, EST DÉCIDÉE : une campagne par jour.
 PF-06 : maintenir un déclenchement à la demande si l'accès GitHub
 le permet, sans dépendre de l'exécution périodique.
 PF-07 : le dispositif doit pouvoir être suspendu sans altérer les
@@ -40,8 +42,11 @@ sans décision distincte.
 
 3. MÉTHODE TECHNIQUE ENVISAGÉE
 - GitHub Actions « schedule » avec expression cron, sur la branche par
-  défaut. Pour le pilote de 10 minutes :
+  défaut. Pour le pilote temporaire de 10 minutes :
       cron: '*/10 * * * *'
+  Pour le régime cible de 1 campagne par jour : expression à fixer
+  après choix de l'heure UTC quotidienne (exemple non adopté :
+      cron: '0 6 * * *').
 - Les expressions cron de GitHub Actions sont en UTC.
 - Le calendrier est porté par le fichier YAML du workflow ; la période
   n'est pas un simple nombre JSON ajustable à l'exécution. Une modification
@@ -142,9 +147,11 @@ CA-09 : les rapports annoncés comme stockés sont effectivement
 CA-10 : toute limite de GitHub Actions est explicitement communiquée.
 
 8. CHARGE PRÉVISIONNELLE ET RISQUES
-À P = 10 minutes, viser 6 campagnes/heure, 144 campagnes/jour et
-environ 1 008 campagnes/7 jours en théorie, si le planificateur
-déclenche tous les créneaux. La durée de campagne inclut notamment
+À P = 10 minutes, viser TEMPORAIREMENT 6 campagnes/heure,
+144 campagnes/jour et environ 1 008 campagnes/7 jours en théorie,
+si le planificateur déclenche tous les créneaux.
+En régime cible P = 24 heures : 1 campagne par jour, environ
+30 à 31 par mois et 365 par an, hors retards et omissions. La durée de campagne inclut notamment
 l'installation du navigateur Chromium ; le temps GitHub Actions
 et les volumes d'artefacts peuvent devenir significatifs.
 La politique de concurrence évitera de superposer inutilement des
@@ -162,19 +169,29 @@ D. Préparer la configuration cron et la prévention des chevauchements.
 E. Activer le pilote toutes les 10 minutes après validation humaine.
 F. Constater plusieurs exécutions et mesurer ponctualité, durée, coûts,
    résultat des dix profils, taille et pérennité des rapports.
-G. Arbitrer une cadence de régime permanent et les notifications.
+G. Basculer à une cadence de régime permanent QUOTIDIENNE, après
+   choix de l'heure, validation du pilote et configuration ; décider
+   séparément des notifications.
 
 10. DECISIONS NON ENCORE ARBITREES
 - Date et durée de démarrage du pilote.
-- Fréquence pérenne après démonstration technique.
+- Fréquence pérenne : DÉCIDÉE, 1 exécution par jour.
+- Heure de la campagne quotidienne : à choisir.
 - Stockage historique durable au-delà des artefacts temporaires.
 - Allègement éventuel des tests navigateur lors des campagnes fréquentes.
 - Seuils d'alerte et canal des notifications.
 - Politique de concurrence, coûts/quota et droits de publication.
 
 11. DÉCISION ET ÉTAT D'IMPLÉMENTATION
-La fréquence cible de PILOTE toutes les dix minutes est demandée.
+La fréquence PILOTE temporaire de 10 minutes est demandée.
+La fréquence CIBLE du régime permanent est DÉCIDÉE : 1 fois par jour.
+Ce choix diminue fortement les besoins de stockage par rapport à
+une conservation à long terme de 144 exécutions quotidiennes.
 Le présent lot est DOCUMENTAIRE : il n'active ni cron, ni workflow
 supplémentaire ni stockage automatique durable. Sa réalisation nécessitera
 une intervention ultérieure explicite sur la configuration et les scripts.
 L'exécution existante sur push/pull_request n'est pas modifiée.
+
+HISTORIQUE DE VERSION
+- v1.1 — 18/10/2026 : correction explicite du régime cible : un test
+  par jour ; le pas de dix minutes ne concerne que les premiers essais.
