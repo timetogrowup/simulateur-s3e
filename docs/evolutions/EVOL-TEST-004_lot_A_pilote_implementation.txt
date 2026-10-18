@@ -1,0 +1,62 @@
+SIMULATEUR S3E — EVOL-TEST-004 — LOT TECHNIQUE A
+ACTIVATION PILOTE À 10 MINUTES ET ROTATION DES TROIS RAPPORTS
+Version 1.0 — 18 octobre 2026
+Statut : CADRAGE PRÉALABLE À IMPLÉMENTATION
+Règle source : docs/evolutions/EVOL-TEST-004_frequence_horodatage.txt v1.3
+Autorisation : responsable du projet « Si tout est correctement documenté vas y ».
+
+OBJECTIF
+Mettre en route une campagne GitHub Actions toutes les 10 minutes, sous
+un workflow ISOLÉ des contrôles usuels push/pull_request, avec rapport
+horodaté par campagne et conservation des TROIS DERNIERS artefacts pilote.
+
+ARCHITECTURE
+.github/workflows/s3e-pilote.yml
+  schedule : cron '*/10 * * * *' en UTC
+  workflow_dispatch : essai manuel possible (si interface GitHub autorisée)
+  concurrency : une seule campagne pilote à la fois, sans annuler un run en cours
+  permissions : contents:read, actions:write (suppression ciblée des artefacts)
+  étapes :
+  - checkout et Node 22, installation npm et Chromium
+  - tests unitaires et profils puis Playwright mobile/desktop
+  - rapport metadata.json + bilan TXT même si tests KO
+  - upload d'un artefact horodaté recette-pilote-<run_id>-<attempt>
+  - seulement si stockage réussi, rotation ciblée du préfixe pilote
+  - CI rouge si tests en échec / conservation incomplète.
+
+tests/archive-campaign.cjs
+  Produit un état de campagne horodaté, format ISO UTC, run_id,
+  run_attempt, commit, statut unitaire et navigateur, référence profil.
+  Ne stocke aucune donnée personnelle.
+
+tests/rotate-pilot-artifacts.cjs
+  API GitHub REST (GH_TOKEN du workflow), liste des artefacts.
+  Trie du plus récent au plus ancien, protège les trois premiers.
+  Supprime uniquement les artefacts au préfixe recette-pilote-
+  appartenant au workflow pilote, au-delà des trois.
+  Ne supprime jamais artefacts de contrôle CI push/PR.
+  Échoue explicitement si une opération échoue ou si >3 conservés.
+  Vérifie que l'artefact du run courant existe avant nettoyage.
+  N'efface pas les métadonnées du run ou les logs GitHub Actions.
+
+LIMITES / CONTRÔLES
+La tâche schedule peut démarrer en retard voire être sautée par GitHub.
+L'installation Chromium répétée toutes les dix minutes consomme du temps
+et des ressources : surveiller quotas, durée et erreurs des workflows.
+Les artefacts peuvent persister dans les caches/logs/états internes GitHub ;
+« 3 derniers » vise strictement les artefacts nommés recette-pilote-.
+Les trois artefacts pilotes ne sont pas nécessairement disponibles
+si GitHub les a expirés ou que les exécutions n'ont pas démarré.
+Cible définitive documentée : 1 campagne quotidienne et 30 jours
+glissants de résultats, NON activée par ce lot ; basculement futur.
+Sécurité : compte automatique GITHUB_TOKEN, permissions write
+strictement ciblées, code de nettoyage exécuté seulement en workflow
+du dépôt main ; aucun effacement des bilans docs/suivi/.
+Les résultats métier fiscaux demeurent fictifs (PR-03 ECART_CONNU).
+
+RECETTE
+Vérifier workflow dispatch ou lancement par planification.
+Vérifier artefact TXT/JSON contenant run_id et date UTC.
+Après la quatrième campagne, vérifier exactement trois artefacts pilote.
+S'assurer des échecs conservés et du statut final vrai du job.
+Consigner run ids/observations dans docs/suivi/ comme bilan ponctuel.
