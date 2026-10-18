@@ -4,7 +4,7 @@
   "private": true,
   "description": "Tests en navigateur du prototype S3E (référentiels fictifs)",
   "scripts": {
-    "test:unit": "node tests/smoke.cjs && node tests/validate-referentiels.cjs && node tests/validate-docs.cjs && node tests/validate-profils.cjs",
+    "test:unit": "node tests/smoke.cjs && node tests/validate-referentiels.cjs && node tests/validate-docs.cjs && node tests/validate-profils.cjs && node tests/compare-profils.cjs",
     "test:browser": "playwright test"
   },
   "devDependencies": {
