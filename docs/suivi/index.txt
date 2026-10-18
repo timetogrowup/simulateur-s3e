@@ -18,3 +18,6 @@ CI : https://github.com/timetogrowup/simulateur-s3e/actions/runs/39109811724
 
 2026-10-18 | Activation du pilote toutes les 10 minutes ; premier run 39125896795 SUCCESS, artefact horodaté créé ; rotation à 3 à confirmer après au moins 4 runs.
 Fichier : docs/suivi/2026-10-18_activation_pilote_10_minutes.txt
+
+2026-10-18 | Diagnostic d'absence de lancement planifié du pilote ; essai de décalage des minutes cron, résultat schedule à vérifier.
+Fichier : docs/suivi/2026-10-18_diagnostic_schedule_pilote.txt
