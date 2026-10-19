@@ -1,5 +1,5 @@
 SIMULATEUR S3E — GUIDE TXT DE DÉVELOPPEMENT SUPERVISÉ
-Version 3.1 — 19/10/2026
+Version 3.2 — 19/10/2026
 Statut : guide de projet et journal de recette, non validation métier ni fiscale.
 
 DOCUMENTS MAÎTRES
@@ -210,3 +210,7 @@ Expression de besoin : docs/evolutions/EVOL-COM-001_expression_besoin_email_quot
 EVOL-COM-001 v1.1 — FRÉQUENTATION DU SIMULATEUR (19/10/2026)
 Le bulletin doit présenter le nombre de simulations terminées, la répartition par heure Europe/Paris, l'heure de pointe, la comparaison avec la veille, et les utilisateurs distincts seulement en tant qu'estimation méthodologiquement justifiée. Une ouverture de page ou un test navigateur automatisé n'est pas une simulation humaine terminée. Aucune donnée individuelle ou réponse financière n'est à collecter. GitHub Pages/localStorage ne suffisent pas pour obtenir des statistiques globales ; choisir d'abord une collecte conforme RGPD. Ni instrumentation ni envoi email activés à ce stade.
 Référence : docs/evolutions/EVOL-COM-001_expression_besoin_email_quotidien.txt v1.1.
+
+EVOL-COM-001 — SPÉCIFICATION TECHNIQUE D'INTÉGRATION (19/10/2026)
+Référence technique : docs/evolutions/EVOL-COM-001_specification_technique_integration.txt, version 1.0. La spécification détaille l'intégration aux fichiers existants index.html (function first, pas calculate/draw), tests Playwright, workflow de recette s3e-pilote.yml, nouveaux scripts scripts/reporting/ et nouveau workflow de courriel. Architecture proposée à arbitrer : collecte événementielle minimale sur un service HTTPS agrégé (ex. Worker+D1), endpoint authentifié de statistiques, génération de bulletin et envoi sécurisé API/SMTP ; aucun revenu, réponse métier ou sauvegarde salarié ne quitte le navigateur. Indicateur utilisateurs distincts non mesurable tant qu'une méthode respectueuse de l'anonymat n'est pas approuvée. Gestion horaire Europe/Paris et DST, évitement des runs skipped et des robots, anti-doublon mail, tests, sécurité, RGPD et lots de déploiement explicités.
+État : DOCUMENTATION TECHNIQUE SEULEMENT — aucune télémétrie, base, service tiers ou envoi mail installé. Prochain jalon : arbitrage de l'architecture/fournisseurs et choix de l'heure limite quotidienne, puis spécification du premier lot avant code.
