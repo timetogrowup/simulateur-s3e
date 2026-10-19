@@ -1,0 +1,65 @@
+SIMULATEUR S3E — DÉCISION D'ARCHITECTURE OPTION A
+EVOL-COM-001 — COLLECTE CLOUDFLARE ET EMAIL RESEND
+Version 1.0 — 19 octobre 2026
+Statut : CHOIX DE PRINCIPE VALIDÉ ; DÉPLOIEMENT NON AUTORISÉ PAR CETTE NOTE
+Références :
+docs/evolutions/EVOL-COM-001_expression_besoin_email_quotidien.txt
+docs/evolutions/EVOL-COM-001_specification_technique_integration.txt
+docs/evolutions/EVOL-COM-001_etude_services_cloudflare_email.txt
+
+DÉCISION UTILISATEUR
+L'utilisateur ne possède pas de nom de domaine et privilégie
+l'option A :
+- Cloudflare Workers + D1 pour recevoir des événements de simulations
+  terminées et calculer des compteurs horaires anonymes ;
+- Resend pour expédier le bilan quotidien de l'activité GitHub,
+  des tests et de l'utilisation à son adresse Gmail privée ;
+- maintien de l'hébergement du simulateur sur GitHub Pages.
+Ne pas inscrire le destinataire dans ce dépôt public : utiliser
+des secrets de configuration pour son adresse.
+
+POINT BLOQUANT À PRENDRE EN COMPTE
+Resend propose une formule gratuite adaptée à un email par jour
+(3 000 emails/mois et 100/jour au 19/10/2026).
+Sans domaine expéditeur personnel vérifié, le domaine mutualisé
+de test onboarding@resend.dev ne permet généralement l'envoi
+QUE vers l'adresse email du compte Resend lui-même.
+Ainsi, un essai sur la seule boîte Gmail destinataire pourra être
+possible SI le compte Resend est créé avec cette adresse ;
+mais cela ne constitue pas un domaine d'envoi professionnel
+ni une garantie de capacité de production durable.
+La mise en service régulière sera conditionnée à la vérification
+de la politique d'envoi de Resend pour le cas d'usage précis,
+ou à l'achat/validation ultérieure d'un domaine, ou à une solution
+SMTP alternative explicitement approuvée.
+Ne jamais laisser entendre que l'achat de domaine est
+nécessaire à la collecte Workers/D1 : cela concerne le courrier.
+
+SOURCES PUBLIQUES VÉRIFIÉES
+https://resend.com/pricing
+https://resend.com/docs
+https://resend.com/changelog/sending-test-emails
+https://developers.cloudflare.com/workers/platform/pricing/
+https://developers.cloudflare.com/d1/platform/pricing/
+
+TRAVAUX À PRÉPARER
+1. Implémentation serveur Worker/D1 : schéma de compteurs,
+   point événement minimal, sécurité et tests.
+2. Instrumentation dans function first() d'index.html,
+   sans collecte de paramètres financiers ni suivi nominatif,
+   et sans compter les tests Playwright.
+3. Génération du digest GitHub+audience, distinction des runs
+   complets et skipped, protection du compte Gmail.
+4. Adaptateur Resend configurable, avec mode simulation locale
+   sans vrai envoi et messages d'erreurs clairs en absence
+   de domaine autorisé.
+5. Essai de livraison à l'adresse du propriétaire du compte
+   après création et connexion explicite des comptes fournisseurs.
+6. Décider ultérieurement de l'heure limite du bulletin
+   (indépendante du lancement des tests à 05 h Paris).
+7. Conserver les règles de gouvernance : évolution TXT avant code,
+   bilan daté TXT et index lors de toute revue de déploiement.
+
+AUCUN CHANGEMENT EN PRODUCTION
+Le site, les secrets, les comptes Cloudflare/Resend et le workflow
+des emails ne sont pas modifiés ni activés dans cette décision.
