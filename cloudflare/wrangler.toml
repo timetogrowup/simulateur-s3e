@@ -12,3 +12,6 @@ ALLOWED_ORIGIN = "https://timetogrowup.github.io"
 # database_name = "s3e-audience"
 # database_id = "<à renseigner>"
 # SECRET à créer hors dépôt : REPORT_API_TOKEN.
+
+[triggers]
+crons = ["17 2 * * *"] # Purge journalière des clés de dédoublonnage >48h ; après déploiement seulement.
