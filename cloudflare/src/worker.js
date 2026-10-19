@@ -75,6 +75,12 @@ async function summary(request,env){
   notes:['Mesure des simulations terminées, pas des personnes distinctes.']});
 }
 export default {
+ async scheduled(controller,env){
+  // Purger uniquement les identifiants éphémères de dédoublonnage (48 h).
+  if(!env.DB)return;
+  const cutoff=new Date(Date.now()-48*3600000).toISOString();
+  await env.DB.prepare('DELETE FROM event_dedupe WHERE inserted_at_utc < ?').bind(cutoff).run();
+ },
  async fetch(request,env){
   const url=new URL(request.url),origin=request.headers.get('origin');
   if(request.method==='OPTIONS'&&url.pathname==='/v1/events'){
