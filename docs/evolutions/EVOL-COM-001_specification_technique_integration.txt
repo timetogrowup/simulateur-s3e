@@ -1,0 +1,400 @@
+SIMULATEUR S3E — SPÉCIFICATION TECHNIQUE D'INTÉGRATION
+EVOL-COM-001 — MESURE D'UTILISATION ET EMAIL QUOTIDIEN DE PILOTAGE
+Version : 1.0 — 19 octobre 2026
+Statut : ARCHITECTURE PROPOSÉE / NON DÉPLOYÉE
+Référence métier :
+  docs/evolutions/EVOL-COM-001_expression_besoin_email_quotidien.txt (v1.1)
+Référentiels projet :
+  docs/gouvernance_projet_chatgpt_github.txt
+  docs/guide_developpement_supervise.txt
+  docs/evolutions/EVOL-TEST-004_frequence_horodatage.txt
+  docs/evolutions/EVOL-TEST-004_lot_B_quotidien_05h_Paris.txt
+Dépôt : https://github.com/timetogrowup/simulateur-s3e
+Site : https://timetogrowup.github.io/simulateur-s3e/
+
+0. SYNTHÈSE ET CHOIX D'ARCHITECTURE
+Le projet actuel est une application statique GitHub Pages :
+- interface et moteur de calcul majoritairement dans index.html ;
+- tables TEST fictives sous referentiels/ ;
+- données de sauvegarde du salarié uniquement dans localStorage ;
+- Node.js utilisé pour les validations, sans serveur de production ;
+- tests Chromium Playwright, calculs et références sous tests/ ;
+- workflow quotidien .github/workflows/s3e-pilote.yml :
+  choix de 05:00 Europe/Paris avec double cron UTC et garde-fou ;
+  rapports d'essai horodatés, artefacts GitHub 30 jours.
+
+Il n'existe PAS aujourd'hui de collecteur central de fréquentation,
+de statistiques historiques globales, ni de service d'envoi du
+rapport quotidien par email.
+
+PROPOSITION TECHNIQUE À ARBITRER
+A. Pour mesurer les événements métier, ajouter un petit point de
+   collecte serveur HTTPS sans y envoyer de données de simulation.
+   Candidat initial : Cloudflare Worker + D1, ou service équivalent
+   possédant compteur agrégé et API d'interrogation authentifiée.
+   Ni fournisseur ni offre n'est considéré comme déjà approuvé.
+B. GitHub Actions produit séparément les statistiques d'activité
+   GitHub, lit le résultat de la recette du jour et interroge
+   l'API agrégée du collecteur.
+C. Une tâche de synthèse quotidienne produit un email TXT, HTML
+   optionnel, puis l'envoie par un prestataire authentifié
+   (ex. API transactionnelle avec domaine expéditeur vérifié,
+   ou passerelle SMTP autorisée). Choix du service à valider.
+D. Les secrets sont stockés dans GitHub Actions Secrets ou dans
+   l'environnement serveur, et JAMAIS dans index.html ou dans Git.
+
+Ce document décrit le schéma recommandé, les contrats d'interface,
+les changements de fichiers et les tests d'acceptation. Il n'autorise
+pas à lui seul l'ajout de services externes ou la mise en collecte.
+
+1. COMPOSANTS ET FLUX
+Navigateur utilisateur (GitHub Pages, index.html)
+  -> quand une PREMIÈRE simulation aboutit : événement « simulation_completed »
+  -> POST HTTPS de données MINIMALES vers /v1/events
+  -> serveur valide l'événement, contrôle le trafic et agrège
+  -> base de compteurs horaires (UTC + fuseau Europe/Paris au rapport).
+GitHub Actions (workflow quotidien déjà présent)
+  -> exécute tests, génère artefact « recette-quotidienne-… »
+  -> API GitHub : runs, jobs, commits, PR, état Pages si disponible.
+Nouveau workflow synthèse / email
+  -> interroge l'API agrégée par date civile Europe/Paris
+  -> assemble les trois rubriques « activité / tests / audience »
+  -> génère bulletin texte + HTML facultatif
+  -> envoie via API de messagerie avec identifiants sécurisés
+  -> journalise un statut d'envoi sans adresse destinataire en clair.
+
+2. CONTRAT D'ÉVÉNEMENT MÉTIER
+Endpoint proposé : POST https://<collecteur-choisi>/v1/events
+Content-Type : application/json
+Taille maximale : 1 Ko ; CORS limité au domaine officiel
+GitHub Pages et aux environnements de développement autorisés.
+Corps public minimal (exemple de structure, non de données réelles) :
+  {
+    "schema": 1,
+    "event": "simulation_completed",
+    "event_id": "<UUID aléatoire d'opération>",
+    "client_time_utc": "<ISO 8601>",
+    "app_version": "<révision publique de la plateforme>"
+  }
+N'ENVOYER AUCUN champ answers, answers.*, revenus, AEN,
+kilométrage, identité, email, adresse IP explicite, résultat
+financier, contenu du questionnaire, détails de sauvegardes.
+L'horodatage faisant foi est celui de la RÉCEPTION SERVEUR UTC ;
+le champ client n'est qu'indicatif, car les horloges des visiteurs
+ne sont pas fiables.
+
+SÉMANTIQUE D'UN COMPTAGE
+- un compteur « simulation_completed » lors du premier bilan
+  chiffré réellement affiché, après réussite du calcul.
+- les recalculs du bilan affiné ne produisent PAS un nouvel
+  événement pour le même parcours.
+- une NOUVELLE simulation recommencée volontairement peut être
+  comptée une nouvelle fois.
+- la saisie initiale, l'ouverture de l'accueil, les réponses
+  partielles, les importations JSON ou reprises de sauvegarde
+  n'ajoutent pas automatiquement une simulation terminée.
+- prévoir un marqueur d'opération aléatoire conservé uniquement
+  dans la session du navigateur le temps du parcours. L'API
+  dédoublonne event_id pendant 48 h pour gérer les retries réseau,
+  puis purge ces clés ; pas de liaison entre journées.
+- désactiver la télémétrie via une configuration TEST visible
+  des parcours automatisés ; bloquer également les provenances
+  de CI connues sur le serveur et tester l'anti-doublon.
+  Cette exclusion des robots est de « best effort » et non une
+  preuve absolue de détection de tous les robots externes.
+- l'échec réseau du compteur est NON BLOQUANT pour le simulateur :
+  il ne doit jamais empêcher l'affichage des résultats ;
+  réessai borné et sans événement doublon, sans file infinie.
+
+3. POINT D'INTÉGRATION DANS LE CODE ACTUEL
+index.html contient notamment :
+- function next() : fin des questions -> view='recap' ;
+- function first() : vérifie les réponses, calcule et bascule
+  en view='report' ;
+- function calculate(e) : moteur financier, appelé ailleurs
+  pour estimation, comparaison et recalcul ;
+- function draw() : rendu selon l'état de l'application.
+
+POINT RECOMMANDÉ : déclencher l'événement depuis function first()
+uniquement APRÈS la réussite de calculate(base) ET la confirmation
+du passage vers le premier rapport, une seule fois par parcours.
+NE PAS émettre depuis calculate() (fonction à appels multiples),
+draw() (rendus multiples) ni next() (questionnaire non achevé).
+La partie réseau doit rester hors du moteur financier.
+
+Création proposée de fichiers :
+- assets/telemetry.js : émetteur métier isolé, best effort ;
+- assets/telemetry-config.js : URL publique du collecteur,
+  drapeau de mise en service, sans clé secrète ;
+- éventuellement assets/app-version.js : identification de version.
+Modifier index.html uniquement pour charger la télémétrie et
+appeler explicitement trackSimulationCompleted() au point métier.
+Éviter de réécrire d'un bloc le moteur monolithique de 50 Ko.
+Préserver intégralement le stockage local des simulations ; aucune
+synchronisation des sauvegardes avec un serveur n'est prévue.
+
+ATTENTION à la stabilité : telemetry.js ne doit pas provoquer de
+ReferenceError lorsque le collecteur est indisponible ; aucun
+calcul fiscal ou contenu du bilan ne doit dépendre de l'API.
+
+4. STOCKAGE ET MODÈLE D'AGRÉGATION
+Schéma logique (type SQL, syntaxe adaptable au fournisseur) :
+
+hourly_counts(
+  hour_start_utc TEXT PRIMARY KEY,
+  simulation_completed_count INTEGER NOT NULL DEFAULT 0,
+  simulation_started_count INTEGER NOT NULL DEFAULT 0
+)
+event_dedupe(
+  event_id TEXT PRIMARY KEY,
+  inserted_at_utc TEXT NOT NULL
+)
+
+Insertion transactionnelle :
+- validation schéma/version/nom événement/UUID ;
+- tentative insertion event_id unique dans event_dedupe ;
+- seulement si nouvel event_id : incrément atomique du
+  compteur de l'heure UTC de réception ;
+- élimination des clés de dédoublonnage après 48 h.
+Ne pas stocker d'adresse email ni de réponses métier.
+Les compteurs horaires sont conservés selon une politique à
+arbitrer (proposition : 90 jours, distincte de la rétention
+GitHub des rapports de tests sur 30 jours).
+Les journaux d'hébergement peuvent contenir des métadonnées
+techniques : vérifier et limiter leur rétention côté fournisseur.
+
+Pas de « véritables personnes uniques » par défaut :
+sans identifiant intersession, mesurer le nombre de personnes
+distinctes est impossible. L'email présentera
+  « utilisateurs distincts estimés : non disponible »
+tant qu'une solution spécifiquement validée ne le permettra pas.
+Ce point ne bloque PAS le compteur des simulations achevées.
+
+5. API D'AGRÉGATS VERS LE BULLETIN
+Endpoint interne proposé :
+GET /v1/summary?date=YYYY-MM-DD&tz=Europe%2FParis
+Authentification forte côté serveur : clé API en GitHub Actions
+Secrets, jamais exposée au navigateur public.
+Réponse JSON versionnée :
+  {
+    "schema":1,
+    "date_paris":"YYYY-MM-DD",
+    "measurement_status":"complete|partial|unavailable",
+    "completed_total":42,
+    "started_total":null,
+    "distinct_users_estimated":null,
+    "hourly":[
+      {"local_hour":"00","count":0}, ...,
+      {"local_hour":"23","count":2}
+    ],
+    "measurement_asof_utc":"<ISO 8601>",
+    "notes":[]
+  }
+Les valeurs ci-dessus sont UNIQUEMENT une forme contractuelle,
+pas un chiffre de fréquentation réellement observé.
+
+JOURNÉE 23/25 HEURES :
+Le moteur d'agrégation part des intervalles UTC, puis les convertit
+en Europe/Paris ; à l'heure d'hiver deux tranches locales « 02 »
+ont deux décalages différents et doivent rester distinguables.
+Pour les graphiques 24 barres, afficher 02h cumulé avec une note,
+et préserver les 25 intervalles UTC dans un détail. Le total
+journalier doit égaler la somme des tranches réellement couvertes.
+Le jour d'été manquant ne doit pas être artificiellement créé.
+L'API doit signaler tout déficit de collecte.
+
+6. ANTI-ABUS, SÉCURITÉ ET CONFORMITÉ
+- HTTPS obligatoire, origin limité et Content-Type contrôlé ;
+  CORS ne remplace PAS une protection anti-abus.
+- Pas de clé privée embarquée dans la page publique GitHub Pages.
+- Limites de taille, quotas et mécanisme anti-spam appropriés ;
+  l'API publique ne permet pas de garantir à elle seule que toute
+  requête est issue d'un vrai humain.
+- Éviter un identifiant persistant par visiteur ; pas de cookie
+  marketing, ni de fingerprinting, ni de géolocalisation.
+- Faire valider l'information préalable et les obligations
+  RGPD/ePrivacy/CNIL par le responsable de traitement avant
+  mise en production du collecteur.
+- Prévoir la désactivation à distance du traitement et l'absence
+  totale de dépendance fonctionnelle du simulateur.
+- Rotation des secrets et principe du moindre privilège ;
+  ne jamais journaliser les tokens ni la destination Gmail.
+- Aucun traitement analytique des données financières individuelles.
+
+7. ASSEMBLAGE DE L'ACTIVITÉ PROJET
+Créer de préférence tests ou scripts de suivi dans scripts/reporting/ :
+  github-activity.cjs : API GitHub pour l'intervalle journalier
+  testcase-summary.cjs : repérage du dernier run complet du jour,
+                         avec jobs réellement exécutés et verdicts
+  audience-summary.cjs : interrogation API d'agrégats
+  build-digest.cjs : assemblage du rapport TXT/JSON/HTML
+  send-digest.cjs : expédition du mail, journal technique d'envoi.
+
+Sources d'activité et règles :
+- SHA et date du dernier commit sur main.
+- Commits depuis la fin du précédent bulletin, API paginée.
+- Pull requests et runs sur la période si accessibles.
+- Distinguer création de commit, exécution de CI et publication
+  de la plateforme : une page publiée n'est pas « validée métier ».
+- Ne pas confondre des runs réussis de filtrage horaire ayant
+  ignoré la recette et un run réellement exécuté.
+- Extraire les nombres OK/ECART_CONNU/ECHEC depuis l'artefact JSON
+  vérifié, et les états navigateur depuis les jobs GitHub.
+- Les résultats PR-03 restent écart connu tant qu'il n'est pas réglé.
+- Les périodes sont déterminées à partir des limites de journée
+  Paris converties en UTC (l'horaire d'été varie selon la date).
+- En cas d'accès refusé/quota API atteint, indiquer les sections
+  concernées comme indisponibles, pas zéro.
+
+8. ORCHESTRATION GITHUB ACTIONS
+Ne PAS greffer l'envoi directement sur la dernière étape du
+workflow de recette : si la campagne de 05 h Paris est retardée,
+cela peut entraîner zéro email ou un bulletin à horaire aléatoire.
+
+Créer .github/workflows/s3e-email-quotidien.yml avec :
+- workflow_dispatch pour validation et reprises manuelles ;
+- schedule quotidien à un horaire limite de diffusion décidé
+  par le responsable, en Europe/Paris ;
+- mécanisme de double créneau UTC + garde-fou Europe/Paris,
+  basé sur tests/select-paris-slot.cjs généralisé à l'heure
+  de diffusion voulue, avec tests DST ;
+- job Node.js : collecter API, assembler, puis envoyer ;
+- permissions GitHub minimales (contents:read, actions:read),
+  permissions additionnelles seulement si justifiées ;
+- secrets : S3E_AUDIENCE_API_TOKEN, S3E_EMAIL_API_KEY,
+  S3E_REPORT_RECIPIENT, S3E_REPORT_SENDER ;
+- environnement de déploiement contrôlé pour emails réels.
+
+ANTI-DOUBLON D'ENVOI :
+GitHub Actions concurrency diminue les chevauchements mais
+ne constitue PAS une garantie d'envoi unique par date. Maintenir
+une clé d'idempotence persistante YYYY-MM-DD_Europe-Paris dans
+un stockage supportant une opération atomique, et la déclarer
+envoyée uniquement si le fournisseur confirme la prise en charge.
+Conserver la trace d'échec et permettre une relance contrôlée.
+Prendre en compte l'état incertain lorsque l'API de mail a reçu
+la demande mais que l'accusé de réception a été perdu.
+Les rapports d'email eux-mêmes ne doivent pas dévoiler de secret
+ni l'adresse du destinataire dans un artefact public.
+
+9. PRESTATAIRE DE MESSAGERIE / EXPÉDITEUR
+Approche privilégiée : fournisseur email transactionnel avec
+API d'envoi, journal de délivrabilité, domaine d'expédition
+autorisé et authentification SPF/DKIM, sous réserve de sélection.
+Variante possible : compte SMTP autorisé avec mots de passe
+d'application ou mécanisme d'authentification adapté et accepté.
+L'adresse Gmail fournie par le demandeur est DESTINATAIRE,
+pas automatiquement adresse expéditrice.
+Aucun fournisseur, jeton ou domaine n'est présumé disponible.
+« Envoyé par API » n'implique pas « délivré dans la boîte Gmail » :
+contrôler les rejets, quotas et erreurs de livraison.
+Ne pas coder de mot de passe dans les sources, workflows, tests
+ni fichiers de documentation.
+
+10. FENÊTRES, CONSERVATION, HISTORIQUE
+Les artefacts de recette existants restent conservés 30 jours
+glissants : ne pas changer cette règle ni le workflow de calcul
+pour les besoins de l'email.
+Conserver si possible le digest agrégé 30 jours également,
+dans un support privé distinct des rapports de tests.
+L'historique de fréquentation (proposition 90 jours) ne se
+confond pas avec les sauvegardes locales du salarié.
+À chaque bulletin : date Europe/Paris, UTC de génération,
+date du dernier run complet, identifiant mail provider, état
+livraison connu/inconnu et indicateurs de couverture.
+Si aucune campagne n'a eu lieu : envoyer un bilan explicite
+« NON EXÉCUTÉ » avec activité et audience disponibles.
+
+11. TESTS TECHNIQUES ET NON-RÉGRESSION
+Avant toute mise en production :
+- ajouter tests/telemetry.spec.cjs ou équivalent Playwright,
+  en interceptant la requête POST sans collecte extérieure réelle ;
+- confirmer un seul événement après premier bilan réussi ;
+- confirmer zéro émission au seul chargement de page, questionnaire
+  incomplet, affinage, imports et reprise de sauvegarde ;
+- tester panne collecteur, délai d'attente, double-clic, réseau
+  intermittent, compatibilité mobile et absence de régression ;
+- tester un scénario volontairement effectué par le robot :
+  exclusion du comptage des visiteurs réels ;
+- tests unitaires d'agrégation : frontière UTC/Paris, DST
+  23/25 h, somme des compteurs, doublons event_id, refus des
+  champs sensibles, expiration dédoublonnage et limitation débit ;
+- tests des états GitHub : sans run, run skipped, run complet OK,
+  erreurs, ECART_CONNU, informations indisponibles ;
+- tests de génération du mail avec chiffres fictifs, sans
+  destinataire réel ni appel réseau ;
+- test de non-divulgation de secrets et du destinataire dans
+  logs, artefacts et dépôt ;
+- recette d'intégration en environnement séparé, puis autorisation
+  explicite avant première collecte publique ou premier mail réel.
+L'ensemble doit rester compatible avec la CI actuelle : tests
+smoke.cjs, validate-referentiels.cjs, validate-profils.cjs,
+compare-profils.cjs, validate-docs.cjs et Chromium.
+
+12. DÉPLOIEMENT EN LOTS
+LOT T0 — Validation technique et conformité :
+  choisir collecteur, durée de compteurs, émetteur email,
+  horaire butoir, information RGPD et métriques disponibles.
+LOT T1 — Modèle de télémétrie et API d'agrégats :
+  contrat minimal, anti-doublons, protections, tests unitaires ;
+  aucune publication du front tant que serveur non validé.
+LOT T2 — Front GitHub Pages :
+  instrumentation dans first(), émetteur isolé, drapeau
+  d'activation, tests Playwright et vérification anti-robots.
+LOT T3 — Rapport de pilotage :
+  scripts Github activity, résultat test réel, audience
+  quotidienne et détection de non-disponibilité.
+LOT T4 — Email :
+  template, API/SMTP sécurisé, anti-doublon, tests sur mail
+  de recette et validation de réception.
+LOT T5 — Mise en service :
+  activation progressive, surveillance sur plusieurs jours,
+  archivage des bilans et recette de sécurité.
+Pour chaque lot : création préalable d'une évolution TXT datée
+dans docs/evolutions/, tests et trace GitHub, puis bilan figé
+dans docs/suivi/ et indexation dans docs/suivi/index.txt,
+selon la gouvernance du projet.
+
+13. CRITÈRES DE LIVRAISON DU DISPOSITIF COMPLET
+CT-01 : compteurs reflètent les simulations terminées et non
+        les ouvertures de page ni les tests CI.
+CT-02 : aucune donnée du questionnaire envoyée au collecteur.
+CT-03 : distribution horaire Paris = total d'une date, DST compris.
+CT-04 : absence de collecte et zéro usage clairement distingués.
+CT-05 : la rubrique personnes distinctes ne prétend pas mesurer
+        ce qui n'est pas techniquement justifié.
+CT-06 : le courrier distingue activité de code et activité réelle
+        de la plateforme.
+CT-07 : un run GitHub skipped n'est jamais compté comme test passé.
+CT-08 : un seul bulletin par jour civil Paris, avec stratégie
+        de rattrapage et état d'envoi connu.
+CT-09 : un jour de test manquant donne quand même un message
+        explicitement qualifié, si infrastructure d'envoi active.
+CT-10 : secrets et destination absents du dépôt/artefacts publics.
+CT-11 : la recette financière actuelle et son workflow quotidien
+        demeurent fonctionnels après l'intégration.
+CT-12 : les rapports GitHub continuent d'expirer après 30 jours.
+CT-13 : le système d'email se désactive indépendamment des tests
+        et de la simulation.
+
+14. DÉCISIONS OUVERTES (NÉCESSAIRES AVANT CODAGE)
+- Collecteur retenu : Worker + D1 ou autre solution ; validation
+  technique, quotas, région d'hébergement, obligations données.
+- Faut-il renoncer à la métrique « utilisateurs distincts » ou
+  accepter une méthode d'estimation spécifiquement validée ?
+- Durée des agrégats d'audience (proposition : 90 jours).
+- Émetteur du mail, méthode d'authentification, domaine vérifié.
+- Heure limite quotidienne d'envoi (après recette, Paris).
+- Format HTML ou texte ; alertes supplémentaires éventuelles.
+- Stockage atomique de la clé d'anti-doublon et récupération après
+  erreur de transmission.
+- Validation du périmètre de données et des mentions d'information.
+
+15. SITUATION AU MOMENT DE LA RÉDACTION
+Le point de mesure, la base de compteurs, l'API d'agrégats, les
+scripts de rapport et l'envoi quotidien des emails ne sont
+PAS DÉVELOPPÉS, et ne sont PAS ACTIVÉS.
+Seuls le site existant, le dispositif de tests GitHub et son
+workflow quotidien constituent l'existant vérifié.
+Cette spécification technique décrit l'intégration recommandée ;
+elle ne constitue pas la preuve d'une fonctionnalité déployée.
