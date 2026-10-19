@@ -4,8 +4,9 @@
   "private": true,
   "description": "Tests en navigateur du prototype S3E (référentiels fictifs)",
   "scripts": {
-    "test:unit": "node tests/smoke.cjs && node tests/validate-referentiels.cjs && node tests/validate-docs.cjs && node tests/validate-profils.cjs && node tests/compare-profils.cjs",
-    "test:browser": "playwright test"
+    "test:unit": "node tests/smoke.cjs && node tests/validate-referentiels.cjs && node tests/validate-docs.cjs && node tests/validate-profils.cjs && node tests/compare-profils.cjs && npm run test:telemetry",
+    "test:browser": "playwright test",
+    "test:telemetry": "node --test tests/cloudflare-worker.test.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.56.1"
