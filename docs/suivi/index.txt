@@ -27,3 +27,7 @@ Fichier : docs/suivi/2026-10-18_verification_traces_pilote.txt
 
 2026-10-18 | Bascule des tests S3E à 05h Paris, gestion été/hiver et rétention 30 jours ; premier run push 39155987873 réussi. Schedule et purge effective à confirmer.
 Fichier : docs/suivi/2026-10-18_bascule_quotidienne_05h_Paris.txt
+
+2026-10-19 | Première recette quotidienne schedule complète et réussie : 9 OK, 1 écart connu, 0 échec. Le second déclenchement UTC a été ignoré par le garde-fou, conformément au fonctionnement prévu.
+Fichier : docs/suivi/2026-10-19_controle_quotidien.txt
+Run : https://github.com/timetogrowup/simulateur-s3e/actions/runs/39220700988
