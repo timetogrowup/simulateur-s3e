@@ -1,0 +1,14 @@
+# Préparation uniquement : configurer une vraie base D1 avant le déploiement.
+name = "s3e-telemetry"
+main = "src/worker.js"
+compatibility_date = "2026-10-19"
+
+[vars]
+ALLOWED_ORIGIN = "https://timetogrowup.github.io"
+
+# Décommenter et remplacer par l'identifiant RÉEL après création D1.
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "s3e-audience"
+# database_id = "<à renseigner>"
+# SECRET à créer hors dépôt : REPORT_API_TOKEN.
