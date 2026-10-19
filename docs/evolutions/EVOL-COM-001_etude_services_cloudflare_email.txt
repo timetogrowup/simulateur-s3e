@@ -1,0 +1,91 @@
+SIMULATEUR S3E — ÉTUDE TECHNIQUE DES SERVICES EXTERNES
+EVOL-COM-001 — CLOUDFARE WORKERS/D1 ET ENVOI DE COURRIEL
+Version 1.0 — 19 octobre 2026
+Statut : ÉTUDE COMPARATIVE, AUCUN SERVICE CRÉÉ NI ABONNEMENT ACTIVÉ
+Référence : docs/evolutions/EVOL-COM-001_specification_technique_integration.txt
+Source des prix : pages officielles consultées lors de l'étude, susceptibles d'évoluer.
+
+I. CONTEXTE S3E
+Site statique hébergé sur GitHub Pages. Envoi d'un événement anonyme
+à la première simulation chiffrée terminée, sans questionnaire, identité,
+revenu ou résultat financier. Rapport quotidien souhaité à une seule
+adresse personnelle, incluant activité GitHub, tests et utilisation.
+La recette automatique tourne sur GitHub Actions ; artefacts 30 jours.
+Le projet actuel n'utilise aucun collecteur analytique centralisé.
+
+II. CLOUDFARE WORKERS + D1
+Worker = point de collecte HTTPS public et API de lecture protégée.
+D1 = stockage des compteurs horaires et des clés de dédoublonnage de courte durée.
+Tarifs plan gratuit (documentation officielle) :
+- Worker : jusqu'à 100 000 requêtes par jour, limites CPU à vérifier.
+- D1 : 5 millions de lignes lues/jour, 100 000 écrites/jour,
+  5 Go de stockage total.
+Docs : https://developers.cloudflare.com/workers/platform/pricing/
+       https://developers.cloudflare.com/d1/platform/pricing/
+Conserver index.html/GitHub Pages ; ajouté uniquement telemetry.js
+chargé depuis index.html, collecteur Worker côté Cloudflare.
+Heures UTC stockées, converties Europe/Paris dans rapport.
+Date 23/25 heures et idempotence à tester.
+Attention : la collecte du navigateur n'est jamais infalsifiable ;
+CORS n'est pas une sécurité contre les requêtes automatisées.
+Le compte « personnes distinctes » n'est pas fiable sans méthode
+spécifique soumise à une revue RGPD. Ne pas calculer ce KPI pour
+commencer. Réponse à absence de collecte = INDISPONIBLE, pas zéro.
+
+III. FOURNISSEURS D'EMAIL TRANSACTIONNEL
+Resend : plan gratuit 3 000 emails/mois, 100/jour.
+API REST/SDK adaptée à GitHub Actions, domaine expéditeur
+personnalisé à vérifier en DNS.
+https://resend.com/pricing
+Brevo : plan gratuit 300 envois/jour, y compris usage
+transactionnel soumis aux quotas et conditions.
+https://help.brevo.com/hc/en-us/articles/208580669-FAQs-What-are-the-limits-of-the-Free-plan
+Cloudflare Email Service : route email et peut envoyer par
+Workers, REST ou SMTP. Envoi GRATUIT à destination vérifiée
+dans le compte, avec conditions (notamment domaine DNS Cloudflare).
+Envoi vers destinataires arbitraires disponible sur Workers Paid
+(3 000/mois inclus). La fonctionnalité outbound est encore présentée
+en bêta dans la documentation consultée.
+https://developers.cloudflare.com/email-service/
+https://developers.cloudflare.com/email-service/platform/pricing/
+https://developers.cloudflare.com/email-service/platform/limits/
+Le destinataire Gmail seul n'autorise pas à usurper gmail.com
+comme domaine expéditeur ; l'expéditeur est à configurer et valider.
+Une adresse email émettrice sur un domaine détenu/administré
+faciliterait le SMTP/API professionnel et la délivrabilité.
+
+IV. RECOMMANDATION CONDITIONNELLE
+Voie 1, faible coût et séparation claire :
+ Cloudflare Worker + D1 GRATUITS sous quotas,
+ Resend Free pour 1 email/jour (si domaine expéditeur utilisable).
+Voie 2, écosystème Cloudflare unique :
+ Workers/D1 + Cloudflare Email Service pour adresse
+ Gmail vérifiée, après validation de domaine DNS Cloudflare.
+ Aucune conclusion ferme de coût global avant vérification
+ de possession/délégation du domaine.
+La solution Brevo est une alternative, pas la première option
+pour un email journalier unique.
+
+V. SECRETS ET INTÉGRATION
+- Navigateur public : URL Worker uniquement, aucun secret.
+- Worker : binding D1 + token d'accès API de lecture privée.
+- GitHub Actions : token lecture API agrégats, secret d'envoi email,
+  destinataire et expéditeur sous Secrets (pas dans dépôt public).
+- Ensemble : 1 seul bulletin par date civile Paris ; état anti-doublon
+  transactionnel, rattrapage si tests non déclenchés.
+- Tests Playwright exclus des compteurs de fréquentation.
+- Aucun envoi ni collecte active avant validation du responsable.
+
+VI. RISQUES ET QUESTIONS BLOQUANTES
+- Le responsable possède-t-il ou maîtrise-t-il un nom de domaine
+  utilisable pour l'expéditeur ? Dispose-t-il de sa configuration DNS ?
+- Faut-il préférer deux fournisseurs (Cloudflare+Resend) ou un seul
+  (Cloudflare Email Service vers adresse vérifiée) ?
+- Quel horaire butoir d'envoi quotidien après les tests GitHub ?
+- La politique RGPD et les mentions d'information sont-elles validées ?
+- Les prestataires sélectionnés acceptent-ils ce cas d'usage et leurs
+  conditions d'essai/quotas sont-elles encore applicables au déploiement ?
+
+VII. DÉCISION
+Étude seulement. Aucun compte prestataire, secret, service Worker,
+D1 ou système de mail n'a été créé par cette étude.
