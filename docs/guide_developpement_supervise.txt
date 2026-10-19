@@ -1,5 +1,5 @@
 SIMULATEUR S3E — GUIDE TXT DE DÉVELOPPEMENT SUPERVISÉ
-Version 3.3 — 19/10/2026
+Version 3.4 — 19/10/2026
 Statut : guide de projet et journal de recette, non validation métier ni fiscale.
 
 DOCUMENTS MAÎTRES
@@ -218,3 +218,9 @@ Référence technique : docs/evolutions/EVOL-COM-001_specification_technique_int
 EVOL-COM-001 — CHOIX D'ARCHITECTURE CLOUDFARE / RESEND (19/10/2026)
 Le responsable choisit l'option A : Cloudflare Workers + D1 pour l'audience anonyme, Resend pour un bulletin email quotidien, et maintien du site GitHub Pages. Absence de domaine personnel : Resend autorise l'expéditeur de test mutualisé uniquement vers l'adresse du compte en mode test ; faire vérifier les conditions avant de promettre un envoi quotidien de production. Un domaine expéditeur vérifié pourra devenir nécessaire. L'adresse de destination est privée et ne doit pas figurer dans GitHub public.
 Référence de décision : docs/evolutions/EVOL-COM-001_decision_architecture_option_A.txt. Aucun déploiement, secret ou envoi activé à cette étape.
+
+EVOL-COM-001 — LOT T1 : SOCLE DU COLLECTEUR CLOUDFLARE D1 (19/10/2026)
+Cadrage préalable : docs/evolutions/EVOL-COM-001_lot_T1_collecteur_cloudflare.txt.
+Code non déployé : cloudflare/src/worker.js (API POST /v1/events minimale anonyme, GET /v1/summary authentifiée ; dédoublonnage opérationnel D1 transactionnel, UTC et Europe/Paris/DST), cloudflare/migrations/0001_init.sql, cloudflare/wrangler.toml (binding DB non renseigné), cloudflare/README.txt, cloudflare/package.json.
+Tests : tests/cloudflare-worker.test.mjs inclus dans package.json test:telemetry et workflow .github/workflows/s3e-tests.yml. Jeux de tests sur origine autorisée, payload strict sans données métier, UUID et doublons, compteurs, heures Paris 23/25 h, token d'accès, erreurs. Contrôle initial CI run 39236983517, étape Cloudflare SUCCESS ; navigateur également SUCCESS lors de la vérification des étapes. Logs finaux et état complet du workflow à confirmer si nécessaire.
+Limites : D1 simulée pour les tests Node, pas encore de vraie base, Worker non déployé. Aucun événement émis depuis index.html et aucun utilisateur mesuré ; collecteur public contre bots et RGPD à valider avant T2. Identifiants de dédoublonnage purgés via cron Worker prévu après 48 heures ; politique de 90 jours des agrégats à arbitrer. Aucun compte Cloudflare connecté, aucune collecte réelle ni aucun email activé.
