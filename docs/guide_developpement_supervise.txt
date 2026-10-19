@@ -1,5 +1,5 @@
 SIMULATEUR S3E — GUIDE TXT DE DÉVELOPPEMENT SUPERVISÉ
-Version 3.0 — 19/10/2026
+Version 3.1 — 19/10/2026
 Statut : guide de projet et journal de recette, non validation métier ni fiscale.
 
 DOCUMENTS MAÎTRES
@@ -206,3 +206,7 @@ Essai initial du nouveau workflow : run 39155987873 (push de modification du wor
 EVOL-COM-001 — BESOINS D'EMAIL QUOTIDIEN S3E (19/10/2026)
 Expression de besoin : docs/evolutions/EVOL-COM-001_expression_besoin_email_quotidien.txt. Demande d'un email quotidien personnel résumant l'activité GitHub du projet et les résultats détaillés des tests. Un rapport doit couvrir les jours sans commit, la distinction entre campagne réalisée, absente et skipped, le détail 9 OK / 1 ECART_CONNU / 0 ECHEC lorsque confirmé, les changements depuis la veille, les liens et les limites de validation métier. Heures en Europe/Paris, envoi idéalement après la recette, avec seuil de rattrapage à décider. Destinataire privé à renseigner en secret GitHub, jamais dans les documents du dépôt public.
 État : DOCUMENTATION SEULEMENT. Aucun compte émetteur, secret, service SMTP/API, ni programmation d'envoi activés. Étape suivante : décision sur fournisseur d'envoi et heure limite, puis tests d'envoi sécurisés avec validation explicite.
+
+EVOL-COM-001 v1.1 — FRÉQUENTATION DU SIMULATEUR (19/10/2026)
+Le bulletin doit présenter le nombre de simulations terminées, la répartition par heure Europe/Paris, l'heure de pointe, la comparaison avec la veille, et les utilisateurs distincts seulement en tant qu'estimation méthodologiquement justifiée. Une ouverture de page ou un test navigateur automatisé n'est pas une simulation humaine terminée. Aucune donnée individuelle ou réponse financière n'est à collecter. GitHub Pages/localStorage ne suffisent pas pour obtenir des statistiques globales ; choisir d'abord une collecte conforme RGPD. Ni instrumentation ni envoi email activés à ce stade.
+Référence : docs/evolutions/EVOL-COM-001_expression_besoin_email_quotidien.txt v1.1.
