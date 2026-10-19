@@ -1,0 +1,55 @@
+SIMULATEUR S3E — BILAN D'ÉTAPE EVOL-COM-001 / LOT T1
+Date : 19 octobre 2026
+Objet : collecteur anonyme Cloudflare Workers et D1
+Référence technique : docs/evolutions/EVOL-COM-001_lot_T1_collecteur_cloudflare.txt
+État : DÉVELOPPEMENT LOCAL ET CI VALIDÉS / NON DÉPLOYÉ
+
+FONCTIONNALITÉS AJOUTÉES AU DÉPÔT
+- cloudflare/src/worker.js : endpoint de réception « simulation_completed »
+  validé strictement (UUID d'opération, origine autorisée,
+  taille limitée, aucune donnée de questionnaire acceptée).
+- Opération D1 atomique par batch : ajout dédoublonné d'event_id
+  puis incrément du compteur horaire si nouvelle opération ;
+  clés expirables après 48 heures.
+- API d'agrégats authentifiée : date Europe/Paris, 24 tranches
+  locales et détail UTC conservant les heures doublées DST.
+- cloudflare/migrations/0001_init.sql et wrangler.toml :
+  schéma et configuration préparés, database_id à renseigner.
+- tests/cloudflare-worker.test.mjs : simulation locale sans
+  fournisseur et sans appels de collecte réels.
+- package.json / CI : nouveau test:telemetry intégré.
+- cloudflare/README.txt : procédure future de configuration.
+
+RECETTE TECHNIQUE
+GitHub Actions run 39236983517 :
+https://github.com/timetogrowup/simulateur-s3e/actions/runs/39236983517
+État global du run : completed / SUCCESS, SHA de cette campagne :
+777a972fc1eaabdcac32f790651bc68727082091.
+Job « Tests, référentiels et documentation » : SUCCESS,
+dont « Tester le collecteur Cloudflare D1 sans déploiement » SUCCESS.
+Job « Parcours Chromium mobile et bureau » : SUCCESS.
+Essai SQL local séparé sur SQLite : insertion idempotente,
+une opération répétée ne réincrémente pas le compteur.
+Cette vérification SQLite est indicative et non une validation
+sur une vraie instance D1 Cloudflare.
+
+LIMITES, RISQUES ET AUCUNE PRÉTENTION DE MISE EN SERVICE
+- Aucun Worker ni aucune D1 déployée ; pas de compte Cloudflare connecté.
+- GitHub Pages / index.html NON modifié ; aucune collecte effective.
+- Le rapport email Resend n'est pas développé dans ce lot.
+- Anti-spam/rate limit et information préalable RGPD nécessaires
+  avant d'activer un endpoint public ; CORS seul est insuffisant.
+- Pas de mesure des personnes physiques distinctes ; uniquement
+  simulations terminées.
+- Les tables restent basées sur des simulations test, pas des données
+  d'usage. Les coûts réels/quota Cloudflare ne sont pas encore mesurés.
+
+PROCHAINES ÉTAPES
+1. Connecter un compte Cloudflare sous le contrôle du responsable ;
+2. Créer la D1 réelle, renseigner son identifiant, les secrets et
+   appliquer la migration en environnement de recette.
+3. Tester réellement les appels Worker/D1 et le comportement
+   du batch en concurrence ; sécuriser l'anti-abus.
+4. Vérifier les obligations d'information de fréquentation ;
+5. Uniquement ensuite, préparer le lot T2 (instrumentation front).
+6. Resend traité séparément, pas d'envoi automatique activé.
