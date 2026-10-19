@@ -1,0 +1,74 @@
+SIMULATEUR S3E — EVOL-COM-001 — LOT T1 COLLECTEUR CLOUDFARE
+Version 1.0 — 19 octobre 2026
+STATUT : SPÉCIFICATION AVANT CODAGE
+Choix : Cloudflare Worker + D1 ; Cloudflare non encore connecté.
+Source : docs/evolutions/EVOL-COM-001_specification_technique_integration.txt
+
+PÉRIMÈTRE
+Créer sous cloudflare/ un Worker JavaScript de collecte de
+« simulation_completed » uniquement, et une migration SQL D1.
+Tester le Worker localement avec mock D1, sans compte Cloudflare ni
+collecte réelle, ainsi que les requêtes, dedup, agrégats et sécurité.
+Ne PAS modifier index.html, ne PAS publier de Worker, ne PAS envoyer
+d'email. Le site public S3E reste identique dans ce lot.
+
+API
+POST /v1/events : JSON strict schema=1, event=simulation_completed,
+event_id UUID v4, client_time_utc ISO UTC optionnel, app_version texte
+alphanumérique court optionnel. Rejeter champs supplémentaires :
+aucune réponse, revenu, résultat ou identifiant salarié ne doit
+jamais être transmis. UTC serveur comme date de référence.
+Validation Content-Type application/json, longueur corps limitée,
+méthode OPTIONS/CORS depuis origine publique déclarée.
+Rejeter origine non autorisée ; rate-limit côté fournisseur à
+prévoir avant mise en production (CORS insuffisant contre bots).
+POST idempotent : transaction D1 avec INSERT OR IGNORE dans une
+table de dédoublonnage, incrément du compteur SI insertion nouvelle ;
+éviter double compte sous concurrence. Les IDs n'identifient qu'une
+opération, sans persistance de profil visiteur.
+Réponses 202 si nouveau, 200 si doublon, 400/403/405/413/415 si
+entrée invalide. La page web ne dépendra pas de la réponse.
+
+GET /v1/summary?date=YYYY-MM-DD&tz=Europe%2FParis :
+Bearer token SECRET serveur, jamais dans le navigateur.
+Calcul de la fenêtre Paris -> UTC avec Intl dans le Worker,
+y compris DST 23/25 heures, retourner le total, 24 tranches
+locales et tranches UTC distinctes détaillées.
+Ne pas renvoyer d'éléments de questionnaire.
+
+STOCKAGE
+D1 tables : hourly_counts(hour_start_utc PK, completed_count),
+event_dedupe(event_id PK, inserted_at_utc).
+SQL de transactionnement atomique via batch D1 : approche
+INSERT OR IGNORE + modification conditionnelle basée sur SQLite
+changes()/détermination du premier insert ; tester les doubles.
+La purge des IDs après 48 heures doit être prévue, soit lors
+des requêtes POST avec cadence bornée, soit via job cron
+indépendant. Compteurs 90 jours envisagés : nettoyage soumis
+à une décision spécifique, ne pas purger par défaut.
+
+SÉCURITÉ ET EXPLOITATION
+Aucun secret en dépôt ; env D1 binding DB et secret REPORT_API_TOKEN.
+Appels localhost et Cloudflare dev sans émission réelle.
+Compte Cloudflare et binding D1 à configurer ultérieurement ;
+fournir README et exemple wrangler sans identifiant inventé.
+Nombre de personnes uniques non mesurable ; seul nombre de
+simulations terminées et histogramme sont dans ce lot.
+Pas de journalisation des IP, identifiants ni des corps POST.
+Prévoir headers Cache-Control:no-store, JSON erreurs sans fuite
+de SQL ni de secret.
+
+RECETTE
+Node:test et mocks : validation stricte, origine, secret,
+dédoublonnage, scénario 10 événements dans une heure,
+période Paris hiver et été, journées DST, absence de base,
+aucun champ sensible, anonymat du modèle.
+Intégrer ces tests à la CI existante.
+Bilan daté dans docs/suivi/, indexé après vérification CI.
+
+RISQUES À SURVEILLER
+Le Worker public peut être abusé par bots : quotas/Turnstile/rate
+limit à définir avant activation du site réel, sans créer de
+fingerprint visiteur. Le calcul exact « personnes distinctes »
+ne peut être promis sans méthode nouvelle conforme RGPD.
+Le choix SQL doit être testé contre les contraintes Cloudflare D1.
