@@ -1,0 +1,168 @@
+SIMULATEUR S3E — EXPRESSION DE BESOIN
+EVOL-COM-001 — EMAIL QUOTIDIEN DE SUIVI D'ACTIVITÉ ET DE RECETTE
+Version 1.0 — 19 octobre 2026
+Statut : BESOIN À VALIDER — DOCUMENTATION UNIQUEMENT, AUCUN ENVOI ACTIVÉ
+Projet : https://github.com/timetogrowup/simulateur-s3e
+Documents associés :
+- docs/evolutions/EVOL-TEST-004_frequence_horodatage.txt
+- docs/evolutions/EVOL-TEST-004_lot_B_quotidien_05h_Paris.txt
+- docs/gouvernance_projet_chatgpt_github.txt
+
+1. CONTEXTE ET FINALITÉ
+Le simulateur S3E est développé et testé dans GitHub. Une recette
+automatique est programmée quotidiennement à 05 h, heure Europe/Paris,
+mais GitHub peut déclencher la campagne avec retard ou l'omettre.
+Le responsable du projet souhaite recevoir automatiquement un email
+journalier qui permet, sans ouvrir GitHub, de savoir :
+- ce qui a changé dans le projet depuis le précédent bulletin ;
+- le niveau d'activité de développement, de documentation et de tests ;
+- si une véritable campagne de tests s'est exécutée ;
+- son résultat, les anomalies nouvelles, les écarts connus et les
+  actions prioritaires éventuelles.
+
+2. DESTINATAIRE ET CONFIDENTIALITÉ
+Destinataire : adresse Gmail personnelle fournie par le responsable
+du projet, à configurer dans une variable/secrète non publiée
+(exemple de nom : S3E_REPORT_RECIPIENT).
+Ne PAS inscrire l'adresse réelle dans ce dépôt public ni dans les logs
+ou fichiers de synthèse publiés. Elle sera communiquée uniquement
+lors de la configuration sécurisée du service d'envoi.
+Un seul destinataire initial ; toute extension de diffusion nécessite
+une nouvelle décision explicite.
+
+3. CADENCE, FUSEAU ET DÉCLENCHEMENT
+EM-01 : un bulletin PAR JOUR CIVIL, selon le fuseau Europe/Paris.
+EM-02 : envoyer de préférence APRÈS la campagne complète quotidienne,
+et après l'enregistrement des résultats ; si les tests sont retardés,
+le bulletin doit l'indiquer clairement et ne pas présenter un état
+ancien comme le résultat du jour.
+EM-03 : prévoir un délai maximal d'attente paramétrable ; à son
+expiration, émettre un bulletin « test du jour non encore exécuté »
+plutôt que rester silencieux. L'heure limite doit être décidée.
+EM-04 : l'heure exacte du courriel est moins importante que son
+caractère quotidien et la fiabilité des informations.
+EM-05 : éviter deux courriels pour une même date civile Paris,
+même en cas de réexécution du workflow ou de double créneau UTC.
+EM-06 : permettre une émission manuelle de validation sans perturber
+l'envoi du bulletin normal.
+
+4. NIVEAU D'ACTIVITÉ DU PROJET
+Le message comprendra, sur la fenêtre depuis le dernier bulletin :
+- nombre de commits nouveaux sur main, date et SHA du dernier ;
+- liste synthétique des changements significatifs (code, tests,
+  documentation, workflow), sans reproduire des secrets ;
+- nombre de PR ouvertes, fusionnées et fermées, si l'information
+  est disponible et utile ;
+- nombre d'exécutions CI et leurs verdicts, en distinguant les
+  événements push, pull_request, workflow_dispatch et schedule ;
+- état du déploiement GitHub Pages s'il est vérifié, sinon
+  « non vérifié » ;
+- incidents, blocages et principales actions restant à mener ;
+- mention explicite « aucune modification aujourd'hui » si tel
+  est le cas, sans assimiler absence de commit à absence d'activité.
+Le « niveau d'activité » sera affiché d'abord par des indicateurs
+factuels (nombre de commits, PR, runs) ; une catégorie synthétique
+Faible / Modérée / Élevée ne sera ajoutée qu'avec des seuils
+documentés et validés, pour ne pas inventer une performance.
+
+5. BILAN DES TESTS DU JOUR
+Le bulletin contiendra :
+- date de référence Paris et date/heure effective de chaque campagne ;
+- indication « campagne exécutée », « non exécutée », « en cours »,
+  « annulée », « échouée » ou « dernier résultat disponible » ;
+- identifiant et lien du run GitHub de la recette COMPLÈTE du jour ;
+- verdict de la suite de contrôles : calculs, référentiels fictifs,
+  profils, navigateur mobile et bureau, publication si testée ;
+- nombres des profils OK / ECART_CONNU / ECHEC / non testés ;
+- anomalies nouvelles et écarts connus, avec priorité et évolution
+  depuis la veille ; ne pas masquer PR-03 (borne partiellement aidée)
+  tant que le point métier demeure ouvert ;
+- comparaison factuelle à J-1 (nouveau, persistant, résolu) ;
+- lien vers le rapport horodaté archivé et vers les logs ;
+- limites : données de référence S3E fictives, pas de validation
+  fiscale ni de recette utilisateur réelle.
+Ne jamais présenter un workflow vert dont les jobs métier sont
+« skipped » comme une campagne métier exécutée et conforme.
+
+6. PRÉSENTATION DU COURRIEL
+Objet conseillé :
+[S3E] Suivi quotidien — AAAA-MM-JJ — OK / Alerte / Non exécuté
+Ordre conseillé :
+1) Synthèse lisible en moins d'une minute ;
+2) Activité du projet depuis le dernier message ;
+3) Bilan détaillé des tests et comparaison avec J-1 ;
+4) Anomalies / actions recommandées ;
+5) Liens vers GitHub et référence du rapport.
+Contenu texte brut UTF-8 obligatoire ; HTML sobre facultatif.
+Les horodatages utilisateurs sont affichés en Europe/Paris.
+Un email reste utile même les journées sans commit et sans erreur.
+
+7. RÈGLES DE FIABILITÉ
+- Source de vérité : GitHub (commits, jobs, artefacts, PR).
+- Vérifier les jobs et étapes réellement exécutés, pas seulement
+  le verdict global d'un workflow.
+- Reporter les chiffres réellement disponibles ; indiquer
+  « inconnu » / « non vérifié » en cas de données manquantes.
+- Distinguer incident du simulateur, échec de test, retard GitHub,
+  absence de campagne et échec d'envoi du mail.
+- Chaque bulletin possède une clé YYYY-MM-DD_Europe-Paris et un
+  identifiant d'envoi pour empêcher les doublons.
+- En cas de panne d'accès GitHub, envoyer une notification limitée
+  « données indisponibles », sans inventer de bilan.
+- Les messages ne doivent contenir ni noms de salariés, ni résultats
+  individuels réels, ni identifiants, jetons ou données confidentielles.
+
+8. MÉCANISME TECHNIQUE À ÉTUDIER
+Architecture privilégiée : GitHub Actions extrait les données du
+dépôt et des workflows, construit un rapport quotidien TXT/HTML,
+puis le transmet via un fournisseur d'email authentifié.
+Alternatives : service de messagerie SMTP/API transactionnelle ou
+automatisation indépendante de GitHub.
+Définir avec le responsable :
+- émetteur autorisé et fournisseur de messagerie ;
+- secrets/jetons et mode d'authentification ;
+- heure limite de diffusion si la recette tarde ;
+- canal de notification si l'envoi échoue ;
+- endroit où enregistrer les empreintes d'envoi pour anti-doublon ;
+- quota/volumétrie et politique de conservation des emails.
+L'adresse de destination et les identifiants SMTP/API ne doivent
+pas être committés dans le dépôt public.
+Une connexion à Gmail autorisée pour lire un compte ne doit pas
+être supposée suffisante pour permettre l'envoi automatisé
+depuis un workflow : cette capacité doit être configurée et testée.
+
+9. CRITÈRES DE RECETTE
+CA-01 : une simulation sur une journée active et une journée sans
+        commit donne les bons indicateurs.
+CA-02 : une campagne complète réussie présente OK, écarts connus
+        et lien de rapport corrects.
+CA-03 : un job métier skipped n'est jamais présenté comme conforme.
+CA-04 : un échec de recette et une absence de lancement sont
+        différenciés, avec un état explicite.
+CA-05 : test du changement d'heure Paris et de l'anti-doublon.
+CA-06 : envoi d'un email de test au destinataire réel uniquement
+        après configuration et validation de l'émetteur.
+CA-07 : aucune adresse réelle ni secret ne se trouve dans le dépôt
+        public ou dans un artefact librement consultable.
+CA-08 : possibilité de suspendre l'envoi sans suspendre les tests.
+CA-09 : traçabilité du rapport généré et du succès/échec d'envoi,
+        sans publier le contenu privé ou l'adresse.
+
+10. PÉRIMÈTRE HORS LOT
+Ne modifie ni le moteur financier ni les référentiels ; ne corrige
+pas automatiquement PR-03 ; n'assure pas une heure exacte de départ
+des tests ; ne crée pas un système de communication syndicale
+destiné aux salariés.
+
+11. DÉCISIONS À PRENDRE AVANT CODAGE
+- Service d'envoi, adresse d'expédition et autorisations ;
+- délai maximal avant l'envoi d'un mail signalant une recette absente ;
+- activation des messages « alerte » supplémentaires hors bulletin
+  quotidien ou maintien d'un email/jour strict ;
+- format détaillé (texte seul ou HTML avec tableaux).
+L'utilisateur a défini le destinataire dans la conversation,
+mais l'adresse est volontairement absente du document public.
+
+12. ÉTAT
+BESOIN RÉDIGÉ, AUCUN EMAIL PROGRAMMÉ OU EXPÉDIÉ.
+Nécessite validation fonctionnelle puis configuration sécurisée.
