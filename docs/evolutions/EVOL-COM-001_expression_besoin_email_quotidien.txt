@@ -1,6 +1,6 @@
 SIMULATEUR S3E — EXPRESSION DE BESOIN
 EVOL-COM-001 — EMAIL QUOTIDIEN DE SUIVI D'ACTIVITÉ ET DE RECETTE
-Version 1.0 — 19 octobre 2026
+Version 1.1 — 19 octobre 2026
 Statut : BESOIN À VALIDER — DOCUMENTATION UNIQUEMENT, AUCUN ENVOI ACTIVÉ
 Projet : https://github.com/timetogrowup/simulateur-s3e
 Documents associés :
@@ -90,9 +90,10 @@ Objet conseillé :
 Ordre conseillé :
 1) Synthèse lisible en moins d'une minute ;
 2) Activité du projet depuis le dernier message ;
-3) Bilan détaillé des tests et comparaison avec J-1 ;
-4) Anomalies / actions recommandées ;
-5) Liens vers GitHub et référence du rapport.
+3) Fréquentation et répartition horaire des simulations ;
+4) Bilan détaillé des tests et comparaison avec J-1 ;
+5) Anomalies / actions recommandées ;
+6) Liens vers GitHub et référence du rapport.
 Contenu texte brut UTF-8 obligatoire ; HTML sobre facultatif.
 Les horodatages utilisateurs sont affichés en Europe/Paris.
 Un email reste utile même les journées sans commit et sans erreur.
@@ -166,3 +167,110 @@ mais l'adresse est volontairement absente du document public.
 12. ÉTAT
 BESOIN RÉDIGÉ, AUCUN EMAIL PROGRAMMÉ OU EXPÉDIÉ.
 Nécessite validation fonctionnelle puis configuration sécurisée.
+
+13. NOUVEAU BESOIN — FRÉQUENTATION DE LA PLATEFORME (19/10/2026)
+Décision : ajouter au bulletin quotidien le nombre de personnes ayant
+utilisé le simulateur ainsi que la distribution des utilisations
+pendant la journée.
+
+13.1 DÉFINITION DES INDICATEURS
+FR-01 : nombre total de simulations TERMINÉES dans la journée.
+        Définition de « terminée » : affichage d'un premier bilan
+        chiffré à l'issue du parcours ; les recalculs d'affinage
+        ne doivent pas être comptés comme une nouvelle simulation.
+FR-02 : nombre de visiteurs distincts estimés ayant produit au moins
+        une simulation, uniquement SI un mécanisme respectueux de
+        la vie privée permet cette estimation.
+        Une personne peut utiliser plusieurs appareils ou navigateurs,
+        ou refuser la mesure ; il est donc trompeur d'appeler ce nombre
+        « personnes uniques certaines ». L'indicateur sera libellé
+        « utilisateurs distincts estimés » avec la méthode et la
+        couverture indiquées. Sans mesure fiable, afficher
+        « non mesurable » plutôt qu'inventer un nombre.
+FR-03 : nombre d'événements de démarrage du parcours, pour distinguer
+        les parcours initiés des simulations achevées, si disponible.
+FR-04 : répartition horaire des simulations terminées en 24 tranches
+        de 00 h–01 h à 23 h–24 h, heure Europe/Paris, sous forme de
+        tableau et de petit histogramme dans l'email HTML éventuel.
+FR-05 : total sur la journée et comparaison avec J-1 ; évolution
+        J-7 optionnelle lorsque les données historiques existent.
+FR-06 : signaler distinctement les jours sans utilisation (zéro
+        effectivement mesuré) et les jours sans mesure fiable.
+FR-07 : si possible, proportion parcours commencés/terminés.
+
+13.2 PÉRIMÈTRE, FILTRAGE ET HORODATAGE
+- Un événement fonctionnel doit être émis lors de la validation
+  réelle de la première simulation, PAS simplement à l'ouverture
+  de la page ni à chaque modification des hypothèses.
+- Agréger par date civile et par heure Europe/Paris, en tenant
+  compte des journées de 23 ou 25 heures au changement d'heure.
+  Conserver un timestamp UTC d'origine pour lever les ambiguïtés.
+- Ne pas compter les campagnes automatisées GitHub, les parcours
+  Playwright ou les essais de développement comme des utilisations
+  réelles ; un marqueur de mode test et des contrôles anti-doublons
+  devront être définis et vérifiés.
+- Si le site reste hébergé sur GitHub Pages en HTML/JavaScript,
+  il faudra un dispositif de collecte externe ou un service de
+  mesure d'audience compatible : les valeurs localStorage propres
+  au navigateur ne permettent pas de construire seules des
+  statistiques globales pour l'ensemble des visiteurs.
+- En l'absence d'une telle instrumentation, aucune statistique
+  historique de fréquentation ne peut être reconstituée fiablement
+  à partir du code et des rapports de tests actuels.
+
+13.3 ANONYMAT, PROTECTION DES DONNÉES ET TRANSPARENCE
+- Ne jamais transmettre les réponses individuelles du questionnaire,
+  les revenus, les choix de véhicule, les résultats financiers, les
+  identités ni les adresses email des visiteurs aux outils d'audience.
+- Privilégier des compteurs agrégés sans identifiant persistant et
+  sans cookie lorsque cela satisfait le besoin : ils permettent de
+  mesurer les simulations, mais pas nécessairement les personnes
+  uniques.
+- Toute méthode de dédoublonnage des visiteurs est à évaluer
+  séparément (nécessité, information, consentement éventuel, durée
+  de conservation, base légale et conformité RGPD/ePrivacy/CNIL).
+- Le bulletin est adressé au responsable du projet uniquement ;
+  il contient des statistiques globales, jamais des données
+  personnelles de visiteurs.
+- Les secrets/API de collecte, s'il en existe, restent hors du
+  dépôt public. Vérifier les quotas et les conditions du fournisseur.
+
+13.4 FORMAT ATTENDU DANS L'EMAIL
+« UTILISATION DE LA PLATEFORME — [date Paris] »
+  Simulations terminées : N
+  Utilisateurs distincts estimés : N ou « non mesurable »
+  Parcours commencés : N ou « non disponible »
+  Variation par rapport à la veille : N / % ou « non disponible »
+  Répartition horaire (heure de Paris) :
+     00–01 h : n0  | ... | 23–24 h : n23
+  Heure de pointe : tranche la plus active ou « aucune »
+  Fiabilité : période couverte, méthode de mesure, éventuel manque.
+Les tests automatiques sont affichés dans une AUTRE rubrique :
+leur activité ne doit jamais gonfler la fréquentation réelle.
+
+13.5 CRITÈRES D'ACCEPTATION
+CA-10 : une simulation achevée produit un seul comptage ;
+        affinages et rechargements sans nouvelle simulation ne
+        créent pas de doublons.
+CA-11 : les robots Playwright et les campagnes GitHub n'augmentent
+        pas les compteurs de visiteurs humains.
+CA-12 : la somme des simulations des 24 tranches correspond au
+        total journalier, sauf particularité d'heure d'hiver
+        explicitement distinguée et expliquée.
+CA-13 : absence de données et fréquentation nulle sont distinguées.
+CA-14 : aucune réponse du questionnaire ni information nominative
+        de visiteur ne quitte le navigateur.
+CA-15 : la qualification de « visiteurs distincts estimés » est
+        rigoureuse et ne présente pas une estimation comme un
+        dénombrement certain de personnes.
+
+13.6 ÉTAT DE MISE EN ŒUVRE
+EXPRESSION DE BESOIN SEULEMENT. Aucun outil d'audience ni collecte
+n'a été installé dans le site à cette étape. Les premiers chiffres
+ne seront disponibles qu'après mise en place d'une mesure testée.
+Choisir le fournisseur de mesure et la méthode de comptage avant code.
+
+HISTORIQUE
+- v1.1 — 19/10/2026 : ajout des statistiques de fréquentation,
+  simulations terminées, utilisateurs estimés et histogramme horaire
+  au bulletin quotidien, avec protection de l'anonymat.
