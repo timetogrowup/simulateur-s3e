@@ -1,5 +1,5 @@
 SIMULATEUR S3E — GUIDE TXT DE DÉVELOPPEMENT SUPERVISÉ
-Version 3.4 — 19/10/2026
+Version 3.5 — 19/10/2026
 Statut : guide de projet et journal de recette, non validation métier ni fiscale.
 
 DOCUMENTS MAÎTRES
@@ -224,3 +224,6 @@ Cadrage préalable : docs/evolutions/EVOL-COM-001_lot_T1_collecteur_cloudflare.t
 Code non déployé : cloudflare/src/worker.js (API POST /v1/events minimale anonyme, GET /v1/summary authentifiée ; dédoublonnage opérationnel D1 transactionnel, UTC et Europe/Paris/DST), cloudflare/migrations/0001_init.sql, cloudflare/wrangler.toml (binding DB non renseigné), cloudflare/README.txt, cloudflare/package.json.
 Tests : tests/cloudflare-worker.test.mjs inclus dans package.json test:telemetry et workflow .github/workflows/s3e-tests.yml. Jeux de tests sur origine autorisée, payload strict sans données métier, UUID et doublons, compteurs, heures Paris 23/25 h, token d'accès, erreurs. Contrôle initial CI run 39236983517, étape Cloudflare SUCCESS ; navigateur également SUCCESS lors de la vérification des étapes. Logs finaux et état complet du workflow à confirmer si nécessaire.
 Limites : D1 simulée pour les tests Node, pas encore de vraie base, Worker non déployé. Aucun événement émis depuis index.html et aucun utilisateur mesuré ; collecteur public contre bots et RGPD à valider avant T2. Identifiants de dédoublonnage purgés via cron Worker prévu après 48 heures ; politique de 90 jours des agrégats à arbitrer. Aucun compte Cloudflare connecté, aucune collecte réelle ni aucun email activé.
+
+EVOL-COM-001 — LIAISON À LA BASE D1 RÉELLE (19/10/2026)
+Le responsable a transmis l'UUID de la base D1 : 97326bbb-a267-4339-9b36-a72b887f300f. Les captures Cloudflare attestent de la présence des tables hourly_counts et event_dedupe. Le binding [[d1_databases]] DB vers s3e-audience a été activé dans cloudflare/wrangler.toml (identifiant public de ressource, non secret). Évolution cadrée dans docs/evolutions/EVOL-COM-001_lot_T1_liaison_D1_reelle.txt. Restent à confirmer : nom réel de la D1, secret REPORT_API_TOKEN, premier déploiement Worker et test réel des requêtes. Aucune collecte visiteurs ni envoi d'email activés par cette modification.
