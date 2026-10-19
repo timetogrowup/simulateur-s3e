@@ -1,5 +1,5 @@
 SIMULATEUR S3E — GUIDE TXT DE DÉVELOPPEMENT SUPERVISÉ
-Version 2.9 — 18/10/2026
+Version 3.0 — 19/10/2026
 Statut : guide de projet et journal de recette, non validation métier ni fiscale.
 
 DOCUMENTS MAÎTRES
@@ -202,3 +202,7 @@ Spécification avant code : docs/evolutions/EVOL-TEST-004_lot_B_quotidien_05h_Pa
 Workflow .github/workflows/s3e-pilote.yml renommé logiquement « S3E - Recette quotidienne 05h Paris ». Ancien cron pilote 10 minutes remplacé par 0 3 * * * et 0 4 * * * en UTC ; job calendrier choisit uniquement la correspondance à 05:00 Europe/Paris via tests/select-paris-slot.cjs. Tests de dates été/hiver : tests/test-paris-slot.cjs.
 Métadonnées rapports : tests/archive-campaign.cjs avec phase quotidien, horodatage UTC et Paris ; archive recette-quotidienne-RUNID-ATTEMPT par campagne (rétention 30 jours), purge ciblée >30 jours après archivage actuel confirmé via tests/rotate-daily-artifacts.cjs. Les anciennes archives « recette-pilote » sont hors de la rotation quotidienne et restent indépendantes.
 Essai initial du nouveau workflow : run 39155987873 (push de modification du workflow), test de calendrier et calculs déjà passés lors du premier contrôle ; conclusion du run complet à confirmer. Les prochains schedule prouveront la cadence réelle uniquement après observation ; GitHub peut retarder/omettre ses jobs.
+
+EVOL-COM-001 — BESOINS D'EMAIL QUOTIDIEN S3E (19/10/2026)
+Expression de besoin : docs/evolutions/EVOL-COM-001_expression_besoin_email_quotidien.txt. Demande d'un email quotidien personnel résumant l'activité GitHub du projet et les résultats détaillés des tests. Un rapport doit couvrir les jours sans commit, la distinction entre campagne réalisée, absente et skipped, le détail 9 OK / 1 ECART_CONNU / 0 ECHEC lorsque confirmé, les changements depuis la veille, les liens et les limites de validation métier. Heures en Europe/Paris, envoi idéalement après la recette, avec seuil de rattrapage à décider. Destinataire privé à renseigner en secret GitHub, jamais dans les documents du dépôt public.
+État : DOCUMENTATION SEULEMENT. Aucun compte émetteur, secret, service SMTP/API, ni programmation d'envoi activés. Étape suivante : décision sur fournisseur d'envoi et heure limite, puis tests d'envoi sécurisés avec validation explicite.
