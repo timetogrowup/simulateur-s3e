@@ -1,0 +1,36 @@
+SIMULATEUR S3E — BILAN DU CONTRÔLE QUOTIDIEN DU 19 OCTOBRE 2026
+Date de revue : 19/10/2026
+État : CONTRÔLE QUOTIDIEN EXÉCUTÉ AVEC SUCCÈS
+
+SOURCE D'OBSERVATION : GitHub Actions, workflow
+« S3E - Recette quotidienne 05h Paris ».
+
+RUN PLANIFIÉ COMPLET
+ID : 39220700988 ; événement schedule.
+Début : 2026-10-19T08:08:55Z = 10:08:55 heure de Paris (CEST).
+Conclusion GitHub : success.
+Job « Sélectionner 05h Europe/Paris » : success.
+Job « Calculs et Chromium — quotidien » : success.
+Log : « Résultats : OK=9, ECART_CONNU=1, ECHEC=0 ».
+PR-03 (installation de recharge) : ECART_CONNU non corrigé.
+Tests calendrier : 8 cas + manuel OK.
+Installation, tests navigateur, archivage et rotation : success.
+Artefact : recette-quotidienne-39220700988-1 (conservé).
+Rotation des archives quotidiennes : 0 supprimée, 2 présentes.
+
+DEUXIÈME LANCEMENT, SANS RECETTE
+ID : 39229362443 ; événement schedule.
+Début : 2026-10-19T09:20:47Z = 11:20:47 heure de Paris.
+Job calendrier : success.
+Job « Calculs et Chromium — quotidien » : skipped.
+Aucun artefact de recette produit, comportement prévu de la sélection
+entre deux créneaux UTC pour tenir compte du changement heure été/hiver.
+
+SYNTHÈSE
+Une et une seule campagne COMPLÈTE a eu lieu le 19 octobre.
+Le planificateur GitHub a déclenché après 05h Paris ; retard accepté
+par le responsable projet, la ponctualité n'étant pas un enjeu.
+La surveillance quotidienne et le dépôt de rapport sont opérationnels
+sur ce premier jour. Cette constatation ne garantit pas les journées
+futures ; elles nécessitent un contrôle des runs ultérieurs.
+Les tests financiers s'appuient encore sur des référentiels fictifs.
