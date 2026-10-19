@@ -1,0 +1,40 @@
+SIMULATEUR S3E — EVOL-COM-001 / LOT T1 : LIAISON D1 RÉELLE
+Version 1.0 — 19 octobre 2026
+ÉTAT : évolution de configuration avant tout déploiement
+Références : docs/evolutions/EVOL-COM-001_lot_T1_collecteur_cloudflare.txt
+             cloudflare/wrangler.toml
+
+BESOIN / SOURCE
+Le propriétaire du compte Cloudflare a communiqué l'UUID de la base D1
+existante : 97326bbb-a267-4339-9b36-a72b887f300f.
+Le schéma des tables hourly_counts et event_dedupe a été créé dans
+la console Cloudflare puis confirmé par capture d'écran.
+L'UUID D1 est un identifiant de ressource et non une clé API.
+
+MODIFICATION PRÉVUE
+Configurer dans cloudflare/wrangler.toml le binding D1 :
+[[d1_databases]]
+binding = "DB"
+database_name = "s3e-audience"
+database_id = "97326bbb-a267-4339-9b36-a72b887f300f"
+
+Le nom de la base doit être vérifié dans Cloudflare si l'interface
+affiche un autre nom ; ne pas créer une seconde base inutile.
+Ne PAS écrire de secret dans Git ou de jeton dans la conversation.
+Ne PAS modifier le front de production GitHub Pages.
+
+PRÉREQUIS AVANT DÉPLOIEMENT DU WORKER
+1. Vérifier que l'UUID correspond au bon compte et au nom D1 voulu.
+2. Configurer REPORT_API_TOKEN comme secret Cloudflare Worker
+   via l'interface ou Wrangler, sans partage public.
+3. Garder ALLOWED_ORIGIN correspondant au site GitHub Pages actuel.
+4. Contrôler que la migration des tables est bien présente
+   (déjà créée manuellement selon les captures).
+5. Valider et tester un déploiement contrôlé et les protections
+   anti-abus avant toute collecte depuis l'application réelle.
+6. Ne pas activer la télémétrie du navigateur avant décision distincte.
+
+RECETTE
+Confirmer configuration wrangler enregistrée dans Git.
+CI habituelle : tests Worker locaux et navigateur toujours réussis.
+La validation D1 en environnement Cloudflare réel reste à venir.
