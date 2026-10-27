@@ -38,6 +38,33 @@
 @media(max-width:700px){.s3e-gallery .s3e-thumbs img{height:56px}.s3e-modal{width:97vw;max-width:97vw}.s3e-modal-photo{height:60vh}}
 @media print{.s3e-controls,.s3e-thumbs,.s3e-modal{display:none!important}}
 
+
+/* V6 — simulateur progressif S3E, composant autonome dans la page */
+.v6-shell{background:#fff;border:1px solid var(--line);padding:22px;border-radius:17px;box-shadow:0 4px 18px #16374612}
+.v6-shell h3{margin:8px 0 12px;min-height:0}
+.v6-progress{height:9px;background:#dfeef0;border-radius:12px;overflow:hidden;margin:12px 0 22px}
+.v6-progress > div{height:100%;background:var(--teal);transition:width .2s}
+.v6-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(225px,1fr));gap:10px;margin:20px 0}
+.v6-options label{display:flex;align-items:center;gap:10px;border:1px solid #cbdfe4;border-radius:12px;padding:13px 16px;cursor:pointer}
+.v6-options label:has(input:checked){border-color:#087d78;background:#e7f7f3}
+.v6-options input{accent-color:#087d78;width:18px;height:18px}
+.v6-fields label{display:block;font-weight:700}
+.v6-fields input{display:block;width:min(100%,390px);border:1px solid #9ebdc6;padding:11px 13px;border-radius:9px;font:inherit;margin-top:8px}
+.v6-buttons{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.v6-buttons button{background:var(--navy);border:0;color:#fff;cursor:pointer;padding:11px 17px;border-radius:10px;font-weight:750}
+.v6-buttons button.secondary{background:#e7f0f2;color:var(--ink)}
+.v6-buttons button:disabled{opacity:.4;cursor:not-allowed}
+.v6-preset{background:#eaf6f4;padding:13px 17px;border-radius:10px;margin:12px 0 18px;line-height:1.55}
+.v6-results{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.v6-result{padding:18px;border:1px solid var(--line);border-radius:12px;background:#f7fafb}
+.v6-result strong{display:block;color:#0d6074;font-size:24px;line-height:1.3}
+.v6-result small{display:block}
+.v6-delta{font-size:14px;font-weight:700;margin-top:10px}
+.v6-alert{color:#904e1b;background:#fff7e9;border:1px solid #f0dab7;padding:13px 17px;border-radius:11px;margin:12px 0}
+.v6-muted{font-size:13px;color:var(--muted)}
+.v6-breakdown{overflow-x:auto;margin:18px 0}
+.v6-breakdown table{min-width:650px;width:100%}
+@media(max-width:720px){.v6-results{grid-template-columns:1fr}.v6-shell{padding:15px}.v6-options{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -58,7 +85,7 @@
 <section class="wrap" id="remuneration"><div class="section-head"><div class="eyebrow">05 / Comprendre sa fiche de paie</div><h2>Une voiture de fonction n'est pas neutre financièrement</h2><p class="intro">L'effet sur le salaire ne dépend pas seulement du modèle retenu. Il faut distinguer contribution éventuelle du salarié, avantage en nature, charges et fiscalité personnelle.</p></div><div class="two"><div class="card"><h3>Quatre notions à dissocier</h3><div class="spec"><span>Catégorie et grille</span><strong>Conditions d'accès</strong></div><div class="spec"><span>Quote-part éventuelle</span><strong>Impact financier direct</strong></div><div class="spec"><span>Avantage en nature</span><strong>Assiette sociale et fiscale</strong></div><div class="spec"><span>Impôt personnel</span><strong>Effet variable selon le foyer</strong></div><p class="fine">Ne pas supposer qu'une différence de valeur catalogue se traduit à l'identique sur le net à payer.</p></div><div class="callout"><h3>Exigeons une simulation individuelle avant le choix</h3><p>Pour comparer deux véhicules, demandez un calcul de paie cohérent sur la même période avec le <strong>net avant impôt</strong>, le <strong>net après prélèvement à la source</strong> et la méthode de calcul de l'<strong>avantage en nature</strong>.</p><p>La présentation de septembre 2026 illustre plusieurs scénarios à des taux d'imposition différents. Ils ne constituent pas un barème directement transposable à chaque salarié.</p></div></div></section>
 
 <section class="wrap" id="comparatif-v2">
-<div class="section-head"><div class="eyebrow">09 / Comparatif étendu <span class="version-pill">V5</span></div><h2>Les chiffres techniques, réunis au même endroit</h2><p class="intro">Le coût d'utilisation dépend autant du rendement et du poids que de la batterie. Ces valeurs sont celles des configurations étudiées en septembre 2026 ; elles ne garantissent pas les performances d'un véhicule livré ultérieurement.</p></div>
+<div class="section-head"><div class="eyebrow">09 / Comparatif étendu <span class="version-pill">V6</span></div><h2>Les chiffres techniques, réunis au même endroit</h2><p class="intro">Le coût d'utilisation dépend autant du rendement et du poids que de la batterie. Ces valeurs sont celles des configurations étudiées en septembre 2026 ; elles ne garantissent pas les performances d'un véhicule livré ultérieurement.</p></div>
 <div class="kpis"><div class="kpi"><div class="num">406 km</div><span>E-2008 : WLTP indiqué</span></div><div class="kpi"><div class="num">642 km</div><span>Scénic : WLTP maximal</span></div><div class="kpi"><div class="num">701 km</div><span>E-3008 : WLTP maximal</span></div><div class="kpi"><div class="num">318 kg</div><span>Scénic plus léger que E-3008</span></div></div>
 <div class="compare-wrap"><table class="detail-table"><thead><tr><th>Mesure</th><th>E-2008 Business</th><th>Scénic Techno GA</th><th>E-3008 Allure GA</th><th>E-3008 GT GA</th></tr></thead><tbody>
 <tr><td>Position</td><td>1</td><td>2</td><td>2</td><td>3</td></tr>
@@ -123,9 +150,9 @@
 <tr><td>Peugeot E-3008 GT</td><td class="numeric">6 680 €</td><td class="numeric">168,92 €</td></tr>
 </tbody></table></div>
 <div class="warnbox" style="margin-top:15px"><strong>Attention aux arrondis et à la méthode.</strong> Plusieurs pages présentent des valeurs légèrement différentes (par exemple 168,91/168,92 € pour l'AEN du GT) ; des bases intermédiaires 5 174 € et 134,58 € sont aussi utilisées dans les changements de position. Ce tableau est une photographie de la simulation reçue, pas une grille de paie certifiée ni un montant à prélever.</div>
-<div class="controlbox"><label for="taux-s3e">Afficher la simulation avec l'hypothèse fiscale :</label><select id="taux-s3e"><option value="11">11 %</option><option value="30">30 %</option></select><button type="button" id="print-s3e">Imprimer les tableaux</button><span class="app-note">L'hypothèse fiscale simulée n'est pas votre taux de prélèvement à la source.</span></div>
+<div class="controlbox"><label for="taux-s3e">Afficher la simulation avec l'hypothèse fiscale :</label><select id="taux-s3e"><option value="0">0 %</option><option value="11" selected>11 %</option><option value="30">30 %</option><option value="41">41 %</option><option value="45">45 %</option></select><button type="button" id="print-s3e">Imprimer les tableaux</button><span class="app-note">L'hypothèse fiscale simulée n'est pas votre taux de prélèvement à la source.</span></div>
 <div class="compare-wrap"><table id="s3e-table-paie"><thead><tr><th>Passage envisagé</th><th>Variation annuelle brute</th><th>Écart annuel AEN</th><th>Effet cotisations (hyp. 23 %)</th><th>Net annuel avant impôt</th><th>Effet fiscal simulé</th><th>Net annuel après hypothèse fiscale</th></tr></thead><tbody id="s3e-simu-body"></tbody></table></div>
-<p class="source-line">Tableaux historiques de comparaison du document de septembre 2026, pages 16 à 19. Montants en euros par an, sauf l'AEN mensuel du premier tableau. Les signes « + » et « − » traduisent un gain ou une perte dans la simulation, pas une prévision individualisée.</p>
+<p class="source-line" id="s3e-table-tax-note" aria-live="polite"></p><p class="source-line">Tableaux historiques de comparaison du document de septembre 2026, pages 16 à 19. Montants en euros par an, sauf l'AEN mensuel du premier tableau. Les signes « + » et « − » traduisent un gain ou une perte dans la simulation, pas une prévision individualisée.</p>
 <div class="mini-grid" style="margin-top:18px"><div class="card"><h3>Comment interpréter les lignes ?</h3><p>Le montant brut ne correspond pas au montant qui reste en fin de mois. Un changement de véhicule affecte à la fois la rémunération, l'avantage en nature et les cotisations. La situation fiscale personnelle joue ensuite sur le résultat.</p><p>Le support fait l'hypothèse d'un taux de charges sociales de <strong>23 %</strong>, qui ne saurait être appliqué indistinctement à tous les salariés.</p></div><div class="card"><h3>Quelle information demander à l'employeur ?</h3><p>Une simulation de paie signée ou validée, précisant le véhicule exact, la catégorie, la date d'effet, le brut, l'AEN, le net avant impôt et le net après prélèvement à la source.</p><p><strong>Le S3E défend une information compréhensible avant tout choix engageant.</strong></p></div></div>
 </section>
 
@@ -148,8 +175,16 @@
 <section class="wrap faq"><div class="section-head"><div class="eyebrow">08 / Questions fréquentes</div><h2>15 questions, 15 réponses précises</h2><p class="intro">Uniquement des réponses documentées sur les véhicules, leur usage et les chiffres de la comparaison de septembre 2026. Les sujets sans réponse établie ne figurent pas dans cette FAQ.</p></div><details><summary>Quels modèles figurent dans le catalogue présenté ?</summary><p>Quatre configurations électriques sont comparées : Peugeot E-2008 Business (position 1), Peugeot E-3008 Allure Grande Autonomie et Renault Scénic E-Tech Techno Grande Autonomie (position 2), puis Peugeot E-3008 GT Grande Autonomie (position 3).</p></details><details><summary>Quelle autonomie WLTP est annoncée pour chaque véhicule ?</summary><p>Le E-2008 est annoncé à environ 406 km, le Scénic Grande Autonomie à 642 km et les deux E-3008 Grande Autonomie à environ 701 km. Ces chiffres correspondent à des mesures normalisées WLTP, non à une autonomie garantie sur tous les trajets.</p></details><details><summary>Peut-on parcourir 701 km d'une traite sur autoroute avec un E-3008 ?</summary><p>Non, ce n'est pas l'autonomie autoroutière à retenir. La comparaison étudiée évoque plutôt 400 à 470 km à vitesse autoroutière pour les E-3008 Grande Autonomie, selon les conditions de circulation, la température et la vitesse.</p></details><details><summary>Quelle autonomie autoroutière est donnée pour le E-2008 et le Scénic ?</summary><p>Les ordres de grandeur recensés sont de 220 à 280 km pour le E-2008 et de 370 à 430 km pour le Scénic Grande Autonomie. Il s'agit d'estimations variables, pas de distances assurées.</p></details><details><summary>Quelle est la puissance des quatre configurations ?</summary><p>156 ch pour le E-2008 Business, 220 ch pour le Scénic Techno Grande Autonomie et 230 ch pour les E-3008 Allure et GT Grande Autonomie.</p></details><details><summary>Quel est le véhicule le plus léger ?</summary><p>Le Peugeot E-2008, avec un poids indiqué de 1 550 kg, devant le Renault Scénic à 1 848 kg et les Peugeot E-3008 à 2 166 kg. Le Scénic pèse donc environ 318 kg de moins que le E-3008.</p></details><details><summary>Qu'apporte la finition E-3008 GT par rapport à l'Allure ?</summary><p>Dans les configurations comparées, la GT ajoute notamment le régulateur adaptatif, les radars de stationnement avant, le hayon motorisé, des sièges et un volant chauffants ainsi que des projecteurs plus évolués. L'Allure ne comprend pas tous ces équipements.</p></details><details><summary>Quel véhicule dispose de la conduite à une pédale ?</summary><p>Le Renault Scénic E-Tech Techno Grande Autonomie est présenté avec une fonction « One Pedal » et plusieurs niveaux de récupération d'énergie. Les trois configurations Peugeot comparées n'intègrent pas cette fonction dans le tableau du dossier.</p></details><details><summary>Une borne 22 kW permet-elle toujours de recharger à 22 kW ?</summary><p>Non. Pour atteindre cette puissance en courant alternatif, il faut une installation compatible et un chargeur embarqué du véhicule acceptant 22 kW. Avec un chargeur de 11 kW, une borne affichée à 22 kW ne fera pas charger la voiture à 22 kW.</p></details><details><summary>Combien de temps faut-il pour recharger une grosse batterie à domicile ?</summary><p>Pour une batterie de l'ordre de 90 à 97 kWh, le document fournit ces ordres de grandeur pour une recharge complète : environ 40 à 50 heures sur une prise domestique à 2,3 kW, 27 à 31 heures sur une prise renforcée à 3,7 kW et 13 à 15 heures sur une wallbox à 7,4 kW. Les pertes électriques et les conditions réelles modifient ces durées.</p></details><details><summary>Une prise murale classique de 16 A est-elle une prise renforcée ?</summary><p>Non. Une prise renforcée nécessite un matériel prévu pour cet usage, un circuit et des protections appropriés. Le seul marquage « 16 A » d'une prise domestique ne suffit pas à garantir son aptitude à recharger régulièrement un véhicule.</p></details><details><summary>Quelle solution est mentionnée pour les familles de plus de trois enfants ?</summary><p>Le dossier présente une possibilité de dérogation vers le Citroën C3 Aircross Hybride Max à sept places. C'est une option mentionnée dans la grille de septembre 2026, et non une attribution automatique.</p></details><details><summary>Quelles dérogations sont mentionnées pour les grands rouleurs ?</summary><p>Pour les fonctions dépassant 35 000 km de déplacements professionnels par an, hors domicile-travail, la grille présente trois alternatives hybrides selon la position : Peugeot 2008 Hybride Business (position 1), Peugeot 308 SW Hybride Rechargeable Business (position 2) et Peugeot 3008 Hybride Rechargeable Allure Business (position 3).</p></details><details><summary>Quelles dates de disponibilité étaient indiquées dans le document ?</summary><p>Au 4 septembre 2026, le Peugeot E-2008 était affiché à partir d'octobre 2026 et les Peugeot E-3008 Grande Autonomie à partir d'avril 2027 sur Peugeot Pro Store. Ce sont les indications historiques du document, pas des dates de livraison garanties aujourd'hui.</p></details><details><summary>Quelles valeurs annuelles servent aux comparaisons financières de la grille ?</summary><p>Les tableaux étudiés utilisent notamment 3 570 € pour le E-2008, 4 804 € pour le Scénic et le E-3008 Allure, et 6 680 € pour le E-3008 GT. Ce sont des valeurs de référence des simulations de septembre 2026, à ne pas confondre avec une retenue identique sur chaque bulletin de paie.</p></details></section>
 <section class="wrap"><div class="card" style="border-left:5px solid var(--teal)"><h3>Pour approfondir avec le S3E</h3><p>Vous pouvez nous signaler les difficultés concrètes rencontrées : recharge à domicile, véhicule inadapté aux missions, délai de livraison, montant de l'avantage en nature ou manque d'information. Ces retours permettent de porter des demandes précises auprès de la direction.</p><p style="margin:0"><strong>Notre ligne : accompagner la transformation, sans laisser les contraintes individuelles de côté.</strong></p></div></section>
 <dialog class="s3e-modal" id="s3e-photo-dialog" aria-label="Visionneuse de photos de véhicules"><div class="s3e-modal-head"><strong class="s3e-modal-title">Photo véhicule</strong><button type="button" class="s3e-modal-close" aria-label="Fermer la photo">×</button></div><img class="s3e-modal-photo" alt=""><div class="s3e-modal-actions"><button type="button" class="s3e-ctl s3e-modal-prev" aria-label="Photo précédente">← Précédente</button><span class="s3e-modal-count"></span><button type="button" class="s3e-ctl s3e-modal-next" aria-label="Photo suivante">Suivante →</button></div><p class="s3e-modal-credit"></p></dialog>
+
+<section class="wrap" id="simulateur-personnalise">
+<div class="section-head"><div class="eyebrow">16 / Simulateur individuel · <span class="version-pill">V6</span></div><h2>Choisissez votre véhicule : quel impact sur votre budget ?</h2><p class="intro">Nous avons adapté ici le questionnaire du simulateur S3E précédent. Il examine votre situation actuelle, vos déplacements, la recharge et la fiscalité, puis compare plusieurs scénarios. <strong>Le premier choix est votre futur véhicule de fonction</strong>, ce qui renseigne automatiquement l'avantage en nature figurant dans notre dossier de comparaison.</p></div>
+<div class="v6-preset"><strong>Référentiel indicatif (septembre 2026) :</strong> E-2008 Business : AEN 85 €/mois ; Scénic Techno et E-3008 Allure : 114,42 €/mois ; E-3008 GT : 168,92 €/mois. Ces exemples de grille ne constituent pas une confirmation de la paie et ne tiennent pas compte de toutes les situations individuelles.</div>
+<div class="v6-shell" id="v6-app" aria-live="polite"></div>
+<p class="v6-muted" style="margin-top:14px">Les réponses sont traitées dans votre navigateur, sans envoi à un serveur. Les frais d'énergie, les cotisations et les coûts d'une voiture personnelle sont estimatifs. Le taux marginal 2026 est un outil d'estimation et ne remplace pas le calcul progressif de l'impôt. Références : <a href="https://www.service-public.gouv.fr/particuliers/vosdroits/F34328" target="_blank" rel="noopener noreferrer">barème fiscal 2026</a> et <a href="https://www.urssaf.fr/accueil/employeur/cotisations/avantages-en-nature.html" target="_blank" rel="noopener noreferrer">règles Urssaf des avantages en nature</a>.</p>
+</section>
+
 </main>
-<footer class="foot"><div class="wrap"><strong>S3E — Information salariés</strong><p>Guide éditorial indépendant établi à partir d'éléments de comparaison de véhicules et de documentation technique disponibles en septembre 2026. Il ne constitue ni un engagement contractuel de l'employeur, ni un conseil fiscal individualisé. Les données, conditions et versions sont à confirmer auprès des interlocuteurs compétents.</p><div>Dernière mise à jour éditoriale : 27 octobre 2026 · Version 5.0</div></div></footer>
+<footer class="foot"><div class="wrap"><strong>S3E — Information salariés</strong><p>Guide éditorial indépendant établi à partir d'éléments de comparaison de véhicules et de documentation technique disponibles en septembre 2026. Il ne constitue ni un engagement contractuel de l'employeur, ni un conseil fiscal individualisé. Les données, conditions et versions sont à confirmer auprès des interlocuteurs compétents.</p><div>Dernière mise à jour éditoriale : 27 octobre 2026 · Version 6.0</div></div></footer>
 <script>
 const content={local:['Trajets locaux : examiner d’abord le E-2008','Sa taille réduite facilite les manœuvres et les déplacements réguliers. Vérifiez toutefois l’autonomie disponible lors des journées les plus chargées et les possibilités de recharge.'],mixte:['Trajets variés : comparer en priorité le Scénic','La combinaison entre batterie, espace à bord et masse du véhicule peut répondre à un usage polyvalent. Essayez l’ergonomie et confirmez la configuration exacte.'],route:['Longue distance : regarder les E-3008 grande autonomie','La grande capacité de batterie peut faciliter les déplacements interrégionaux. Le poids, le temps de recharge réel et la disponibilité comptent tout autant que le chiffre WLTP.'],confort:['Confort : étudier les équipements du E-3008 GT','Cette finition ajoute des prestations utiles au quotidien. Vérifiez si ces améliorations justifient le coût personnel éventuel et comparez avec la dotation du Scénic.']};
 for(const b of document.querySelectorAll('.filter'))b.addEventListener('click',()=>{for(const x of document.querySelectorAll('.filter'))x.setAttribute('aria-pressed',String(x===b));const [title,body]=content[b.dataset.choice];document.querySelector('#recommend').innerHTML='<h3>'+title+'</h3><p>'+body+'</p>';});
@@ -163,7 +198,20 @@ const scenariosS3E=[
 ["Cadres A/B → E-3008 Allure / Scénic",-1234,357.84,-201.52,-1032.48,-67.46,-965.02,-323.30,-709.18]
 ];
 const formatS3E=x=>(x>0?'+':'')+new Intl.NumberFormat('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2}).format(x)+' €';
-function renderS3E(){const sel=document.getElementById('taux-s3e');const body=document.getElementById('s3e-simu-body');if(!sel||!body)return;const is30=sel.value==='30';body.innerHTML=scenariosS3E.map(row=>{const vals=[row[1],row[2],row[3],row[4],is30?row[7]:row[5],is30?row[8]:row[6]];return '<tr><td>'+row[0]+'</td>'+vals.map((v,i)=>'<td class="numeric '+(i===5?(v>=0?'delta-plus':'delta-minus'):'')+'">'+formatS3E(v)+'</td>').join('')+'</tr>';}).join('');}
+function renderS3E(){
+ const selector=document.getElementById('taux-s3e'),table=document.getElementById('s3e-simu-body');if(!selector||!table)return;
+ const t=Number(selector.value);
+ table.innerHTML=scenariosS3E.map(r=>{
+   // The source only supplies the 11 % and 30 % examples.
+   // 0 % uses no supplementary tax; 41 % and 45 % are explicit linear illustrations based on the 30 % source.
+   const tax=t===0?0:t===11?r[5]:t===30?r[7]:r[7]*t/30;
+   const after=t===11?r[6]:t===30?r[8]:r[4]-tax;
+   const values=[r[1],r[2],r[3],r[4],tax,after];
+   return '<tr><td>'+r[0]+'</td>'+values.map((v,i)=>'<td class="numeric '+(i===5?(v>=0?'delta-plus':'delta-minus'):'')+'">'+formatS3E(v)+'</td>').join('')+'</tr>';
+ }).join('');
+ const disclaimer=document.getElementById('s3e-table-tax-note');
+ if(disclaimer)disclaimer.textContent=(t===11||t===30?'Taux '+t+' % : chiffres issus des deux exemples du dossier de septembre 2026.':'Taux '+t+' % : résultat indicatif calculé pour la page (0 % sans effet fiscal complémentaire ; 41 % et 45 % extrapolés linéairement à partir de 30 %). Cette méthode simplifiée ne simule pas l’impôt progressif réel.');
+}
 document.getElementById('taux-s3e')?.addEventListener('change',renderS3E);
 document.getElementById('print-s3e')?.addEventListener('click',()=>window.print());
 renderS3E();
@@ -211,6 +259,138 @@ s3eDialog?.addEventListener('click',e=>{if(e.target===s3eDialog)s3eCloseModal()}
 document.addEventListener('keydown',e=>{if(!s3eActiveModalModel)return;if(e.key==='ArrowLeft'){e.preventDefault();s3eShiftGallery(s3eActiveModalModel,-1)}if(e.key==='ArrowRight'){e.preventDefault();s3eShiftGallery(s3eActiveModalModel,1)}});
 let s3eStartX=null;s3eDialog?.querySelector('.s3e-modal-photo')?.addEventListener('touchstart',e=>{s3eStartX=e.changedTouches[0].clientX},{passive:true});s3eDialog?.querySelector('.s3e-modal-photo')?.addEventListener('touchend',e=>{if(s3eStartX===null||!s3eActiveModalModel)return;const dist=e.changedTouches[0].clientX-s3eStartX;if(Math.abs(dist)>45)s3eShiftGallery(s3eActiveModalModel,dist<0?1:-1);s3eStartX=null},{passive:true});
 Object.keys(s3eGalleryData).forEach(s3eDrawGallery);
+
+
+/* Questionnaire adapté du simulateur S3E initial — V6. Aucun appel réseau ni sauvegarde automatique. */
+const v6Models={
+ e2008:{label:'Peugeot E-2008 Business',aen:85,conso:15.5,wltp:406,reference:3570},
+ scenic:{label:'Renault Scénic E-Tech Techno GA',aen:114.42,conso:16.7,wltp:642,reference:4804},
+ allure:{label:'Peugeot E-3008 Allure Grande Autonomie',aen:114.42,conso:17.8,wltp:701,reference:4804},
+ gt:{label:'Peugeot E-3008 GT Grande Autonomie',aen:168.92,conso:17.8,wltp:701,reference:6680}
+};
+const v6Questions=[
+ {id:'vehicle',title:'Quel véhicule de fonction électrique choisissez-vous ?',kind:'choice',options:Object.entries(v6Models).map(([value,o])=>({value,label:o.label})),hint:'La sélection charge automatiquement l’AEN mensuel indicatif et la consommation WLTP du modèle.'},
+ {id:'motor',title:'Quelle est la motorisation de votre véhicule de fonction actuel ?',kind:'choice',options:['Diesel','Essence','Hybride','Électrique'],hint:'Votre situation actuelle sert de point de comparaison.'},
+ {id:'aenCurrent',title:'Quel est votre avantage en nature (AEN) mensuel actuel ?',kind:'number',unit:'€ / mois',def:100,min:0,max:10000,step:.01,hint:'Recopiez le montant AEN figurant sur votre bulletin de paie. Le montant n’est pas une dépense directe.'},
+ {id:'distance',title:'Quelle est la distance aller entre votre domicile et votre lieu de travail ?',kind:'number',unit:'km',def:20,min:0,max:350,step:1},
+ {id:'days',title:'Combien de jours par semaine utilisez-vous la voiture pour vous rendre au travail ?',kind:'number',unit:'jours',def:3,min:0,max:7,step:.5},
+ {id:'privateKm',title:'Combien de kilomètres privés parcourez-vous chaque année ?',kind:'number',unit:'km / an',def:7500,min:0,max:80000,step:500,hint:'Hors trajets domicile–travail et missions professionnelles.'},
+ {id:'proKm',title:'Combien de kilomètres parcourez-vous annuellement en missions professionnelles ?',kind:'number',unit:'km / an',def:10000,min:0,max:100000,step:500,hint:'Ces kilomètres sont indiqués pour décrire le profil mais supposés pris en charge par l’employeur dans les scénarios.'},
+ {id:'oldCommute',title:'Qui paie actuellement l’énergie de vos trajets domicile–travail ?',kind:'choice',options:[{value:'0',label:'Entreprise à 100 %'},{value:'.5',label:'Partagée à 50 %'},{value:'1',label:'Personnellement à 100 %'}]},
+ {id:'oldPrivate',title:'Qui paie actuellement l’énergie de vos trajets privés ?',kind:'choice',options:[{value:'0',label:'Entreprise à 100 %'},{value:'.5',label:'Partagée à 50 %'},{value:'1',label:'Personnellement à 100 %'}]},
+ {id:'oldPrice',title:'Quel prix unitaire estimez-vous pour l’énergie de votre véhicule actuel ?',kind:'number',unit:'€/L (thermique) ou €/kWh (électrique)',def:1.75,min:0,max:5,step:.01,hint:'Exemples de démonstration : diesel 1,75 €/L, essence 1,85 €/L ; électricité 0,25 €/kWh. Modifiez selon votre situation.'},
+ {id:'home',title:'Pouvez-vous recharger votre futur véhicule à domicile ?',kind:'choice',options:[{value:'installed',label:'Oui, l’installation existe'},{value:'needs',label:'Oui, avec installation à prévoir'},{value:'impossible',label:'Non, pas de recharge à domicile'}]},
+ {id:'homeShare',title:'Quelle part de vos recharges futures pensez-vous effectuer chez vous ?',kind:'number',unit:'%',def:60,min:0,max:100,step:5,when:a=>a.home!=='impossible'},
+ {id:'homePrice',title:'Quel est votre tarif domestique d’électricité ?',kind:'number',unit:'€/kWh',def:.25,min:0,max:2,step:.01,when:a=>a.home!=='impossible'&&(Number(a.homeShare??60)>0)},
+ {id:'publicPaid',title:'Quelle part de vos recharges hors domicile restera personnellement à votre charge ?',kind:'number',unit:'%',def:50,min:0,max:100,step:5,hint:'Pourcentage de l’énergie chargée hors domicile non remboursée par l’employeur.'},
+ {id:'publicPrice',title:'Quel prix pratiquez-vous sur les bornes publiques payées personnellement ?',kind:'number',unit:'€/kWh',def:.5,min:0,max:3,step:.01,when:a=>Number(a.publicPaid??50)>0},
+ {id:'install',title:'Quel coût d’installation de recharge resterait à votre charge ?',kind:'number',unit:'€ (une fois)',def:1000,min:0,max:20000,step:50,when:a=>a.home==='needs',hint:'Saisissez le reste à payer après une éventuelle aide, sans inventer une prise en charge.'},
+ {id:'tmi',title:'Quelle est votre tranche marginale d’imposition ?',kind:'choice',options:[{value:'0',label:'0 %'},{value:'11',label:'11 %'},{value:'30',label:'30 %'},{value:'41',label:'41 %'},{value:'45',label:'45 %'}],hint:'La TMI n’est ni le taux moyen d’impôt ni le taux de prélèvement à la source.'},
+ {id:'social',title:'Quel taux approximatif de cotisations salariales retenir pour l’effet AEN ?',kind:'number',unit:'%',def:23,min:0,max:50,step:.5,hint:'Hypothèse simplifiée, à vérifier avec le service paie.'},
+ {id:'contribution',title:'Quelle contribution brute annuelle supplémentaire serait effectivement prélevée pour ce choix ?',kind:'number',unit:'€ / an',def:0,min:0,max:50000,step:50,hint:'Laissez 0 si aucune contribution supplémentaire n’est prévue. Les valeurs annuelles de référence du catalogue ne constituent pas automatiquement une retenue salariale.'},
+ {id:'personal',title:'Souhaitez-vous comparer aussi avec l’achat d’un véhicule personnel ?',kind:'choice',options:[{value:'non',label:'Non, comparer uniquement les deux véhicules de fonction'},{value:'oui',label:'Oui, étudier le scénario sans véhicule de fonction'}]},
+ {id:'persMotor',title:'Quelle motorisation choisiriez-vous pour votre propre voiture ?',kind:'choice',options:['Diesel','Essence','Hybride','Électrique'],when:a=>a.personal==='oui'},
+ {id:'purchase',title:'Quel prix d’achat prévoiriez-vous pour votre voiture personnelle ?',kind:'number',unit:'€',def:25000,min:0,max:200000,step:500,when:a=>a.personal==='oui'},
+ {id:'years',title:'Pendant combien d’années la conserveriez-vous ?',kind:'number',unit:'années',def:6,min:1,max:25,step:1,when:a=>a.personal==='oui'},
+ {id:'resale',title:'À combien estimez-vous sa revente en fin de période ?',kind:'number',unit:'€',def:10000,min:0,max:200000,step:500,when:a=>a.personal==='oui'},
+ {id:'insurance',title:'Combien paieriez-vous d’assurance par an ?',kind:'number',unit:'€ / an',def:700,min:0,max:20000,step:50,when:a=>a.personal==='oui'},
+ {id:'maintenance',title:'Combien paieriez-vous d’entretien par an ?',kind:'number',unit:'€ / an',def:800,min:0,max:20000,step:50,when:a=>a.personal==='oui'},
+ {id:'compensation',title:'Quelle compensation mensuelle brute confirmée serait versée en cas de restitution ?',kind:'number',unit:'€ / mois',def:0,min:0,max:3000,step:25,when:a=>a.personal==='oui',hint:'Ne saisissez un montant que s’il est prévu pour votre situation ; sinon 0.'}
+];
+let v6Answers={},v6Step=0,v6Screen='welcome',v6Last=null;
+const v6App=document.getElementById('v6-app');
+const v6Euro=x=>new Intl.NumberFormat('fr-FR',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(x);
+const v6Num=(id,def=0)=>Number(v6Answers[id]??def);
+const v6Active=()=>v6Questions.filter(q=>!q.when||q.when(v6Answers));
+const v6Esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function v6Draw(){
+ if(!v6App)return;
+ if(v6Screen==='welcome'){
+  v6App.innerHTML='<h3>Simulation S3E : votre véhicule, votre pouvoir d’achat</h3><p>Un parcours progressif inspiré du questionnaire S3E : situation actuelle, véhicule choisi, déplacements, recharge, fiscalité et, si souhaité, voiture personnelle.</p><div class="v6-alert">AEN issus de valeurs indicatives de septembre 2026 ; autres prix et coûts sont des hypothèses à personnaliser. Résultat non contractuel, non certifié par la paie.</div><div class="v6-buttons"><button type="button" data-v6-action="start">Commencer le questionnaire</button></div>';
+ }else if(v6Screen==='questions'){
+  const list=v6Active();v6Step=Math.max(0,Math.min(v6Step,list.length-1));const q=list[v6Step];
+  const vehicle=v6Models[v6Answers.vehicle];
+  let html='<p class="v6-muted">Question '+(v6Step+1)+' sur '+list.length+'</p><div class="v6-progress"><div style="width:'+Math.round(100*(v6Step+1)/list.length)+'%"></div></div>';
+  if(vehicle)html+='<div class="v6-preset"><strong>'+v6Esc(vehicle.label)+'</strong> · AEN indicatif '+v6Euro(vehicle.aen)+'/mois · '+vehicle.wltp+' km WLTP · '+vehicle.conso+' kWh/100 km. Valeur annuelle de référence : '+v6Euro(vehicle.reference)+' (non automatiquement prélevée).</div>';
+  html+='<h3>'+v6Esc(q.title)+'</h3>';
+  if(q.hint)html+='<p class="v6-muted">'+v6Esc(q.hint)+'</p>';
+  if(q.kind==='choice')html+='<div class="v6-options">'+q.options.map(opt=>{const x=typeof opt==='string'?{value:opt,label:opt}:opt;return '<label><input type="radio" name="v6-answer" value="'+v6Esc(x.value)+'" '+(String(v6Answers[q.id])===String(x.value)?'checked':'')+'>'+v6Esc(x.label)+'</label>';}).join('')+'</div>';
+  else html+='<div class="v6-fields"><label for="v6-number">'+v6Esc(q.unit||'Valeur')+'<input id="v6-number" inputmode="decimal" type="number" min="'+q.min+'" max="'+q.max+'" step="'+q.step+'" value="'+v6Esc(v6Answers[q.id]??q.def??'')+'"></label></div>';
+  html+='<div class="v6-buttons"><button type="button" class="secondary" data-v6-action="prev" '+(v6Step===0?'disabled':'')+'>Précédent</button><button type="button" data-v6-action="next">'+(v6Step===list.length-1?'Calculer mes scénarios':'Question suivante')+'</button></div>';
+  v6App.innerHTML=html;
+ }else if(v6Screen==='results'){v6RenderResults();}
+}
+function v6Start(){v6Answers={tmi:document.getElementById('taux-s3e')?.value||'11'};v6Step=0;v6Screen='questions';v6Draw();}
+function v6Move(delta){
+ if(delta<0){v6Step=Math.max(0,v6Step-1);v6Draw();return;}
+ const list=v6Active(),q=list[v6Step];let answer;
+ if(q.kind==='choice'){answer=v6App.querySelector('input[name="v6-answer"]:checked')?.value;if(answer===undefined){alert('Choisissez une réponse.');return;}}
+ else {const field=document.getElementById('v6-number');if(!field||field.value.trim()===''){alert('Indiquez un montant ou une quantité.');return;}answer=Number(field.value);if(!Number.isFinite(answer)||answer<q.min||answer>q.max){alert('Valeur hors de la plage autorisée.');return;}}
+ v6Answers[q.id]=answer;
+ if(q.id==='vehicle')delete v6Answers.contribution;
+ if(q.id==='home'&&answer==='impossible'){v6Answers.homeShare=0;}
+ if(q.id==='personal'&&answer==='non'){delete v6Answers.persMotor;}
+ if(v6Step>=v6Active().length-1){v6Screen='results';v6Draw();}else{v6Step++;v6Draw();}
+}
+function v6Compute(){
+ const a=v6Answers,m=v6Models[a.vehicle];if(!m)throw Error('Véhicule absent.');
+ const commute=2*v6Num('distance',20)*v6Num('days',3)*46,priv=v6Num('privateKm',7500),annualKm=commute+priv;
+ const tmi=v6Num('tmi',11)/100,social=v6Num('social',23)/100,deductible=.7;
+ const costAen=month=>month*12*(social+tmi*(1-social*deductible));
+ const fuel={Diesel:6,Essence:7,Hybride:5,'Électrique':20};
+ const oldMotor=a.motor||'Diesel',oldConso=fuel[oldMotor]||6;
+ const oldPrice=v6Num('oldPrice',1.75);
+ const oldCommute=commute*oldConso/100*oldPrice*v6Num('oldCommute',1);
+ const oldPrivate=priv*oldConso/100*oldPrice*v6Num('oldPrivate',1);
+ const oldAen=costAen(v6Num('aenCurrent',100));
+ const old={title:'Véhicule de fonction actuel',aen:oldAen,energy:oldCommute+oldPrivate,installation:0,contribution:0,ownership:0,compensation:0};
+ const home=a.home==='impossible'?0:v6Num('homeShare',60)/100;
+ const homePrice=v6Num('homePrice',.25),paid=v6Num('publicPaid',50)/100,pubPrice=v6Num('publicPrice',.5);
+ const futureEnergy=annualKm*m.conso/100*(home*homePrice+(1-home)*paid*pubPrice);
+ const inst=a.home==='needs'?v6Num('install',1000)/6:0;
+ const contributionGross=v6Num('contribution',0);
+ const contributionNet=contributionGross*(1-social)*(1-tmi*(1-social*deductible));
+ const future={title:'Futur véhicule : '+m.label,aen:costAen(m.aen),energy:futureEnergy,installation:inst,contribution:contributionNet,ownership:0,compensation:0};
+ const scenarios=[old,future];
+ if(a.personal==='oui'){
+  const pm=a.persMotor||'Essence',c=fuel[pm]||7,price=pm==='Électrique'?homePrice:pm==='Diesel'?1.75:1.85;
+  const owning=Math.max(0,v6Num('purchase',25000)-v6Num('resale',10000))/Math.max(1,v6Num('years',6))+v6Num('insurance',700)+v6Num('maintenance',800);
+  const energy=annualKm*c/100*price;
+  const compGross=v6Num('compensation',0)*12;
+  const compNet=compGross*(1-social)*(1-tmi*(1-social*deductible));
+  scenarios.push({title:'Voiture personnelle',aen:0,energy,installation:0,contribution:0,ownership:owning,compensation:-compNet});
+ }
+ for(const sc of scenarios)sc.total=sc.aen+sc.energy+sc.installation+sc.contribution+sc.ownership+sc.compensation;
+ return {scenarios,annualKm,commute,priv,model:m,proKm:v6Num('proKm',10000),tmi};
+}
+function v6RenderResults(){
+ let result;try{result=v6Compute();}catch(err){v6App.innerHTML='<p class="v6-alert">'+v6Esc(err.message)+'</p>';return;}v6Last=result;
+ const base=result.scenarios[0].total;
+ let html='<h3>Votre estimation de coût annuel</h3><p class="v6-muted">Pour '+new Intl.NumberFormat('fr-FR').format(result.annualKm)+' km/an de trajets privés et domicile–travail. Les '+new Intl.NumberFormat('fr-FR').format(result.proKm)+' km de missions sont supposés pris en charge par l’employeur. L’effet de l’AEN représente un supplément estimé de cotisations et d’impôt, pas le montant AEN versé en numéraire.</p>';
+ html+='<div class="v6-results">'+result.scenarios.map((x,i)=>'<div class="v6-result"><small>'+v6Esc(x.title)+'</small><strong>'+v6Euro(x.total/12)+'/mois</strong><span>'+v6Euro(x.total)+'/an</span><div class="v6-delta">'+(i===0?'Référence actuelle':(base-x.total>=0?'+':'')+v6Euro((base-x.total)/12)+'/mois vs actuel')+'</div></div>').join('')+'</div>';
+ const rows=[['Effet social/fiscal estimé de l’AEN','aen'],['Énergie à votre charge','energy'],['Installation annualisée','installation'],['Contribution de rémunération renseignée','contribution'],['Achat, assurance, entretien annualisés','ownership'],['Compensation nette estimée (déduite)','compensation'],['TOTAL ANNUEL','total']];
+ html+='<h3 style="margin-top:26px">Détail du calcul par scénario</h3><div class="v6-breakdown"><table><thead><tr><th>Poste annuel</th>'+result.scenarios.map(x=>'<th>'+v6Esc(x.title)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(([label,key])=>'<tr><td>'+label+'</td>'+result.scenarios.map(x=>'<td>'+v6Euro(x[key])+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';
+ html+='<div class="v6-alert"><strong>Limites à connaître :</strong> les AEN de '+v6Euro(result.model.aen)+'/mois sont issus de la comparaison de septembre 2026, sans validation individualisée. La taxation est estimée au taux marginal '+Math.round(result.tmi*100)+' % (et non selon les tranches progressives), les cotisations et frais sont simplifiés, les consommations WLTP peuvent différer de la réalité. La valeur annuelle de référence '+v6Euro(result.model.reference)+' n’est pas assimilée à une retenue salariale. Le montant de contribution additionnelle est celui que vous avez personnellement renseigné.</div>';
+ html+='<div class="v6-buttons"><button type="button" class="secondary" data-v6-action="edit">Modifier mes réponses</button><button type="button" class="secondary" data-v6-action="reset">Nouvelle simulation</button><button type="button" data-v6-action="print">Imprimer la page</button><button type="button" data-v6-action="csv">Exporter CSV</button></div>';
+ v6App.innerHTML=html;
+}
+function v6ExportCSV(){
+ if(!v6Last)return;const col=v6Last.scenarios,rows=[['Poste',...col.map(x=>x.title)],...['aen','energy','installation','contribution','ownership','compensation','total'].map(k=>[k,...col.map(x=>x[k].toFixed(2))])];
+ const csv='\uFEFF'+rows.map(row=>row.map(s=>'"'+String(s).replaceAll('"','""')+'"').join(';')).join('\r\n');
+ const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='s3e-comparaison-vehicule-v6.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+v6App?.addEventListener('click',event=>{
+ const btn=event.target.closest('[data-v6-action]');if(!btn)return;
+ const action=btn.dataset.v6Action;
+ if(action==='start')v6Start();
+ else if(action==='next')v6Move(1);
+ else if(action==='prev')v6Move(-1);
+ else if(action==='edit'){v6Screen='questions';v6Step=0;v6Draw();}
+ else if(action==='reset'){v6Screen='welcome';v6Answers={};v6Draw();}
+ else if(action==='print')window.print();
+ else if(action==='csv')v6ExportCSV();
+});
+v6Draw();
 
 </script>
 </body></html>
